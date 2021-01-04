@@ -71,7 +71,6 @@ def generateNoneOverlapCIDR(ip=None, num=4, prefixlen=16):
     }
 
 Tmp = generateNoneOverlapCIDR(ip='7.2.3.3/1', prefixlen=16)
-print (Tmp)
 if Tmp['ret_code'] == 0:
     for item in Tmp['result']:
         print (netaddr.IPNetwork(item).ip.bits())
