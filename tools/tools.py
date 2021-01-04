@@ -10,9 +10,9 @@ def generateNoneOverlapCIDR(ip=None, num=4, prefixlen=16):
             TmpRandomInt = random.randint(TmpStart, TmpStop)
             TmpRandomCIDRStr = str(netaddr.IPAddress(TmpRandomInt)) + '/'+ str(TmpFinalPrefixLen)
             TmpRandomIPObj = netaddr.IPNetwork(TmpRandomCIDRStr).ip
-            if TmpRandomIPObj.is_unicast() or TmpRandomIPObj.is_multicast() or TmpRandomIPObj.is_reserved()\
+            if TmpRandomIPObj.is_multicast() or TmpRandomIPObj.is_reserved()\
                     or TmpRandomIPObj.is_netmask() or TmpRandomIPObj.is_hostmask() or TmpRandomIPObj.is_loopback():
-                print ('bad ip CIDR')
+                print ('bad: '+str(TmpRandomIPObj))
                 continue
 
 
@@ -56,5 +56,10 @@ def generateNoneOverlapCIDR(ip=None, num=4, prefixlen=16):
 
 
     print ("Final result: "+str(TmpCIDRList))
+    return {
+        "ret_code":0,
+        "result": TmpCIDRList
+    }
 
-generateNoneOverlapCIDR(ip='7.2.3.3/8')
+for item in generateNoneOverlapCIDR(ip='7.2.3.3/24')['result']:
+    print (netaddr.IPNetwork(item).ip.bits())
