@@ -15,9 +15,7 @@ def generateNoneOverlapCIDR(ip=None, num=4, prefixlen=16):
                 print ('bad: '+str(TmpRandomIPObj))
                 continue
 
-
             TmpCIDRList.append(TmpRandomCIDRStr)
-
 
             print (TmpCIDRList)
             RetCode = subprocess.call("ipconflict %s "%(' '.join(TmpCIDRList)), shell=True)
