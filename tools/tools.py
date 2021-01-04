@@ -24,6 +24,7 @@ def generateNoneOverlapCIDR(ip=None, num=4, prefixlen=16):
             elif str(RetCode) != '1':
                 TmpCIDRList.pop()
 
+    prefixlen = min(32, prefixlen)
     TmpCIDRList=[]
     try:
         TmpNetworkObj = netaddr.IPNetwork(ip)
@@ -37,6 +38,11 @@ def generateNoneOverlapCIDR(ip=None, num=4, prefixlen=16):
 
     TmpPrefixLen = TmpNetworkObj.prefixlen
 #    TmpFinalPrefixLen = TmpPrefixLen if TmpPrefixLen <= prefixlen else prefixlen
+    if ((2**prefixlen) - 1 ) < num+1:
+        return {
+            "ret_code":1,
+            "result": "No enougth CIDRs"
+        }
     TmpFinalPrefixLen = prefixlen
 
     ###  网络位够用，使用网络部分生成CIDR ###
@@ -64,5 +70,8 @@ def generateNoneOverlapCIDR(ip=None, num=4, prefixlen=16):
         "result": TmpCIDRList
     }
 
-for item in generateNoneOverlapCIDR(ip='7.2.3.3/8', prefixlen=24)['result']:
-    print (netaddr.IPNetwork(item).ip.bits())
+Tmp = generateNoneOverlapCIDR(ip='7.2.3.3/1', prefixlen=16)
+print (Tmp)
+if Tmp['ret_code'] == 0:
+    for item in Tmp['result']:
+        print (netaddr.IPNetwork(item).ip.bits())
