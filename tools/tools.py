@@ -36,14 +36,19 @@ def generateNoneOverlapCIDR(ip=None, num=4, prefixlen=16):
         }
 
     TmpPrefixLen = TmpNetworkObj.prefixlen
-    TmpFinalPrefixLen = TmpPrefixLen if TmpPrefixLen <= prefixlen else TmpPrefixLen
+#    TmpFinalPrefixLen = TmpPrefixLen if TmpPrefixLen <= prefixlen else prefixlen
+    TmpFinalPrefixLen = prefixlen
 
+    ###  网络位够用，使用网络部分生成CIDR ###
     if num < 2**TmpPrefixLen:
-        TmpStart, TmpStop = (TmpNetworkObj[-1].value, 4294967296)
+        TmpStart, TmpStop = (TmpNetworkObj[-1].value, 4294967296-1)   ### 4294967296 = 2^32
 
         __generator(TmpStart, TmpStop)
+    ####  网络位不够用,使用主机位生成CIDR ##
     else:
         TmpBinStr = TmpNetworkObj.ip.bin[2:]
+
+        ###  异或网络位###
         TmpPrefixBin = bin(int(TmpBinStr[:TmpPrefixLen], 2) ^ int('1'*TmpPrefixLen, 2))[2:]
         TmpSuffixBin = '0'*(32 - TmpPrefixLen)
 
@@ -59,5 +64,5 @@ def generateNoneOverlapCIDR(ip=None, num=4, prefixlen=16):
         "result": TmpCIDRList
     }
 
-for item in generateNoneOverlapCIDR(ip='7.2.3.3/24')['result']:
+for item in generateNoneOverlapCIDR(ip='7.2.3.3/8', prefixlen=24)['result']:
     print (netaddr.IPNetwork(item).ip.bits())
