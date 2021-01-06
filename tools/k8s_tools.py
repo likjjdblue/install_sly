@@ -9,6 +9,9 @@ class K8SClient(object):
         config.load_kube_config()
         self.K8SAppsV1Client = client.AppsV1Api()
         self.K8SCoreV1Client = client.CoreV1Api()
+        self.K8SStorageV1Client = client.StorageV1Api()
+        self.K8SRbacAuthorizationV1Client = client.RbacAuthorizationV1Api()
+
 
 
     def getNamespacedDeployment(self, deployment=None, namespace='default'):
@@ -307,9 +310,9 @@ class K8SClient(object):
             }
 
     def deleteNamespacedReplicationControler(self, replicationcontroler='', namespace='default'):
-        TmpSecret = self.getNamespacedReplicationControler(replicationcontroler=replicationcontroler,
+        TmpReplicationControler = self.getNamespacedReplicationControler(replicationcontroler=replicationcontroler,
                                                            namespace=namespace)
-        if TmpSecret['ret_code'] != 0:
+        if TmpReplicationControler['ret_code'] != 0:
             return {
                 "ret_code": 0,
                 'result': 'ReplicationControler object deleted'
@@ -320,6 +323,156 @@ class K8SClient(object):
             "ret_code": 0,
             'result': 'ReplicationControler object deleted'
         }
+
+    def getStorageClass(self, storageclass):
+        try:
+            TmpResponse = self.K8SStorageV1Client.read_storage_class(name=storageclass)
+            return {
+                "ret_code": 0,
+                'result': TmpResponse
+            }
+        except Exception as e:
+            print (str(e))
+            return {
+                "ret_code":1,
+                'result': 'StorageClass %s  not exists'%(storageclass,)
+            }
+
+    def deleteStorageClass(self, storageclass):
+        TmpStorageClass = self.getStorageClass(storageclass=storageclass)
+        if TmpStorageClass['ret_code'] != 0:
+            return {
+                "ret_code": 0,
+                'result': 'StorageClass object deleted'
+            }
+
+        self.K8SStorageV1Client.delete_storage_class(name=storageclass)
+        return {
+            "ret_code": 0,
+            'result': 'StorageClass object deleted'
+        }
+
+    def getNamespacedServiceAccount(self, serviceaccount='', namespace='default'):
+        try:
+            TmpResponse = self.K8SCoreV1Client.read_namespaced_service_account(name=serviceaccount,
+                                                                               namespace=namespace)
+            return {
+                "ret_code": 0,
+                'result': TmpResponse
+            }
+        except Exception as e:
+            print (str(e))
+            return {
+                "ret_code":1,
+                'result': 'namespace %s or ServiceAccount %s  not exists'%(namespace, serviceaccount)
+            }
+
+    def deleteNamespacedServiceAccount(self, serviceaccount, namespace='default'):
+        TmpServiceAccount = self.getNamespacedServiceAccount(serviceaccount=serviceaccount, namespace=namespace)
+        if TmpServiceAccount['ret_code'] != 0:
+            return {
+                "ret_code": 0,
+                'result': 'ServiceAccount object deleted'
+            }
+
+        self.K8SCoreV1Client.delete_namespaced_service_account(name=serviceaccount, namespace=namespace)
+        return {
+            "ret_code": 0,
+            'result': 'ServiceAccount object deleted'
+        }
+
+
+    def getClusterRole(self, clusterrole=''):
+        try:
+            TmpResponse = self.K8SRbacAuthorizationV1Client.read_cluster_role(name=clusterrole)
+            return {
+                "ret_code": 0,
+                'result': TmpResponse
+            }
+        except Exception as e:
+            print (str(e))
+            return {
+                "ret_code":1,
+                'result': 'CLusterRole %s  not exists'%(clusterrole,)
+            }
+
+    def deleteClusterRole(self, clusterrole=''):
+        TmpClusterRole = self.getClusterRole(clusterrole=clusterrole)
+        if TmpClusterRole['ret_code'] != 0:
+            return {
+                "ret_code": 0,
+                'result': 'ClusterRole object deleted'
+            }
+
+        self.K8SRbacAuthorizationV1Client.delete_cluster_role(name=clusterrole)
+        return {
+            "ret_code": 0,
+            'result': 'ClusterRole object deleted'
+        }
+
+
+
+    def getClusterRoleBinding(self, clusterrolebinding=''):
+        try:
+            TmpResponse = self.K8SRbacAuthorizationV1Client.read_cluster_role_binding(name=clusterrolebinding)
+            return {
+                "ret_code": 0,
+                'result': TmpResponse
+            }
+        except Exception as e:
+            print (str(e))
+            return {
+                "ret_code":1,
+                'result': 'CLusterRoleBinding %s  not exists'%(clusterrolebinding,)
+            }
+
+    def deleteClusterRoleBinding(self, clusterrolebinding=''):
+        TmpClusterRoleBinding = self.getClusterRoleBinding(clusterrolebinding=clusterrolebinding)
+        if TmpClusterRoleBinding['ret_code'] != 0:
+            return {
+                "ret_code": 0,
+                'result': 'ClusterRoleBinding object deleted'
+            }
+
+        self.K8SRbacAuthorizationV1Client.delete_cluster_role_binding(name=clusterrolebinding)
+        return {
+            "ret_code": 0,
+            'result': 'ClusterRoleBinding object deleted'
+        }
+
+
+
+    def getNamespacedRole(self, role='', namespace='default'):
+        try:
+            TmpResponse = self.K8SRbacAuthorizationV1Client.read_namespaced_role(name=role, namespace=namespace)
+            return {
+                "ret_code": 0,
+                'result': TmpResponse
+            }
+        except Exception as e:
+            print (str(e))
+            return {
+                "ret_code":1,
+                'result': 'namespace %s or Role %s  not exists'%(namespace, role)
+            }
+
+    def deleteNamespacedRole(self, role, namespace='default'):
+        TmpRole = self.getNamespacedRole(role=role, namespace=namespace)
+        if TmpRole['ret_code'] != 0:
+            return {
+                "ret_code": 0,
+                'result': 'Role object deleted'
+            }
+
+        self.K8SRbacAuthorizationV1Client.delete_namespaced_role(name=role, namespace=namespace)
+        return {
+            "ret_code": 0,
+            'result': 'Role object deleted'
+        }
+
+
+
+
 
 
 TmpObj = K8SClient()
@@ -342,3 +495,13 @@ TmpObj = K8SClient()
 #print (TmpObj.deleteNamespacedStateFulSet('nacos', 'wakaka'))
 #print (TmpObj.getNamespacedReplicationControler('mysql-nacos', 'wakaka'))
 #print (TmpObj.deleteNamespacedReplicationControler('mysql-nacos', 'wakaka'))
+#print (TmpObj.getStorageClass('managed-nfs-storage-foo'))
+#print (TmpObj.deleteStorageClass('managed-nfs-storage-foo'))
+#print (TmpObj.getNamespacedServiceAccount('nfs-client-provisioner', 'wakaka'))
+#print (TmpObj.deleteNamespacedServiceAccount('nfs-client-provisioner', 'wakaka'))
+#print (TmpObj.getClusterRole('nfs-client-provisioner-runner-wbd'))
+#print (TmpObj.deleteClusterRole('nfs-client-provisioner-runner-wbd'))
+#print (TmpObj.getClusterRoleBinding('run-nfs-client-provisioner-wbd'))
+#print (TmpObj.deleteClusterRoleBinding('run-nfs-client-provisioner-wbd'))
+#print (TmpObj.getNamespacedRole('leader-locking-nfs-client-provisioner', 'wakaka'))
+#print (TmpObj.deleteNamespacedRole('leader-locking-nfs-client-provisioner', 'wakaka'))
