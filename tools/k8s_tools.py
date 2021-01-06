@@ -3,6 +3,8 @@
 
 from kubernetes import client, config
 import os, yaml
+from kubernetes.stream import stream
+
 
 class K8SClient(object):
     def __init__(self):
@@ -470,6 +472,68 @@ class K8SClient(object):
             'result': 'Role object deleted'
         }
 
+    def getNamespacedPod(self, pod='', namespace='default'):
+        try:
+            TmpResponse = self.K8SCoreV1Client.read_namespaced_pod(name=pod,namespace=namespace)
+            return {
+                "ret_code": 0,
+                'result': TmpResponse
+            }
+        except Exception as e:
+            print (str(e))
+            return {
+                "ret_code":1,
+                'result': 'namespace %s or Pod %s  not exists'%(namespace, pod)
+            }
+
+    def deleteNamespacedPod(self, pod, namespace='default'):
+        TmpPod = self.getNamespacedPod(pod=pod, namespace=namespace)
+        if TmpPod['ret_code'] != 0:
+            return {
+                "ret_code": 0,
+                'result': 'Pod object deleted'
+            }
+
+        self.K8SRbacAuthorizationV1Client.delete_namespaced_pod(name=pod, namespace=namespace)
+        return {
+            "ret_code": 0,
+            'result': 'Pod object deleted'
+        }
+
+    def filterNamespacedPod(self, filters={}, namespace='default'):
+        TmpFilterList = [str(key)+'='+str(value) for key, value in filters.iteritems()]
+        TmpFilterStr = ','.join(TmpFilterList)
+        try:
+            TmpResponse = self.K8SCoreV1Client.list_namespaced_pod(namespace=namespace, label_selector=TmpFilterStr)
+            return {
+                'ret_code': 0,
+                'result': TmpResponse
+            }
+        except Exception as e:
+            print (str(e))
+            return {
+                "ret_code": 0,
+                'result': TmpResponse.items
+            }
+
+    def execNamespacedPod(self, pod='',namespace='default',cmd=''):
+        try:
+            TmpCmdList=cmd.split()
+            TmpResponse = stream(self.K8SCoreV1Client.connect_get_namespaced_pod_exec,
+                                 name=pod, namespace=namespace, command=TmpCmdList, stderr=True, stdin=False,
+                                 stdout=True, tty=True)
+            return {
+                "ret_code": 0,
+                'result': TmpResponse
+            }
+
+        except Exception as e:
+            print (str(e))
+            return {
+                "ret_code": 0,
+                'result': str(e)
+            }
+
 
 
 
@@ -505,3 +569,6 @@ TmpObj = K8SClient()
 #print (TmpObj.deleteClusterRoleBinding('run-nfs-client-provisioner-wbd'))
 #print (TmpObj.getNamespacedRole('leader-locking-nfs-client-provisioner', 'wakaka'))
 #print (TmpObj.deleteNamespacedRole('leader-locking-nfs-client-provisioner', 'wakaka'))
+#print (TmpObj.getNamespacedPod('nacos-0', 'slytest'))
+#print (TmpObj.filterNamespacedPod(namespace='slyk8s', filters={'app':'dicttool','release':'dicttool'}))
+print (TmpObj.execNamespacedPod(pod='rabbitmq-6c6567cc88-qhb74', namespace='yl', cmd='rabbitmqctl delete_vhost bar'))
