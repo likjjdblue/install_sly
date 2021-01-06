@@ -11,7 +11,7 @@ class K8SClient(object):
         self.K8SCoreV1Client = client.CoreV1Api()
 
 
-    def getDeploymentFromNamespace(self, deployment=None, namespace='default'):
+    def getNamespacedDeployment(self, deployment=None, namespace='default'):
         try:
             TmpResponse = self.K8SAppsV1Client.read_namespaced_deployment_status(name=deployment, namespace=namespace)
             return {
@@ -72,7 +72,7 @@ class K8SClient(object):
             }
 
     def deleteNamespacedDeployment(self, deployment='', namespace='default'):
-        TmpDeployment = self.getDeploymentFromNamespace(deployment=deployment, namespace=namespace)
+        TmpDeployment = self.getNamespacedDeployment(deployment=deployment, namespace=namespace)
         if TmpDeployment['ret_code'] != 0:
             return {
                 "ret_code": 0,
@@ -122,14 +122,223 @@ class K8SClient(object):
         }
 
 
+    def getNamespacedSVC(self, service, namespace='default'):
+        try:
+            TmpResponse = self.K8SCoreV1Client.read_namespaced_service(name=service, namespace=namespace)
+            return {
+                "ret_code": 0,
+                'result': TmpResponse
+            }
+        except Exception as e:
+            print (str(e))
+            return {
+                "ret_code":1,
+                'result': 'namespace %s or SVC %s  not exists'%(namespace, service)
+            }
+
+    def deleteNampespacedSVC(self, service, namespace='default'):
+        TmpSVC = self.getNamespacedSVC(service=service, namespace=namespace)
+        if TmpSVC['ret_code'] != 0:
+            return {
+                "ret_code": 0,
+                'result': 'SVC object deleted'
+            }
+
+        self.K8SCoreV1Client.delete_namespaced_service(name=service, namespace=namespace)
+        return {
+            "ret_code": 0,
+            'result': 'SVC object deleted'
+        }
+
+
+    def getNamespacedConfigMap(self, configmap, namespace='default'):
+        try:
+            TmpResponse = self.K8SCoreV1Client.read_namespaced_config_map(name=configmap, namespace=namespace)
+            return {
+                "ret_code": 0,
+                'result': TmpResponse
+            }
+        except Exception as e:
+            print (str(e))
+            return {
+                "ret_code":1,
+                'result': 'namespace %s or ConfigMap %s  not exists'%(namespace, configmap)
+            }
+
+    def deleteNampespacedConfigMap(self, configmap, namespace='default'):
+        TmpSVC = self.getNamespacedConfigMap(configmap=configmap, namespace=namespace)
+        if TmpSVC['ret_code'] != 0:
+            return {
+                "ret_code": 0,
+                'result': 'ConfigMap object deleted'
+            }
+
+        self.K8SCoreV1Client.delete_namespaced_config_map(name=configmap, namespace=namespace)
+        return {
+            "ret_code": 0,
+            'result': 'ConfigMap object deleted'
+        }
+
+    def getNamespacedSecret(self, secret, namespace='default'):
+        try:
+            TmpResponse = self.K8SCoreV1Client.read_namespaced_secret(name=secret, namespace=namespace)
+            return {
+                "ret_code": 0,
+                'result': TmpResponse
+            }
+        except Exception as e:
+            print (str(e))
+            return {
+                "ret_code":1,
+                'result': 'namespace %s or Secret %s  not exists'%(namespace, secret)
+            }
+
+    def deleteNamespacedSecret(self, secret, namespace='default'):
+        TmpSecret = self.getNamespacedSecret(secret=secret, namespace=namespace)
+        if TmpSecret['ret_code'] != 0:
+            return {
+                "ret_code": 0,
+                'result': 'Secret object deleted'
+            }
+
+        self.K8SCoreV1Client.delete_namespaced_secret(name=secret, namespace=namespace)
+        return {
+            "ret_code": 0,
+            'result': 'Secret object deleted'
+        }
+
+    def getPersistentVolume(self, pv):
+        try:
+            TmpResponse = self.K8SCoreV1Client.read_persistent_volume(name=pv)
+            return {
+                "ret_code": 0,
+                'result': TmpResponse
+            }
+        except Exception as e:
+            print (str(e))
+            return {
+                "ret_code":1,
+                'result': 'PV %s  not exists'%(pv,)
+            }
+
+    def deletePersistentVolume(self, pv):
+        TmpPV = self.getPersistentVolume(pv=pv)
+        if TmpPV['ret_code'] != 0:
+            return {
+                "ret_code": 0,
+                'result': 'PV object deleted'
+            }
+
+        self.K8SCoreV1Client.delete_persistent_volume(name=pv)
+        return {
+            "ret_code": 0,
+            'result': 'PV object deleted'
+        }
+
+    def getNamespacedPVC(self, pvc='', namespace='default'):
+        try:
+            TmpResponse = self.K8SCoreV1Client.read_namespaced_persistent_volume_claim(name=pvc, namespace=namespace)
+            return {
+                "ret_code": 0,
+                'result': TmpResponse
+            }
+        except Exception as e:
+            print (str(e))
+            return {
+                "ret_code":1,
+                'result': 'namespace %s or PVC %s  not exists'%(namespace, pvc)
+            }
+
+    def deleteNamespacedPVC(self, pvc, namespace='default'):
+        TmpSecret = self.getNamespacedPVC(pvc=pvc, namespace=namespace)
+        if TmpSecret['ret_code'] != 0:
+            return {
+                "ret_code": 0,
+                'result': 'PVC object deleted'
+            }
+
+        self.K8SCoreV1Client.delete_namespaced_persistent_volume_claim(name=pvc, namespace=namespace)
+        return {
+            "ret_code": 0,
+            'result': 'PVC object deleted'
+        }
+
+    def getNamespacedStatefulSet(self, statefulset='', namespace='default'):
+        try:
+            TmpResponse = self.K8SAppsV1Client.read_namespaced_stateful_set(name=statefulset, namespace=namespace)
+            return {
+                "ret_code": 0,
+                'result': TmpResponse
+            }
+        except Exception as e:
+            print (e)
+            return  {
+                "ret_code": 1,
+                'result': "StatefulSet %s or Namespace %s not exists"%(statefulset, namespace)
+            }
+
+    def deleteNamespacedStateFulSet(self, statefulset='', namespace='default'):
+        TmpStatefulSet = self.getNamespacedStatefulSet(statefulset=statefulset, namespace=namespace)
+        if TmpStatefulSet['ret_code'] != 0:
+            return {
+                "ret_code": 0,
+                'result': 'statefulset object deleted'
+            }
+
+        self.K8SAppsV1Client.delete_namespaced_stateful_set(name=statefulset, namespace=namespace)
+        return {
+            "ret_code": 0,
+            'result': 'statefulset object deleted'
+        }
+
+    def getNamespacedReplicationControler(self, replicationcontroler='', namespace='default'):
+        try:
+            TmpResponse = self.K8SCoreV1Client.read_namespaced_replication_controller(name=replicationcontroler,
+                                                                                      namespace=namespace)
+            return {
+                "ret_code": 0,
+                'result': TmpResponse
+            }
+        except Exception as e:
+            print (str(e))
+            return {
+                "ret_code":1,
+                'result': 'namespace %s or ReplicationControler %s  not exists'%(namespace, replicationcontroler)
+            }
+
+    def deleteNamespacedReplicationControler(self, replicationcontroler='', namespace='default'):
+        TmpSecret = self.getNamespacedReplicationControler(replicationcontroler=replicationcontroler,
+                                                           namespace=namespace)
+        if TmpSecret['ret_code'] != 0:
+            return {
+                "ret_code": 0,
+                'result': 'ReplicationControler object deleted'
+            }
+
+        self.K8SCoreV1Client.delete_namespaced_replication_controller(name=replicationcontroler, namespace=namespace)
+        return {
+            "ret_code": 0,
+            'result': 'ReplicationControler object deleted'
+        }
 
 
 TmpObj = K8SClient()
-#print (TmpObj.GetDeploymentFromNamespace(deployment='redis', namespace='slytest'))
+#print (TmpObj.getNamespacedDeployment(deployment='redis', namespace='slyk8s'))
 #print (TmpObj.checkNamespacedDeploymentState(deployment='redis', namespace='slytest'))
 #print (TmpObj.createNamespace('wakaka'))
-print (TmpObj.createNamespacedDeploymentFromYAML('redis/deployment.yaml'))
-
-print (TmpObj.deleteNamespacedDeployment(deployment='redis'))
-
-
+#print (TmpObj.createNamespacedDeploymentFromYAML('redis/deployment.yaml'))
+#print (TmpObj.deleteNamespacedDeployment(deployment='redis'))
+#print (TmpObj.getNamespacedSVC('trsmas', 'wakaka'))
+#print (TmpObj.deleteNampespacedSVC('ckm-svc', 'wakaka'))
+#print (TmpObj.getNamespacedConfigMap('mariadb-master', 'slyk8s'))
+#print (TmpObj.deleteNampespacedConfigMap('nacos-cm', 'wakaka'))
+#print (TmpObj.getNamespacedSecret('dicttool-secret', 'wakaka'))
+#print (TmpObj.deleteNamespacedSecret('dicttool-secret', 'wakaka'))
+#print (TmpObj.getPersistentVolume('pv-dicttool-log-wbd'))
+#print (TmpObj.deletePersistentVolume('pv-dicttool-log-wbd'))
+#print (TmpObj.getNamespacedPVC('pvc-dicttool-log', 'wakaka'))
+#print (TmpObj.deleteNamespacedPVC('pvc-dicttool-log', 'wakaka'))
+#print (TmpObj.getNamespacedStatefulSet('nacos','wakaka'))
+#print (TmpObj.deleteNamespacedStateFulSet('nacos', 'wakaka'))
+#print (TmpObj.getNamespacedReplicationControler('mysql-nacos', 'wakaka'))
+#print (TmpObj.deleteNamespacedReplicationControler('mysql-nacos', 'wakaka'))
