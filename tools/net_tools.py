@@ -70,7 +70,8 @@ def generateNoneOverlapCIDR(ip=None, num=4, prefixlen=16):
         "result": TmpCIDRList
     }
 
-Tmp = generateNoneOverlapCIDR(ip='7.2.3.3/3', prefixlen=3)
-if Tmp['ret_code'] == 0:
-    for item in Tmp['result']:
-        print (netaddr.IPNetwork(item).ip.bits())
+if __name__ == '__main__':
+    Tmp = generateNoneOverlapCIDR(ip='7.2.3.3/3', prefixlen=3)
+    if Tmp['ret_code'] == 0:
+        for item in Tmp['result']:
+            print (netaddr.IPNetwork(item).ip.bits())

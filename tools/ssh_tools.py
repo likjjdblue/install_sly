@@ -137,4 +137,12 @@ class SSHTool(object):
                 'result': str(e)
             }
 
+    def startService(self, name):
+        return self.ExecCmd('systemctl start %s'%(name.strip(),))
+
+
+    def stopService(self, name):
+        return self.ExecCmd('systemctl stop %s'%(name.strip(),))
+
+
 

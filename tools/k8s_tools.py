@@ -630,7 +630,7 @@ class K8SClient(object):
 
 
 
-TmpObj = K8SClient()
+#TmpObj = K8SClient()
 
 
 #print (TmpObj.getNamespacedDeployment(name='redis', namespace='slyk8s'))
@@ -672,9 +672,10 @@ TmpObj = K8SClient()
 #print (TmpObj.deleteClusterRoleBinding('run-nfs-client-provisioner-wbd'))
 #print (TmpObj.deleteNamespacedStateFulSet('nacos', 'wakaka'))
 
-TmpObj.createNamespace('wakaka')
-for a,b,c in os.walk('tmp'):
-    for file in c:
-        print (TmpObj.deleteResourceFromYaml(filepath=os.path.join('tmp/', file), namespace='wakaka'))
-        print ('+'*20)
-        sleep (5)
+if __name__ == '__main__':
+    TmpObj.createNamespace('wakaka')
+    for a,b,c in os.walk('tmp'):
+        for file in c:
+            print (TmpObj.deleteResourceFromYaml(filepath=os.path.join('tmp/', file), namespace='wakaka'))
+            print ('+'*20)
+            sleep (5)
