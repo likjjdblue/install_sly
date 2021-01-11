@@ -54,8 +54,8 @@ class SSHTool(object):
             kwargs['get_pty'] = get_pty
             _, stdout, stderr = self.SSHObj.exec_command(*args, **kwargs)
 
-            TmpDict['stdout'] = stdout.readlines()
-            TmpDict['stderr'] = stderr.readlines()
+            TmpDict['stdout'] = stdout.read()
+            TmpDict['stderr'] = stderr.read()
             TmpDict['exitcode'] = stdout.channel.recv_exit_status()
 
             return {
