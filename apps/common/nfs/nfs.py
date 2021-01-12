@@ -5,7 +5,7 @@ sys.path.append('../../..')
 import tools
 import re
 
-class NFSTools(object):
+class NFSTool(object):
     def __init__(self, hostname, port, username, password):
         self.SSHClient = tools.ssh_tools.SSHTool(hostname, port, username, password)
         self.BaseDir= '/'
@@ -92,8 +92,6 @@ class NFSTools(object):
 
     def createSubFolder(self, subpath):
         TmpPath = os.path.join(self.BaseDir, subpath)
-        self.SSHClient.ExecCmd('mkdir -p %s'%(TmpPath, ))
-
-
+        self.SSHClient.ExecCmd('mkdir -p %s'%(TmpPath,))
 
 
