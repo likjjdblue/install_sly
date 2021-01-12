@@ -92,6 +92,30 @@ class SSHTool(object):
                 'result': str(e)
             }
 
+
+    def writeRemoteFile(self, filename, data, *args, **kwargs):
+        TmpCheckResult = self.checkConnection()
+        if TmpCheckResult['ret_code'] != 0:
+            return TmpCheckResult
+
+        TmpFTPClient = self.SSHObj.open_sftp()
+        kwargs['filename'] = filename
+        kwargs['mode'] = 'wb'
+        try:
+            with TmpFTPClient.file(*args, **kwargs) as f:
+                TmpFileContent = f.write(data)
+
+            return {
+                'ret_code': 0,
+                'result': TmpFileContent
+            }
+        except Exception as e:
+            print (str(e))
+            return {
+                'ret_code': 1,
+                'result': str(e)
+            }
+
     def uploadFile(self, localpath, remotepath, *args, **kwargs):
         TmpCheckResult = self.checkConnection()
         if TmpCheckResult['ret_code'] != 0:
@@ -143,6 +167,10 @@ class SSHTool(object):
 
     def stopService(self, name):
         return self.ExecCmd('systemctl stop %s'%(name.strip(),))
+
+    def restartService(self, name):
+        return self.ExecCmd('systemctl restart %s' % (name.strip(),))
+
 
 
 
