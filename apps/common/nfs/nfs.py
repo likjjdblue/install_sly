@@ -6,7 +6,7 @@ import tools
 import re
 
 class NFSTool(object):
-    def __init__(self, hostname, port, username, password):
+    def __init__(self, hostname, port, username, password, *args, **kwargs):
         self.SSHClient = tools.ssh_tools.SSHTool(hostname, port, username, password)
         self.BaseDir= '/'
 
@@ -92,6 +92,13 @@ class NFSTool(object):
 
     def createSubFolder(self, subpath):
         TmpPath = os.path.join(self.BaseDir, subpath)
-        self.SSHClient.ExecCmd('mkdir -p %s'%(TmpPath,))
+        TmpResponse = self.SSHClient.ExecCmd('mkdir -p %s'%(TmpPath,))
+        if TmpResponse['ret_code'] != 0:
+            return TmpResponse
+
+        return {
+            'ret_code': 0,
+            'result': 'NFS create subfolder %s successfully'%(subpath,)
+        }
 
 
