@@ -73,7 +73,7 @@ class NFSTool(object):
                     break
 
             if not TmpMatched:
-                TmpFileContent += '\n' + '%s %s\n'%(basedir, '*(rw,sync,no_root_squash,no_subtree_check)')
+                TmpFileContent += '\n' + '%s     %s\n'%(basedir, '*(rw,sync,no_root_squash,no_subtree_check)')
                 self.SSHClient.writeRemoteFile(filename='/etc/exports', data=TmpFileContent)
 
             print ('Restart NFS server...')
