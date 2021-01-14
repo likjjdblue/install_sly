@@ -626,6 +626,22 @@ class K8SClient(object):
                 }
 
 
+    def checkNamespacedResourceHealth(self, name, kind, namespace):
+        RawNamespacedFuncName = 'getNamespaced' + kind
+
+        try:
+            if hasattr(self, RawNamespacedFuncName):
+                TmpResponse = getattr(self, RawNamespacedFuncName)(name=name, namespace=namespace).to_dict()
+                return TmpResponse['status']['replicas'] != TmpResponse['status']['ready_replicas']
+
+        except Exception as e:
+            print (str(e))
+            return False
+
+
+
+
+
 
 
 

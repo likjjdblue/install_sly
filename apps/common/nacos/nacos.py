@@ -13,19 +13,21 @@ import jinja2
 import yaml
 import subprocess
 from time import sleep
+from tools import k8s_tools
+from pprint import pprint
 
 class NacosTool(object):
     def __init__(self, namespace='default', mysqldatapath='nacos_mysql', nacosdatapath='nfs-provisioner', nfsinfo={},
-                 harbor=None):
+                 harbor=None, retrytimes=10):
 
         namespace = namespace.strip()
+        self.RetryTimes = int(retrytimes)
         self.NFSAddr = nfsinfo['hostname']
         self.NFSPort = nfsinfo['port']
         self.NFSUsername = nfsinfo['username']
         self.NFSPassword = nfsinfo['password']
         self.NFSBasePath = nfsinfo['basepath']
         self.AppInfo = deepcopy(AppInfo)
-
 
         self.AppInfo['NFSAddr'] = self.NFSAddr
         self.AppInfo['NFSBasePath'] = self.NFSBasePath
@@ -39,7 +41,7 @@ class NacosTool(object):
         self.NFSObj = nfs.NFSTool(**nfsinfo)
 
     def setupNFS(self):
-        TmpResponse = self.NFSObj.installNFS(basedir=AppInfo['NFSBasePath'])
+        TmpResponse = self.NFSObj.installNFS(basedir=self.AppInfo['NFSBasePath'])
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
@@ -56,10 +58,10 @@ class NacosTool(object):
         }
 
     def generateValues(self):
-        self.AppInfo['NacosImage'] = replaceDockerRepo(self.AppInfo['NacosImage'], self.AppInfo['Namespace'])
-        self.AppInfo['MysqlImage'] = replaceDockerRepo(self.AppInfo['MysqlImage'], self.AppInfo['Namespace'])
+        self.AppInfo['NacosImage'] = replaceDockerRepo(self.AppInfo['NacosImage'], self.AppInfo['HarborAddr'])
+        self.AppInfo['MysqlImage'] = replaceDockerRepo(self.AppInfo['MysqlImage'], self.AppInfo['HarborAddr'])
         self.AppInfo['NFSProvisionerImage'] =replaceDockerRepo(self.AppInfo['NFSProvisionerImage'],
-                                                               self.AppInfo['Namespace'])
+                                                               self.AppInfo['HarborAddr'])
         self.AppInfo['MysqlPassword'] = crypto_tools.generateRandomString(lenght=10)
 
 
@@ -84,10 +86,10 @@ class NacosTool(object):
             with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='wb') as f:
                 yaml.safe_dump(self.AppInfo, f)
 
-            subprocess.Popen('/usr/bin/cp -r resource/* %s'%(TmpTargetNamespaceDIR,), shell=True)
+            subprocess.Popen('/usr/bin/cp -r resource %s'%(TmpTargetNamespaceDIR,), shell=True)
             sleep (5)
 
-            for basepath, _, files in os.walk(TmpTargetNamespaceDIR):
+            for basepath, _, files in os.walk(os.path.join(TmpTargetNamespaceDIR, 'resource')):
                 for file in files:
                     TmpContent = ''
                     with open(os.path.join(basepath, file), mode='rb') as f:
@@ -98,7 +100,157 @@ class NacosTool(object):
                         f.write(TmpContent)
 
     def applyYAML(self):
-        pass
+        print ('Create namespace: '+str(self.AppInfo['Namespace']))
+        TmpResponse = self.k8sObj.createNamespace(name=self.AppInfo['Namespace'])
+        if TmpResponse['ret_code'] != 0:
+            print (TmpResponse)
+            return TmpResponse
+
+        print ('Apply nacos RBAC...')
+        TmpTargetNamespaceDIR = os.path.join(self.AppInfo['TargetNamespaceDIR'], self.AppInfo['Namespace'],
+                                             self.AppInfo['AppName'])
+        TmpTargetNamespaceDIR = os.path.normpath(os.path.realpath(TmpTargetNamespaceDIR))
+
+        TmpResponse = self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'rbac.yaml'),
+                                                         namespace=self.AppInfo['Namespace'])
+        if TmpResponse['ret_code'] != 0:
+            print (TmpResponse)
+            return TmpResponse
+
+
+        print ('Create ServiceAccount and deploy NFS-Client Provisioner....')
+        if not self.k8sObj.checkNamespacedResourceHealth(name='nfs-client-provisioner', kind='Deployment',namespace=self.AppInfo['Namespace']):
+            try:
+                self.k8sObj.deleteNamespacedDeployment(name='nfs-client-provisioner', namespace=self.AppInfo['Namespace'])
+            except:
+                pass
+
+
+            TmpResponse = self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'deployment.yaml'),
+                                                         namespace=self.AppInfo['Namespace'])
+            if TmpResponse['ret_code'] != 0:
+                print (TmpResponse)
+                return TmpResponse
+
+        isRunning=False
+        for itime in range(self.RetryTimes):
+            TmpResponse = self.k8sObj.getNamespacedDeployment(name='nfs-client-provisioner',
+                                                                   namespace=self.AppInfo['Namespace'])['result'].to_dict()
+
+            if TmpResponse['status']['replicas'] != TmpResponse['status']['ready_replicas']:
+                print ('Waitting for Deployment %s to be ready,replicas: %s, available replicas: %s')%(
+                    TmpResponse['metadata']['name'], str(TmpResponse['status']['replicas']),
+                    str(TmpResponse['status']['ready_replicas'])
+                )
+                sleep (20)
+                continue
+            print ('Deployment: %s is available;replicas: %s')%(TmpResponse['metadata']['name'],
+                                                              str(TmpResponse['status']['replicas']))
+            isRunning = True
+            break
+
+        if not isRunning:
+            print ('Failed to apply Deployment: %s')%(TmpResponse['metadata']['name'],)
+            return {
+                'ret_code': 1,
+                'result': 'Failed to apply Deployment: %s'%(TmpResponse['metadata']['name'],)
+            }
+        
+        print ('Apply StorageClass.....')
+        TmpResponse = self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'class.yaml'),
+                                                         namespace=self.AppInfo['Namespace'])
+        if TmpResponse['ret_code'] != 0:
+            print (TmpResponse)
+            return {
+                'ret_code': 1,
+                'result': TmpResponse
+            }
+
+        print ('Apply Nacos Mysql....')
+        if not self.k8sObj.checkNamespacedResourceHealth(name='mysql', namespace=self.AppInfo['Namespace'],
+                                                         kind='ReplicationController'):
+            try:
+                self.k8sObj.deleteNamespacedReplicationController(name='mysql', namespace=self.AppInfo['Namespace'])
+            except:
+                pass
+
+
+            TmpResponse = self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mysql-nfs.yaml'),
+                                                         namespace=self.AppInfo['Namespace'])
+            if TmpResponse['ret_code'] != 0:
+                print (TmpResponse)
+                return TmpResponse
+
+        isRunning=False
+        for itime in range(self.RetryTimes):
+            TmpResponse = self.k8sObj.getNamespacedReplicationController(name='mysql',
+                                                                   namespace=self.AppInfo['Namespace'])['result'].to_dict()
+
+            if TmpResponse['status']['replicas'] != TmpResponse['status']['ready_replicas']:
+                print ('Waitting for Replication Controller %s to be ready,replicas: %s, available replicas: %s')%(
+                    TmpResponse['metadata']['name'], str(TmpResponse['status']['replicas']),
+                    str(TmpResponse['status']['ready_replicas'])
+                )
+                sleep (20)
+                continue
+            print ('Replication Controller: %s is available;replicas: %s')%(TmpResponse['metadata']['name'],
+                                                              str(TmpResponse['status']['replicas']))
+            isRunning = True
+            break
+
+        if not isRunning:
+            print ('Failed to apply ReplicationController: %s')%(TmpResponse['metadata']['name'],)
+            return {
+                'ret_code': 1,
+                'result': 'Failed to apply ReplicationController: %s'%(TmpResponse['metadata']['name'],)
+            }
+
+        sleep(180)
+
+        print ('Apply  Nacos ....')
+        if not self.k8sObj.checkNamespacedResourceHealth(name='nacos', namespace=self.AppInfo['Namespace'],
+                                                         kind='StatefulSet'):
+            try:
+                self.k8sObj.deleteNamespacedStatefulSet(name='nacos', namespace=self.AppInfo['Namespace'])
+            except:
+                pass
+
+            TmpResponse = self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'nacos-pvc-nfs.yaml'),
+                                                         namespace=self.AppInfo['Namespace'])
+            if TmpResponse['ret_code'] != 0:
+                print (TmpResponse)
+                return TmpResponse
+
+        isRunning=False
+        for itime in range(self.RetryTimes):
+            TmpResponse = self.k8sObj.getNamespacedStatefulSet(name='nacos',
+                                                                   namespace=self.AppInfo['Namespace'])['result'].to_dict()
+
+
+            if TmpResponse['status']['replicas'] != TmpResponse['status']['ready_replicas']:
+                print ('Waitting for Stateful Set %s to be ready,replicas: %s, available replicas: %s')%(
+                    TmpResponse['metadata']['name'], str(TmpResponse['status']['replicas']),
+                    str(TmpResponse['status']['ready_replicas'])
+                )
+                sleep (20)
+                continue
+            print ('Stateful Set: %s is available;replicas: %s')%(TmpResponse['metadata']['name'],
+                                                              str(TmpResponse['status']['replicas']))
+            isRunning = True
+            break
+
+        if not isRunning:
+            print ('Failed to apply Stateful Set: %s')%(TmpResponse['metadata']['name'],)
+            return {
+                'ret_code': 1,
+                'result': 'Failed to apply Stateful Set: %s'%(TmpResponse['metadata']['name'],)
+            }
+
+
+
+
+
+        print ('END')
 
 
 
@@ -114,7 +266,10 @@ class NacosTool(object):
 
 
 
-tmp = NacosTool(namespace='sly', nfsinfo=dict(hostname='192.168.200.168', port=1022, username='root', password='!QAZ2wsx1234',
+
+
+tmp = NacosTool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.168', port=1022, username='root', password='!QAZ2wsx1234',
                          basepath='/TRS/DATA'))
-print (tmp.setupNFS())
+tmp.setupNFS()
 print (tmp.renderTemplate())
+print (tmp.applyYAML())

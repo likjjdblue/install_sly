@@ -57,6 +57,7 @@ class NFSTool(object):
 
         print ('Setup NFS .....')
         self.SSHClient.ExecCmd('mkdir -p %s'%(basedir,))
+        self.SSHClient.ExecCmd('chown nfsnobody:nfsnobody  %s'%(basedir,))
         self.SSHClient.ExecCmd('touch /etc/exports')
 
         try:

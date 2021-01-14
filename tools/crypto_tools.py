@@ -8,6 +8,8 @@ import base64
 def generateRandomString(lenght):
     length = int(lenght)
     TmpRawStr = string.ascii_letters + string.digits + string.punctuation
+    TmpRawStr = TmpRawStr.replace("'",'')
+    TmpRawStr = TmpRawStr.replace('"', '')
     TmpStr = ''.join(random.choice(TmpRawStr) for _ in range(length))
     return TmpStr
 
@@ -22,4 +24,5 @@ def EncodeBase64(input):
 
 def DecodeBase64(input):
     return base64.b64decode(input)
+
 
