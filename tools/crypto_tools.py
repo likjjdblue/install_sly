@@ -8,10 +8,15 @@ import base64
 def generateRandomString(lenght):
     length = int(lenght)
     TmpRawStr = string.ascii_letters + string.digits + string.punctuation
-    TmpRawStr = TmpRawStr.replace("'",'')
-    TmpRawStr = TmpRawStr.replace('"', '')
     TmpStr = ''.join(random.choice(TmpRawStr) for _ in range(length))
     return TmpStr
+
+def generateRandomAlphaNumericString(lenght):
+    length = int(lenght)
+    TmpRawStr = string.ascii_letters + string.digits
+    TmpStr = ''.join(random.choice(TmpRawStr) for _ in range(length))
+    return TmpStr
+
 
 def generateTRSSecret(input):
     rawinfo = input.strip()

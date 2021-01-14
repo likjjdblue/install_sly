@@ -634,6 +634,7 @@ class K8SClient(object):
                 TmpResponse = getattr(self, RawNamespacedFuncName)(name=name, namespace=namespace).to_dict()
                 return TmpResponse['status']['replicas'] != TmpResponse['status']['ready_replicas']
 
+
         except Exception as e:
             print (str(e))
             return False

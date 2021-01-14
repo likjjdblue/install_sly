@@ -62,7 +62,7 @@ class NacosTool(object):
         self.AppInfo['MysqlImage'] = replaceDockerRepo(self.AppInfo['MysqlImage'], self.AppInfo['HarborAddr'])
         self.AppInfo['NFSProvisionerImage'] =replaceDockerRepo(self.AppInfo['NFSProvisionerImage'],
                                                                self.AppInfo['HarborAddr'])
-        self.AppInfo['MysqlPassword'] = crypto_tools.generateRandomString(lenght=10)
+        self.AppInfo['MysqlPassword'] = crypto_tools.generateRandomAlphaNumericString(lenght=10)
 
 
     def renderTemplate(self):
@@ -204,7 +204,7 @@ class NacosTool(object):
                 'ret_code': 1,
                 'result': 'Failed to apply ReplicationController: %s'%(TmpResponse['metadata']['name'],)
             }
-
+        print ('Waitting Mysql for running....')
         sleep(180)
 
         print ('Apply  Nacos ....')
@@ -234,6 +234,7 @@ class NacosTool(object):
                 )
                 sleep (20)
                 continue
+            sleep (20)
             print ('Stateful Set: %s is available;replicas: %s')%(TmpResponse['metadata']['name'],
                                                               str(TmpResponse['status']['replicas']))
             isRunning = True
@@ -246,30 +247,32 @@ class NacosTool(object):
                 'result': 'Failed to apply Stateful Set: %s'%(TmpResponse['metadata']['name'],)
             }
 
+        return {
+            'ret_code': 0,
+            'result': 'Stateful Set: %s is available;replicas: %s'%(TmpResponse['metadata']['name'],
+                                                                    str(TmpResponse['status']['replicas']))
+        }
+
+    def start(self):
+        TmpResponse = self.setupNFS()
+        if TmpResponse['ret_code'] != 0:
+            return TmpResponse
+
+        self.renderTemplate()
+
+        TmpResponse = self.applyYAML()
+        if TmpResponse['ret_code'] != 0:
+            return TmpResponse
 
 
 
 
-        print ('END')
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-tmp = NacosTool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.168', port=1022, username='root', password='!QAZ2wsx1234',
+if __name__ == "__main__":
+    tmp = NacosTool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.168', port=1022, username='root', password='!QAZ2wsx1234',
                          basepath='/TRS/DATA'))
-tmp.setupNFS()
-print (tmp.renderTemplate())
-print (tmp.applyYAML())
+    tmp.start()
