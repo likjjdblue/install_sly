@@ -3,6 +3,8 @@
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
       <excludeFolder url="file://$MODULE_DIR$/apps/common/nfs/resource" />
+      <excludeFolder url="file://$MODULE_DIR$/apps/common/redisha/resource" />
+      <excludeFolder url="file://$MODULE_DIR$/apps/common/redisha/resource_backup" />
       <excludeFolder url="file://$MODULE_DIR$/tools/tmp" />
     </content>
     <orderEntry type="jdk" jdkName="Python 2.7" jdkType="Python SDK" />
