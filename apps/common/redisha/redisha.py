@@ -17,8 +17,7 @@ from tools import k8s_tools
 from pprint import pprint
 
 class RedisHATool(object):
-    def __init__(self, namespace='default', nfsinfo={},
-                 harbor=None, retrytimes=10):
+    def __init__(self, namespace='default', nfsinfo={},redisdatapath='nfs-provisioner',harbor=None, retrytimes=10):
 
         namespace = namespace.strip()
         self.RetryTimes = int(retrytimes)
@@ -32,6 +31,7 @@ class RedisHATool(object):
         self.AppInfo['NFSAddr'] = self.NFSAddr
         self.AppInfo['NFSBasePath'] = self.NFSBasePath
         self.AppInfo['Namespace'] = namespace
+        self.AppInfo['RedisDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, redisdatapath]))
 
         self.AppInfo['HarborAddr'] = harbor
         self.k8sObj = k8s_tools.K8SClient()
@@ -43,7 +43,9 @@ class RedisHATool(object):
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
+
         print ('create Redis HA NFS successfully')
+        self.NFSObj.createSubFolder(self.AppInfo['RedisDataPath'])
 
 
         return {
@@ -94,11 +96,74 @@ class RedisHATool(object):
                         f.write(TmpContent)
 
     def applyYAML(self):
-        print ('Create namespace: '+str(self.AppInfo['Namespace']))
+        print ('Create namespace: ' + str(self.AppInfo['Namespace']))
         TmpResponse = self.k8sObj.createNamespace(name=self.AppInfo['Namespace'])
         if TmpResponse['ret_code'] != 0:
             print (TmpResponse)
             return TmpResponse
+
+        print ('Apply  RBAC...')
+        TmpTargetNamespaceDIR = os.path.join(self.AppInfo['TargetNamespaceDIR'], self.AppInfo['Namespace'],
+                                             self.AppInfo['AppName'])
+        TmpTargetNamespaceDIR = os.path.normpath(os.path.realpath(TmpTargetNamespaceDIR))
+
+        TmpResponse = self.k8sObj.createResourceFromYaml(
+            filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'rbac.yaml'),
+            namespace=self.AppInfo['Namespace'])
+        if TmpResponse['ret_code'] != 0:
+            print (TmpResponse)
+            return TmpResponse
+
+        print ('Create ServiceAccount and deploy NFS-Client Provisioner....')
+        if not self.k8sObj.checkNamespacedResourceHealth(name='nfs-client-provisioner', kind='Deployment',
+                                                         namespace=self.AppInfo['Namespace']):
+            try:
+                self.k8sObj.deleteNamespacedDeployment(name='nfs-client-provisioner',
+                                                       namespace=self.AppInfo['Namespace'])
+            except:
+                pass
+
+            TmpResponse = self.k8sObj.createResourceFromYaml(
+                filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'deployment.yaml'),
+                namespace=self.AppInfo['Namespace'])
+            if TmpResponse['ret_code'] != 0:
+                print (TmpResponse)
+                return TmpResponse
+
+        isRunning = False
+        for itime in range(self.RetryTimes):
+            TmpResponse = self.k8sObj.getNamespacedDeployment(name='nfs-client-provisioner',
+                                                              namespace=self.AppInfo['Namespace'])['result'].to_dict()
+
+            if TmpResponse['status']['replicas'] != TmpResponse['status']['ready_replicas']:
+                print ('Waitting for Deployment %s to be ready,replicas: %s, available replicas: %s') % (
+                    TmpResponse['metadata']['name'], str(TmpResponse['status']['replicas']),
+                    str(TmpResponse['status']['ready_replicas'])
+                )
+                sleep(20)
+                continue
+            print ('Deployment: %s is available;replicas: %s') % (TmpResponse['metadata']['name'],
+                                                                  str(TmpResponse['status']['replicas']))
+            isRunning = True
+            break
+
+        if not isRunning:
+            print ('Failed to apply Deployment: %s') % (TmpResponse['metadata']['name'],)
+            return {
+                'ret_code': 1,
+                'result': 'Failed to apply Deployment: %s' % (TmpResponse['metadata']['name'],)
+            }
+
+        print ('Apply StorageClass.....')
+        TmpResponse = self.k8sObj.createResourceFromYaml(
+            filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'class.yaml'),
+            namespace=self.AppInfo['Namespace'])
+        if TmpResponse['ret_code'] != 0:
+            print (TmpResponse)
+            return {
+                'ret_code': 1,
+                'result': TmpResponse
+            }
 
         print ('Apply Redis HA YAML ...')
         TmpTargetNamespaceDIR = os.path.join(self.AppInfo['TargetNamespaceDIR'], self.AppInfo['Namespace'],
