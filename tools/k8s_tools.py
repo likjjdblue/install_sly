@@ -16,6 +16,7 @@ class K8SClient(object):
         self.K8SCoreV1Client = client.CoreV1Api()
         self.K8SStorageV1Client = client.StorageV1Api()
         self.K8SRbacAuthorizationV1Client = client.RbacAuthorizationV1Api()
+        self.K8SPolicyV1beta1Client = client.PolicyV1beta1Api()
 
 
 
@@ -641,6 +642,39 @@ class K8SClient(object):
         except Exception as e:
             print (str(e))
             return False
+
+
+    def getNamespacedPodDisruptionBudget(self, name, namespace='default'):
+        try:
+            TmpResponse = self.K8SPolicyV1beta1Client.read_namespaced_pod_disruption_budget(name=name,
+                                                                                            namespace=namespace)
+            return {
+                "ret_code": 0,
+                'result': TmpResponse
+            }
+        except Exception as e:
+            print (e)
+            return  {
+                "ret_code": 1,
+                'result': "PodDisruptionBudget %s or Namespace %s not exists"%(name, namespace)
+            }
+
+
+
+    def deleteNamespacedPodDisruptionBudget(self, name, namespace='default'):
+        TmpDeployment = self.getNamespacedPodDisruptionBudget(name=name, namespace=namespace)
+        if TmpDeployment['ret_code'] != 0:
+            return {
+                "ret_code": 0,
+                'result': 'PodDisruptionBudget object deleted'
+            }
+
+        self.K8SPolicyV1beta1Client.delete_namespaced_pod_disruption_budget(name=name, namespace=namespace)
+        return {
+            "ret_code": 0,
+            'result': 'PodDisruptionBudget object deleted'
+        }
+
 
 
 
