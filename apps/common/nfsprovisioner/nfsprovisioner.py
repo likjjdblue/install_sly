@@ -3,7 +3,7 @@
 
 import sys, os
 sys.path.append('../../..')
-from apps.common import nfs, nfsprovisioner
+from apps.common import nfs
 from tools import k8s_tools
 from metadata import AppInfo
 from copy import deepcopy
@@ -16,8 +16,8 @@ from time import sleep
 from tools import k8s_tools
 from pprint import pprint
 
-class MongodbTool(object):
-    def __init__(self, namespace='default', nfsinfo={}, mongodbdatapath='nfs-provisioner', harbor=None, retrytimes=10):
+class NFSProvisionerTool(object):
+    def __init__(self, namespace='default', nfsinfo={},nfsdatapath='nfs-provisioner',harbor=None, retrytimes=10):
 
         namespace = namespace.strip()
         self.RetryTimes = int(retrytimes)
@@ -31,9 +31,7 @@ class MongodbTool(object):
         self.AppInfo['NFSAddr'] = self.NFSAddr
         self.AppInfo['NFSBasePath'] = self.NFSBasePath
         self.AppInfo['Namespace'] = namespace
-        self.AppInfo['MongodbDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, mongodbdatapath]))
-        self.AppInfo['ProvisionerPath'] = mongodbdatapath
-
+        self.AppInfo['NFSDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, nfsdatapath]))
 
         self.AppInfo['HarborAddr'] = harbor
         self.k8sObj = k8s_tools.K8SClient()
@@ -45,8 +43,9 @@ class MongodbTool(object):
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
-        print ('create MongoDB NFS successfully')
-        self.NFSObj.createSubFolder(self.AppInfo['MongodbDataPath'])
+
+        print ('create  NFS successfully')
+        self.NFSObj.createSubFolder(self.AppInfo['NFSDataPath'])
 
 
         return {
@@ -55,11 +54,8 @@ class MongodbTool(object):
         }
 
     def generateValues(self):
-        self.AppInfo['MongodbImage'] = replaceDockerRepo(self.AppInfo['MongodbImage'], self.AppInfo['HarborAddr'])
         self.AppInfo['NFSProvisionerImage'] =replaceDockerRepo(self.AppInfo['NFSProvisionerImage'],
                                                                self.AppInfo['HarborAddr'])
-        self.AppInfo['MongoPassword'] = crypto_tools.EncodeBase64(crypto_tools.generateRandomAlphaNumericString(lenght=10))
-
 
     def renderTemplate(self):
         if not os.path.isdir(os.path.realpath(self.AppInfo['TargetNamespaceDIR'])):
@@ -102,28 +98,7 @@ class MongodbTool(object):
             print (TmpResponse)
             return TmpResponse
 
-        print ('setup  NFS provisioner for %s'%(self.AppInfo['AppName'], ))
-        TmpNFSInfo={
-            'hostname': self.NFSAddr,
-            'port': self.NFSPort,
-            'username': self.NFSUsername,
-            'password': self.NFSPassword,
-            'basepath': self.NFSBasePath,
-        }
-
-        TmpNFSProvisionser = nfsprovisioner.NFSProvisionerTool(nfsinfo=TmpNFSInfo, namespace=self.AppInfo['Namespace'],
-                                                               nfsdatapath=self.AppInfo['ProvisionerPath'],
-                                                               harbor=self.AppInfo['HarborAddr']
-                                                               )
-
-        TmpResponse = TmpNFSProvisionser.start()
-        if TmpResponse['ret_code'] != 0:
-            print ('failed setup NFS provisioner for %s'%(self.AppInfo['AppName'],))
-            return TmpResponse
-
-        print ('setup NFS provisioner for  %s successfully '%(self.AppInfo['AppName'],))
-
-        '''print ('Apply  RBAC...')
+        print ('Apply  RBAC...')
         TmpTargetNamespaceDIR = os.path.join(self.AppInfo['TargetNamespaceDIR'], self.AppInfo['Namespace'],
                                              self.AppInfo['AppName'])
         TmpTargetNamespaceDIR = os.path.normpath(os.path.realpath(TmpTargetNamespaceDIR))
@@ -138,6 +113,7 @@ class MongodbTool(object):
         print ('Create ServiceAccount and deploy NFS-Client Provisioner....')
         if not self.k8sObj.checkNamespacedResourceHealth(name='nfs-client-provisioner', kind='Deployment',
                                                          namespace=self.AppInfo['Namespace']):
+            print ('NOT health......')
             try:
                 self.k8sObj.deleteNamespacedDeployment(name='nfs-client-provisioner',
                                                        namespace=self.AppInfo['Namespace'])
@@ -156,7 +132,8 @@ class MongodbTool(object):
             TmpResponse = self.k8sObj.getNamespacedDeployment(name='nfs-client-provisioner',
                                                               namespace=self.AppInfo['Namespace'])['result'].to_dict()
 
-            if TmpResponse['status']['replicas'] != TmpResponse['status']['ready_replicas']:
+            if (TmpResponse['status']['replicas'] != TmpResponse['status']['ready_replicas']) or \
+                (TmpResponse['status']['replicas'] is None):
                 print ('Waitting for Deployment %s to be ready,replicas: %s, available replicas: %s') % (
                     TmpResponse['metadata']['name'], str(TmpResponse['status']['replicas']),
                     str(TmpResponse['status']['ready_replicas'])
@@ -184,57 +161,13 @@ class MongodbTool(object):
             return {
                 'ret_code': 1,
                 'result': TmpResponse
-            }'''
-
-        print ('Apply Mongodb YAML ...')
-        TmpTargetNamespaceDIR = os.path.join(self.AppInfo['TargetNamespaceDIR'], self.AppInfo['Namespace'],
-                                             self.AppInfo['AppName'])
-        TmpTargetNamespaceDIR = os.path.normpath(os.path.realpath(TmpTargetNamespaceDIR))
-
-        if not self.k8sObj.checkNamespacedResourceHealth(name='mongodb', namespace=self.AppInfo['Namespace'],
-                                                         kind='StatefulSet'):
-            try:
-                self.k8sObj.deleteNamespacedStatefulSet(name='mongodb', namespace=self.AppInfo['Namespace'])
-            except:
-                pass
-
-            TmpResponse = self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mongodb.yaml'),
-                                                         namespace=self.AppInfo['Namespace'])
-            if TmpResponse['ret_code'] != 0:
-                print (TmpResponse)
-                return TmpResponse
-
-        isRunning=False
-        for itime in range(self.RetryTimes):
-            TmpResponse = self.k8sObj.getNamespacedStatefulSet(name='mongodb',
-                                                                   namespace=self.AppInfo['Namespace'])['result'].to_dict()
-
-
-            if TmpResponse['status']['replicas'] != TmpResponse['status']['ready_replicas']:
-                print ('Waitting for Stateful Set %s to be ready,replicas: %s, available replicas: %s')%(
-                    TmpResponse['metadata']['name'], str(TmpResponse['status']['replicas']),
-                    str(TmpResponse['status']['ready_replicas'])
-                )
-                sleep (20)
-                continue
-            sleep (20)
-            print ('Stateful Set: %s is available;replicas: %s')%(TmpResponse['metadata']['name'],
-                                                              str(TmpResponse['status']['replicas']))
-            isRunning = True
-            break
-
-        if not isRunning:
-            print ('Failed to apply Stateful Set: %s')%(TmpResponse['metadata']['name'],)
-            return {
-                'ret_code': 1,
-                'result': 'Failed to apply Stateful Set: %s'%(TmpResponse['metadata']['name'],)
             }
 
         return {
             'ret_code': 0,
-            'result': 'Stateful Set: %s is available;replicas: %s'%(TmpResponse['metadata']['name'],
-                                                                    str(TmpResponse['status']['replicas']))
+            'result': 'setup NFS provisioner successfully '
         }
+
 
     def start(self):
         TmpResponse = self.setupNFS()
@@ -253,6 +186,6 @@ class MongodbTool(object):
 
 
 if __name__ == "__main__":
-    tmp = MongodbTool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.168', port=1022, username='root', password='!QAZ2wsx1234',
+    tmp = NFSProvisionerTool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.168', port=1022, username='root', password='!QAZ2wsx1234',
                          basepath='/TRS/DATA'))
     tmp.start()

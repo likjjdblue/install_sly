@@ -3,7 +3,7 @@
 
 import sys, os
 sys.path.append('../../..')
-from apps.common import nfs
+from apps.common import nfs, nfsprovisioner
 from tools import k8s_tools
 from metadata import AppInfo
 from copy import deepcopy
@@ -32,6 +32,7 @@ class RedisHATool(object):
         self.AppInfo['NFSBasePath'] = self.NFSBasePath
         self.AppInfo['Namespace'] = namespace
         self.AppInfo['RedisDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, redisdatapath]))
+        self.AppInfo['ProvisionerPath'] = redisdatapath
 
         self.AppInfo['HarborAddr'] = harbor
         self.k8sObj = k8s_tools.K8SClient()
@@ -102,7 +103,30 @@ class RedisHATool(object):
             print (TmpResponse)
             return TmpResponse
 
-        print ('Apply  RBAC...')
+        print ('setup  NFS provisioner for %s'%(self.AppInfo['AppName'], ))
+        TmpNFSInfo={
+            'hostname': self.NFSAddr,
+            'port': self.NFSPort,
+            'username': self.NFSUsername,
+            'password': self.NFSPassword,
+            'basepath': self.NFSBasePath,
+        }
+
+        TmpNFSProvisionser = nfsprovisioner.NFSProvisionerTool(nfsinfo=TmpNFSInfo, namespace=self.AppInfo['Namespace'],
+                                                               nfsdatapath=self.AppInfo['ProvisionerPath'],
+                                                               harbor=self.AppInfo['HarborAddr']
+                                                               )
+
+        TmpResponse = TmpNFSProvisionser.start()
+        if TmpResponse['ret_code'] != 0:
+            print ('failed setup NFS provisioner for %s'%(self.AppInfo['AppName'],))
+            return TmpResponse
+
+        print ('setup NFS provisioner for  %s successfully '%(self.AppInfo['AppName'],))
+
+
+
+        '''print ('Apply  RBAC...')
         TmpTargetNamespaceDIR = os.path.join(self.AppInfo['TargetNamespaceDIR'], self.AppInfo['Namespace'],
                                              self.AppInfo['AppName'])
         TmpTargetNamespaceDIR = os.path.normpath(os.path.realpath(TmpTargetNamespaceDIR))
@@ -163,7 +187,7 @@ class RedisHATool(object):
             return {
                 'ret_code': 1,
                 'result': TmpResponse
-            }
+            }'''
 
         print ('Apply Redis HA YAML ...')
         TmpTargetNamespaceDIR = os.path.join(self.AppInfo['TargetNamespaceDIR'], self.AppInfo['Namespace'],

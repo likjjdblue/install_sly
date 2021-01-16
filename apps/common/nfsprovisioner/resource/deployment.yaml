@@ -32,9 +32,9 @@ spec:
             - name: NFS_SERVER
               value: {{ NFSAddr }}
             - name: NFS_PATH
-              value: {{ RedisDataPath }}
+              value: {{ NFSDataPath }}
       volumes:
         - name: nfs-client-root
           nfs:
             server: {{ NFSAddr }}
-            path: {{ RedisDataPath }}
+            path: {{ NFSDataPath }}

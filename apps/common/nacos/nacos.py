@@ -3,7 +3,7 @@
 
 import sys, os
 sys.path.append('../../..')
-from apps.common import nfs
+from apps.common import nfs, nfsprovisioner
 from tools import k8s_tools
 from metadata import AppInfo
 from copy import deepcopy
@@ -34,6 +34,7 @@ class NacosTool(object):
         self.AppInfo['MysqlDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, mysqldatapath]))
         self.AppInfo['NacosDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, nacosdatapath]))
         self.AppInfo['Namespace'] = namespace
+        self.AppInfo['ProvisionerPath'] = nacosdatapath
 
         self.AppInfo['HarborAddr'] = harbor
         self.k8sObj = k8s_tools.K8SClient()
@@ -106,7 +107,30 @@ class NacosTool(object):
             print (TmpResponse)
             return TmpResponse
 
-        print ('Apply nacos RBAC...')
+
+        print ('setup  NFS provisioner for %s'%(self.AppInfo['AppName'], ))
+        TmpNFSInfo={
+            'hostname': self.NFSAddr,
+            'port': self.NFSPort,
+            'username': self.NFSUsername,
+            'password': self.NFSPassword,
+            'basepath': self.NFSBasePath,
+        }
+
+        TmpNFSProvisionser = nfsprovisioner.NFSProvisionerTool(nfsinfo=TmpNFSInfo, namespace=self.AppInfo['Namespace'],
+                                                               nfsdatapath=self.AppInfo['ProvisionerPath'],
+                                                               harbor=self.AppInfo['HarborAddr']
+                                                               )
+
+        TmpResponse = TmpNFSProvisionser.start()
+        if TmpResponse['ret_code'] != 0:
+            print ('failed setup NFS provisioner for %s'%(self.AppInfo['AppName'],))
+            return TmpResponse
+
+        print ('setup NFS provisioner for  %s successfully '%(self.AppInfo['AppName'],))
+
+
+        '''print ('Apply nacos RBAC...')
         TmpTargetNamespaceDIR = os.path.join(self.AppInfo['TargetNamespaceDIR'], self.AppInfo['Namespace'],
                                              self.AppInfo['AppName'])
         TmpTargetNamespaceDIR = os.path.normpath(os.path.realpath(TmpTargetNamespaceDIR))
@@ -164,7 +188,7 @@ class NacosTool(object):
             return {
                 'ret_code': 1,
                 'result': TmpResponse
-            }
+            }'''
 
         print ('Apply Nacos Mysql....')
         if not self.k8sObj.checkNamespacedResourceHealth(name='mysql', namespace=self.AppInfo['Namespace'],
@@ -263,6 +287,8 @@ class NacosTool(object):
         TmpResponse = self.applyYAML()
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
+
+        return TmpResponse
 
 
 

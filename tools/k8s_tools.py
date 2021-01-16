@@ -6,6 +6,7 @@ import os, yaml
 from kubernetes.stream import stream
 from kubernetes.utils import create_from_dict
 from time import sleep
+from pprint import pprint
 
 
 class K8SClient(object):
@@ -628,11 +629,13 @@ class K8SClient(object):
 
     def checkNamespacedResourceHealth(self, name, kind, namespace):
         RawNamespacedFuncName = 'getNamespaced' + kind
+        sleep (5)
 
         try:
             if hasattr(self, RawNamespacedFuncName):
-                TmpResponse = getattr(self, RawNamespacedFuncName)(name=name, namespace=namespace).to_dict()
-                return TmpResponse['status']['replicas'] != TmpResponse['status']['ready_replicas']
+                TmpResponse = getattr(self, RawNamespacedFuncName)(name=name, namespace=namespace)
+                TmpResponse = TmpResponse['result'].to_dict()
+                return TmpResponse['status']['replicas'] == TmpResponse['status']['ready_replicas']
 
 
         except Exception as e:
