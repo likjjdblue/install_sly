@@ -16,8 +16,8 @@ from time import sleep
 from tools import k8s_tools
 from pprint import pprint
 
-class MongodbTool(object):
-    def __init__(self, namespace='default', nfsinfo={}, mongodbdatapath='nfs-provisioner', harbor=None, retrytimes=10):
+class RabbitmqHATool(object):
+    def __init__(self, namespace='default', nfsinfo={},rabbitmqdatapath='nfs-provisioner',harbor=None, retrytimes=10):
 
         namespace = namespace.strip()
         self.RetryTimes = int(retrytimes)
@@ -31,9 +31,8 @@ class MongodbTool(object):
         self.AppInfo['NFSAddr'] = self.NFSAddr
         self.AppInfo['NFSBasePath'] = self.NFSBasePath
         self.AppInfo['Namespace'] = namespace
-        self.AppInfo['MongodbDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, mongodbdatapath]))
-        self.AppInfo['ProvisionerPath'] = mongodbdatapath
-
+        self.AppInfo['RabbitmqDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, rabbitmqdatapath]))
+        self.AppInfo['ProvisionerPath'] = rabbitmqdatapath
 
         self.AppInfo['HarborAddr'] = harbor
         self.k8sObj = k8s_tools.K8SClient()
@@ -45,8 +44,9 @@ class MongodbTool(object):
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
-        print ('create MongoDB NFS successfully')
-        self.NFSObj.createSubFolder(self.AppInfo['MongodbDataPath'])
+
+        print ('create Rabbitmq HA NFS successfully')
+        self.NFSObj.createSubFolder(self.AppInfo['RabbitmqDataPath'])
 
 
         return {
@@ -55,10 +55,11 @@ class MongodbTool(object):
         }
 
     def generateValues(self):
-        self.AppInfo['MongodbImage'] = replaceDockerRepo(self.AppInfo['MongodbImage'], self.AppInfo['HarborAddr'])
+        self.AppInfo['BushboxImage'] = replaceDockerRepo(self.AppInfo['BusyboxImage'], self.AppInfo['HarborAddr'])
+        self.AppInfo['RabbitmqImage'] = replaceDockerRepo(self.AppInfo['RabbitmqImage'], self.AppInfo['HarborAddr'])
         self.AppInfo['NFSProvisionerImage'] =replaceDockerRepo(self.AppInfo['NFSProvisionerImage'],
                                                                self.AppInfo['HarborAddr'])
-        self.AppInfo['MongoPassword'] = crypto_tools.EncodeBase64(crypto_tools.generateRandomAlphaNumericString(lenght=10))
+        self.AppInfo['RabbitmqPassword'] = crypto_tools.EncodeBase64(crypto_tools.generateRandomAlphaNumericString(lenght=10))
 
 
     def renderTemplate(self):
@@ -82,12 +83,11 @@ class MongodbTool(object):
             with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='wb') as f:
                 yaml.safe_dump(self.AppInfo, f)
 
-
             TmpCWDPath = os.path.abspath(__file__)
             TmpCWDPath = os.path.dirname(TmpCWDPath)
 
-            subprocess.Popen('/usr/bin/cp -r %s %s'%(os.path.join(TmpCWDPath, 'resource')
-                                                     ,TmpTargetNamespaceDIR), shell=True)
+            subprocess.Popen('/usr/bin/cp -r %s %s'%(os.path.join(TmpCWDPath, 'resource'),
+                                                     TmpTargetNamespaceDIR), shell=True)
             sleep (5)
 
             for basepath, _, files in os.walk(os.path.join(TmpTargetNamespaceDIR, 'resource')):
@@ -127,6 +127,8 @@ class MongodbTool(object):
             return TmpResponse
 
         print ('setup NFS provisioner for  %s successfully '%(self.AppInfo['AppName'],))
+
+
 
         '''print ('Apply  RBAC...')
         TmpTargetNamespaceDIR = os.path.join(self.AppInfo['TargetNamespaceDIR'], self.AppInfo['Namespace'],
@@ -191,19 +193,21 @@ class MongodbTool(object):
                 'result': TmpResponse
             }'''
 
-        print ('Apply Mongodb YAML ...')
+        print ('Apply Rabbitmq HA YAML ...')
         TmpTargetNamespaceDIR = os.path.join(self.AppInfo['TargetNamespaceDIR'], self.AppInfo['Namespace'],
                                              self.AppInfo['AppName'])
         TmpTargetNamespaceDIR = os.path.normpath(os.path.realpath(TmpTargetNamespaceDIR))
 
-        if not self.k8sObj.checkNamespacedResourceHealth(name='mongodb', namespace=self.AppInfo['Namespace'],
+
+        print ('Apply  Rabbitmq HA ....')
+        if not self.k8sObj.checkNamespacedResourceHealth(name='rabbitmq-ha', namespace=self.AppInfo['Namespace'],
                                                          kind='StatefulSet'):
             try:
-                self.k8sObj.deleteNamespacedStatefulSet(name='mongodb', namespace=self.AppInfo['Namespace'])
+                self.k8sObj.deleteNamespacedStatefulSet(name='rabbitmq-ha', namespace=self.AppInfo['Namespace'])
             except:
                 pass
 
-            TmpResponse = self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mongodb.yaml'),
+            TmpResponse = self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'rabbitmq-ha.yaml'),
                                                          namespace=self.AppInfo['Namespace'])
             if TmpResponse['ret_code'] != 0:
                 print (TmpResponse)
@@ -211,7 +215,7 @@ class MongodbTool(object):
 
         isRunning=False
         for itime in range(self.RetryTimes):
-            TmpResponse = self.k8sObj.getNamespacedStatefulSet(name='mongodb',
+            TmpResponse = self.k8sObj.getNamespacedStatefulSet(name='rabbitmq-ha',
                                                                    namespace=self.AppInfo['Namespace'])['result'].to_dict()
 
 
@@ -241,6 +245,40 @@ class MongodbTool(object):
                                                                     str(TmpResponse['status']['replicas']))
         }
 
+    def createVhosts(self):
+        TmpRabbitmqPods = self.k8sObj.filterNamespacedPod(namespace=self.AppInfo['Namespace'], filters={
+            'app': 'rabbitmq-ha',
+            'release': 'rabbitmq-ha',
+        })['result']
+
+        TmpPod = None
+        for _ in range(1):
+            for pod in TmpRabbitmqPods:
+                print ('Config target Rabbitmq POD: '+str(pod.to_dict()['metadata']['name']))
+                TmpPod = pod.to_dict()
+                break
+
+
+        TmpAdminPassword = crypto_tools.DecodeBase64(self.AppInfo['RabbitmqPassword'])
+        self.k8sObj.execNamespacedPod(namespace=self.AppInfo['Namespace'], name=TmpPod['metadata']['name'],
+                                      cmd='rabbitmqctl add_user admin %s'%(TmpAdminPassword,)
+                                      )
+
+
+
+        self.k8sObj.execNamespacedPod(namespace=self.AppInfo['Namespace'], name=TmpPod['metadata']['name'],
+                                      cmd='rabbitmqctl set_user_tags admin administrator'
+                                      )
+
+        for vhost in self.AppInfo['VHosts']:
+            print ('creating Rabbitmq Vhost: '+str(vhost))
+            self.k8sObj.execNamespacedPod(namespace=self.AppInfo['Namespace'], name=TmpPod['metadata']['name'],
+                                           cmd='rabbitmqctl add_vhost %s'%(vhost.strip(),)
+                                           )
+
+
+
+
     def start(self):
         TmpResponse = self.setupNFS()
         if TmpResponse['ret_code'] != 0:
@@ -252,12 +290,11 @@ class MongodbTool(object):
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
-        return TmpResponse
-
 
 
 
 if __name__ == "__main__":
-    tmp = MongodbTool(namespace='sly2', nfsinfo=dict(hostname='192.168.0.68', port=22, username='root', password='!QAZ2wsx1234',
+    tmp = RabbitmqHATool(namespace='sly2', nfsinfo=dict(hostname='192.168.0.68', port=22, username='root', password='!QAZ2wsx1234',
                          basepath='/TRS/DATA'))
     tmp.start()
+    tmp.createVhosts()

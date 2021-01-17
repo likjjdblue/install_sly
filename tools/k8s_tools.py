@@ -498,13 +498,13 @@ class K8SClient(object):
             TmpResponse = self.K8SCoreV1Client.list_namespaced_pod(namespace=namespace, label_selector=TmpFilterStr)
             return {
                 'ret_code': 0,
-                'result': TmpResponse
+                'result': TmpResponse.items
             }
         except Exception as e:
             print (str(e))
             return {
                 "ret_code": 0,
-                'result': TmpResponse.items
+                'result': None
             }
 
     def execNamespacedPod(self, name,namespace='default',cmd=''):
