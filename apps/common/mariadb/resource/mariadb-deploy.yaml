@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: mariadb
+  name: mariadb-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: mariadb
+  template:
+    metadata:
+      labels:
+        run: mariadb
+    spec:
+      volumes:
+      - name: mariadb-data
+        persistentVolumeClaim:
+          claimName: mariadb-pvc-data
+      - name: mariadb-conf
+        configMap:
+          name: mariadb-configmap
+      containers:
+      - image: {{ MariaDBImage }}
+#      - image: registry.cn-hangzhou.aliyuncs.com/trsrd/mysql:utf8mb4-5.7.27
+        imagePullPolicy: IfNotPresent
+        name: mariadb
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "{{ MariaDBPassword }}"
+        ports:
+        - containerPort: 3306
+        volumeMounts:
+        - mountPath: "/var/lib/mysql"
+          name: mariadb-data
+        - mountPath: "/etc/mysql/conf.d/mysql.cnf"
+          name: mariadb-conf
+      restartPolicy: Always
+

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mariadb-pvc-data
+spec:
+  accessModes:
+     - ReadWriteOnce
+  volumeMode: Filesystem
+  storageClassName: mariadb-pv-data-class
+  resources:
+     requests:
+       storage: 20Gi
