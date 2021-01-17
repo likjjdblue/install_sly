@@ -52,8 +52,10 @@ class NFSTool(object):
                 print ('Failed to install NFS ')
                 return TmpResult
 
-            self.SSHClient.ExecCmd('firewall-cmd --permanent --add-service=nfs;fireawall-cmd --reload')
+            TmpRuls = 'firewall-cmd --permanent --add-service=nfs;firewall-cmd --permanent --add-service=mountd;firewall-cmd --permanent --add-service=rpc-bind;firewall-cmd --reload'
+            self.SSHClient.ExecCmd(TmpRuls)
             self.SSHClient.ExecCmd('systemctl enable nfs')
+
 
         print ('Setup NFS .....')
         self.SSHClient.ExecCmd('mkdir -p %s'%(basedir,))
