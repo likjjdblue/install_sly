@@ -83,7 +83,11 @@ class RedisHATool(object):
             with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='wb') as f:
                 yaml.safe_dump(self.AppInfo, f)
 
-            subprocess.Popen('/usr/bin/cp -r resource %s'%(TmpTargetNamespaceDIR,), shell=True)
+            TmpCWDPath = os.path.abspath(__file__)
+            TmpCWDPath = os.path.dirname(TmpCWDPath)
+
+            subprocess.Popen('/usr/bin/cp -r %s %s'%(os.path.join(TmpCWDPath, 'resource'),
+                                                     TmpTargetNamespaceDIR), shell=True)
             sleep (5)
 
             for basepath, _, files in os.walk(os.path.join(TmpTargetNamespaceDIR, 'resource')):
@@ -256,6 +260,6 @@ class RedisHATool(object):
 
 
 if __name__ == "__main__":
-    tmp = RedisHATool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.168', port=1022, username='root', password='!QAZ2wsx1234',
+    tmp = RedisHATool(namespace='sly2', nfsinfo=dict(hostname='192.168.0.68', port=22, username='root', password='!QAZ2wsx1234',
                          basepath='/TRS/DATA'))
     tmp.start()

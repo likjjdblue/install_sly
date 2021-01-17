@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData">
+  <component name="PublishConfigData" serverName="192.168.0.68">
     <serverData>
+      <paths name="192.168.0.68">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/home/source/install_sly" local="$PROJECT_DIR$" web="/" />
+            <mapping local="" />
+          </mappings>
+        </serverdata>
+      </paths>
       <paths name="192.168.200.168">
         <serverdata>
           <mappings>

@@ -82,7 +82,12 @@ class MongodbTool(object):
             with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='wb') as f:
                 yaml.safe_dump(self.AppInfo, f)
 
-            subprocess.Popen('/usr/bin/cp -r resource %s'%(TmpTargetNamespaceDIR,), shell=True)
+
+            TmpCWDPath = os.path.abspath(__file__)
+            TmpCWDPath = os.path.dirname(TmpCWDPath)
+
+            subprocess.Popen('/usr/bin/cp -r %s %s'%(os.path.join(TmpCWDPath, 'resource')
+                                                     ,TmpTargetNamespaceDIR), shell=True)
             sleep (5)
 
             for basepath, _, files in os.walk(os.path.join(TmpTargetNamespaceDIR, 'resource')):

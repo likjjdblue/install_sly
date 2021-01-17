@@ -14,7 +14,7 @@ class SSHTool(object):
 
         self.SSHObj = SSHClient()
         self.SSHObj.load_system_host_keys()
-        self.SSHObj.set_missing_host_key_policy(paramiko.client.AutoAddPolicy)
+        self.SSHObj.set_missing_host_key_policy(paramiko.client.AutoAddPolicy())
 
     def checkConnection(self):
         if self.GoodConnection:
