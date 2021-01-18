@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nacostool
+spec:
+  containers:
+  - name: nacos-tool
+    image: {{ NaocsToolImage }}
+    imagePullPolicy: IfNotPresent
+    env:
+    - name: LC_ALL
+      value: 'en_US.UTF-8'
+    - name: NacosHostIP
+      value: 'nacos-headless'
+    - name: NacosHostPort
+      value: '8848'
+    - name: NaocsUserName
+      value: nacos
+    - name: NacosUserPassword
+      value: nacos
+    - name: RetryInterval
+      value: '10'
+    - name: RetryTimes
+      value: '10'
+    - name: ConnectionTimeOut
+      value: '10'
+    volumeMounts:
+    - mountPath: /TRS/DATA
+      name: pvc-nacostool-data-new
+#  nodeSelector:
+#     kubernetes.io/hostname: "10.0.100.98"
+  restartPolicy: Never
+  volumes:
+  - name: pvc-nacostool-data-new
+    persistentVolumeClaim:
+      claimName: pvc-nacostool-data-new

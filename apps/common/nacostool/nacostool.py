@@ -17,8 +17,8 @@ from tools import k8s_tools
 from pprint import pprint
 from codecs import open as open
 
-class SQLTool(object):
-    def __init__(self, namespace='default', sqlfilepath='sqltool-pv-sql', sqlaccountpath='sqltool-pv-account',
+class NacosTool(object):
+    def __init__(self, namespace='default', nacosdatapath='nacostool',
                  nfsinfo={},harbor=None, retrytimes=600):
 
         namespace = namespace.strip()
@@ -32,9 +32,7 @@ class SQLTool(object):
 
         self.AppInfo['NFSAddr'] = self.NFSAddr
         self.AppInfo['NFSBasePath'] = self.NFSBasePath
-        self.AppInfo['SQLFilePath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, sqlfilepath]))
-        self.AppInfo['SQLAccountPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, sqlaccountpath]))
-
+        self.AppInfo['NacosDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, nacosdatapath]))
 
         self.AppInfo['Namespace'] = namespace
 
@@ -50,15 +48,14 @@ class SQLTool(object):
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
-        print ('create SQLTool NFS successfully')
+        print ('create NacosTool NFS successfully')
 
-        self.NFSObj.createSubFolder(self.AppInfo['SQLFilePath'])
-        self.NFSObj.createSubFolder(self.AppInfo['SQLAccountPath'])
-
+        self.NFSObj.createSubFolder(self.AppInfo['NacosDataPath'])
 
 
 
-        print ('setup SQLTool NFS successfully')
+
+        print ('setup NacosTool NFS successfully')
 
         return {
             'ret_code': 0,
@@ -66,7 +63,7 @@ class SQLTool(object):
         }
 
     def generateValues(self):
-        self.AppInfo['SQLToolImage'] = replaceDockerRepo(self.AppInfo['SQLToolImage'], self.AppInfo['HarborAddr'])
+        self.AppInfo['NaocsToolImage'] = replaceDockerRepo(self.AppInfo['NaocsToolImage'], self.AppInfo['HarborAddr'])
         self.AppInfo['NFSProvisionerImage'] =replaceDockerRepo(self.AppInfo['NFSProvisionerImage'],
                                                                self.AppInfo['HarborAddr'])
 
@@ -118,11 +115,11 @@ class SQLTool(object):
             return TmpResponse
 
 
-        print ('Apply SQLTool ....')
+        print ('Apply NacosTool ....')
         if True:
             try:
                 print ('delete pod....')
-                tmp=self.k8sObj.deleteNamespacedPod(name='sqltool-deploy', namespace=self.AppInfo['Namespace'])
+                tmp=self.k8sObj.deleteNamespacedPod(name='nacostool', namespace=self.AppInfo['Namespace'])
                 print (tmp)
             except Exception as e:
                 pass
@@ -132,16 +129,16 @@ class SQLTool(object):
             TmpTargetNamespaceDIR = os.path.normpath(os.path.realpath(TmpTargetNamespaceDIR))
 
 
-            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'sqltool-pv.yaml'),
+            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'nacostool-pv.yaml'),
                                                namespace=self.AppInfo['Namespace']
                                                )
-            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'sqltool-pvc.yaml'),
+            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'nacostool-pvc.yaml'),
                                                namespace=self.AppInfo['Namespace']
                                                )
 
 
             TmpResponse = self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource',
-                                                        'sqltool-deploy.yaml'),namespace=self.AppInfo['Namespace'])
+                                                        'nacostool-deploy.yaml'),namespace=self.AppInfo['Namespace'])
             if TmpResponse['ret_code'] != 0:
                 print (TmpResponse)
                 return TmpResponse
@@ -149,7 +146,7 @@ class SQLTool(object):
         isRunning=False
         for itime in range(self.RetryTimes):
             print ('current times: '+str(itime))
-            TmpResponse = self.k8sObj.getNamespacedPod(name='sqltool-deploy',
+            TmpResponse = self.k8sObj.getNamespacedPod(name='nacostool',
                                                                    namespace=self.AppInfo['Namespace'])['result'].to_dict()
 
             TmpPodStatus = TmpResponse['status']['phase']
@@ -196,6 +193,6 @@ class SQLTool(object):
 
 
 if __name__ == "__main__":
-    tmp = SQLTool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.168', port=1022, username='root', password='!QAZ2wsx1234',
+    tmp = NacosTool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.168', port=1022, username='root', password='!QAZ2wsx1234',
                          basepath='/TRS/DATA'))
     tmp.start()
