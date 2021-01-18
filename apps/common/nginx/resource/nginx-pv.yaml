@@ -1,0 +1,48 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nginx-pv-log
+spec:
+  capacity:
+    storage: 40Gi
+  volumeMode: Filesystem
+  storageClassName: nginx-pv-log-class
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: {{ NginxLogDataPath }}
+    server: {{ NFSAddr }}
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nginx-pv-web
+spec:
+  capacity:
+    storage: 40Gi
+  volumeMode: Filesystem
+  storageClassName: nginx-pv-web-class
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: {{ NginxDataPath }}
+    server: {{ NFSAddr }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nginx-pv-config
+spec:
+  capacity:
+    storage: 40Gi
+  volumeMode: Filesystem
+  storageClassName: nginx-pv-config-class
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: {{ NginxConfigDataPath }}
+    server: {{ NFSAddr }}

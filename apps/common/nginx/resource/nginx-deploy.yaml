@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: nginx
+  name: nginx-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: nginx
+  template:
+    metadata:
+      labels:
+        run: nginx
+    spec:
+      volumes:
+      - name: local-date
+        hostPath: 
+          path: /etc/localtime
+      - name: nginx-data-web
+        persistentVolumeClaim:
+          claimName: nginx-pvc-web
+      - name: nginx-data-log
+        persistentVolumeClaim:
+          claimName: nginx-pvc-log
+      - name: nginx-config-data
+        persistentVolumeClaim:
+           claimName: nginx-pvc-config
+      - name: nginx-config
+        configMap:
+          name: nginx-configmap
+      containers:
+      - image: {{ NginxImage }}
+        name: nginx
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: "/etc/localtime"
+          name: local-date
+        - mountPath: "/TRS/WEB/"
+          name: nginx-data-web
+        - mountPath: "/var/log/nginx/"
+          name: nginx-data-log
+        - mountPath: "/etc/nginx/conf.d"
+          name: nginx-config-data
+        - mountPath: "/etc/nginx/nginx.conf"
+          name: nginx-config
+          subPath: nginx.conf
+      restartPolicy: Always

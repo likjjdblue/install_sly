@@ -8,7 +8,7 @@ from tools import k8s_tools
 from metadata import AppInfo
 from copy import deepcopy
 from apps import replaceDockerRepo
-from  tools import crypto_tools
+from  tools import crypto_tools, ssh_tools
 import jinja2
 import yaml
 import subprocess
@@ -17,9 +17,9 @@ from tools import k8s_tools
 from pprint import pprint
 from codecs import open as open
 
-class MariaDBTool(object):
-    def __init__(self, namespace='default', mariadbdatapath='mariadb-pv-data', nfsinfo={},
-                 harbor=None, retrytimes=10):
+class NginxTool(object):
+    def __init__(self, namespace='default', nginxdatapath='nginx-pv-web', nginxlogpath='nginx-pv-log',
+                 nginxconfigpath='nginx-pv-config', nfsinfo={},harbor=None, retrytimes=10):
 
         namespace = namespace.strip()
         self.RetryTimes = int(retrytimes)
@@ -32,24 +32,34 @@ class MariaDBTool(object):
 
         self.AppInfo['NFSAddr'] = self.NFSAddr
         self.AppInfo['NFSBasePath'] = self.NFSBasePath
-        self.AppInfo['MariaDBDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, mariadbdatapath]))
+        self.AppInfo['NginxDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, nginxdatapath]))
+        self.AppInfo['NginxLogDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, nginxlogpath]))
+        self.AppInfo['NginxConfigDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, nginxconfigpath]))
+
+
         self.AppInfo['Namespace'] = namespace
 
         self.AppInfo['HarborAddr'] = harbor
         self.k8sObj = k8s_tools.K8SClient()
 
         self.NFSObj = nfs.NFSTool(**nfsinfo)
+        self.SSHObj = ssh_tools.SSHTool(hostname=nfsinfo['hostname'], port=nfsinfo['port'], username=nfsinfo['username'],
+                                password=nfsinfo['password'])
 
     def setupNFS(self):
         TmpResponse = self.NFSObj.installNFS(basedir=self.AppInfo['NFSBasePath'])
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
-        print ('create MariaDB NFS successfully')
+        print ('create Nginx NFS successfully')
 
-        self.NFSObj.createSubFolder(self.AppInfo['MariaDBDataPath'])
+        self.NFSObj.createSubFolder(self.AppInfo['NginxDataPath'])
+        self.NFSObj.createSubFolder(self.AppInfo['NginxLogDataPath'])
+        self.NFSObj.createSubFolder(self.AppInfo['NginxConfigDataPath'])
 
-        print ('setup MariaDB NFS successfully')
+
+
+        print ('setup Nginx NFS successfully')
 
         return {
             'ret_code': 0,
@@ -57,10 +67,10 @@ class MariaDBTool(object):
         }
 
     def generateValues(self):
-        self.AppInfo['MariaDBImage'] = replaceDockerRepo(self.AppInfo['MariaDBImage'], self.AppInfo['HarborAddr'])
+        self.AppInfo['NginxImage'] = replaceDockerRepo(self.AppInfo['NginxImage'], self.AppInfo['HarborAddr'])
         self.AppInfo['NFSProvisionerImage'] =replaceDockerRepo(self.AppInfo['NFSProvisionerImage'],
                                                                self.AppInfo['HarborAddr'])
-        self.AppInfo['MariaDBPassword'] = crypto_tools.generateRandomAlphaNumericString(lenght=10)
+
 
 
     def renderTemplate(self):
@@ -109,11 +119,11 @@ class MariaDBTool(object):
             return TmpResponse
 
 
-        print ('Apply MariaDB ....')
-        if not self.k8sObj.checkNamespacedResourceHealth(name='mariadb-deploy', namespace=self.AppInfo['Namespace'],
+        print ('Apply Nginx ....')
+        if not self.k8sObj.checkNamespacedResourceHealth(name='nginx-deploy', namespace=self.AppInfo['Namespace'],
                                                          kind='Deployment'):
             try:
-                self.k8sObj.deleteNamespacedDeployment(name='mariadb-deploy', namespace=self.AppInfo['Namespace'])
+                self.k8sObj.deleteNamespacedDeployment(name='nginx-deploy', namespace=self.AppInfo['Namespace'])
             except:
                 pass
 
@@ -122,30 +132,29 @@ class MariaDBTool(object):
             TmpTargetNamespaceDIR = os.path.normpath(os.path.realpath(TmpTargetNamespaceDIR))
 
 
+            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'nginx-pv.yaml'),
+                                               namespace=self.AppInfo['Namespace']
+                                               )
+            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'nginx-pvc.yaml'),
+                                               namespace=self.AppInfo['Namespace']
+                                               )
+            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'nginx-svc.yaml'),
+                                               namespace=self.AppInfo['Namespace']
+                                               )
+            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'nginx-cm-nginx.conf.yaml'),
+                                               namespace=self.AppInfo['Namespace']
+                                               )
 
-            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mariadb-cm.yaml'),
-                                               namespace=self.AppInfo['Namespace']
-                                               )
-            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mariadb-pv.yaml'),
-                                               namespace=self.AppInfo['Namespace']
-                                               )
-            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mariadb-pvc.yaml'),
-                                               namespace=self.AppInfo['Namespace']
-                                               )
-            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mariadb-svc.yaml'),
-                                               namespace=self.AppInfo['Namespace']
-                                               )
 
-
-            TmpResponse = self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mariadb-deploy.yaml'),
-                                                         namespace=self.AppInfo['Namespace'])
+            TmpResponse = self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource',
+                                                        'nginx-deploy.yaml'),namespace=self.AppInfo['Namespace'])
             if TmpResponse['ret_code'] != 0:
                 print (TmpResponse)
                 return TmpResponse
 
         isRunning=False
         for itime in range(self.RetryTimes):
-            TmpResponse = self.k8sObj.getNamespacedDeployment(name='mariadb-deploy',
+            TmpResponse = self.k8sObj.getNamespacedDeployment(name='nginx-deploy',
                                                                    namespace=self.AppInfo['Namespace'])['result'].to_dict()
 
             if (TmpResponse['status']['replicas'] != TmpResponse['status']['ready_replicas']) and \
@@ -167,7 +176,7 @@ class MariaDBTool(object):
                 'ret_code': 1,
                 'result': 'Failed to apply Deployment: %s'%(TmpResponse['metadata']['name'],)
             }
-        print ('Waitting MariaDB for running....')
+        print ('Waitting Nginx for running....')
         sleep(180)
 
         return {
@@ -193,6 +202,6 @@ class MariaDBTool(object):
 
 
 if __name__ == "__main__":
-    tmp = MariaDBTool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.168', port=1022, username='root', password='!QAZ2wsx1234',
+    tmp = NginxTool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.168', port=1022, username='root', password='!QAZ2wsx1234',
                          basepath='/TRS/DATA'))
     tmp.start()

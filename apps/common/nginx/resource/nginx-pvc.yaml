@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nginx-pvc-log
+spec:
+  accessModes:
+     - ReadWriteOnce
+  volumeMode: Filesystem
+  storageClassName: nginx-pv-log-class
+  resources:
+     requests:
+       storage: 40Gi
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nginx-pvc-web
+spec:
+  accessModes:
+     - ReadWriteOnce
+  volumeMode: Filesystem
+  storageClassName: nginx-pv-web-class
+  resources:
+     requests:
+       storage: 40Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nginx-pvc-config
+spec:
+  accessModes:
+     - ReadWriteOnce
+  volumeMode: Filesystem
+  storageClassName: nginx-pv-config-class
+  resources:
+     requests:
+       storage: 40Gi       
+
