@@ -9,6 +9,9 @@ def replaceDockerRepo(image, harboraddr):
         return image
 
     TmpOriginalRepoList = image.split('/')
+    if len(TmpOriginalRepoList)<=1:
+        TmpOriginalRepoList = [''] + TmpOriginalRepoList
+
     TmpOriginalRepoList[0] = harboraddr
     return '/'.join(TmpOriginalRepoList)
 
