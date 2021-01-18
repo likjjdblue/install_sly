@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sqltool-deploy
+spec:
+  containers:
+  - name: sql-tool
+    image: {{ SQLToolImage }}
+    imagePullPolicy: IfNotPresent
+    volumeMounts:
+    - mountPath: /TRS/account
+      name: pvc-sqltool-account
+    - mountPath: /TRS/sql
+      name: pvc-sqltool-sql
+    env:
+      - name: db_host
+        value: "mariadb-svc"
+  nodeSelector:
+     kubernetes.io/hostname: "192.168.24.31"
+  restartPolicy: Never
+  volumes:
+  - name: pvc-sqltool-account
+    persistentVolumeClaim:
+      claimName: sqltool-pvc-account
+  - name: pvc-sqltool-sql
+    persistentVolumeClaim:
+      claimName: sqltool-pvc-sql
