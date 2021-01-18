@@ -485,7 +485,7 @@ class K8SClient(object):
                 'result': 'Pod object deleted'
             }
 
-        self.K8SRbacAuthorizationV1Client.delete_namespaced_pod(name=name, namespace=namespace)
+        self.K8SCoreV1Client.delete_namespaced_pod(name=name, namespace=namespace)
         return {
             "ret_code": 0,
             'result': 'Pod object deleted'
