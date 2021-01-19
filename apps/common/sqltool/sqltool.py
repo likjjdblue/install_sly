@@ -110,6 +110,9 @@ class SQLTool(object):
                     with open(os.path.join(basepath, file), mode='wb', encoding='utf-8') as f:
                         f.write(TmpContent)
 
+        with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='rb', encoding='utf-8') as f:
+            self.AppInfo = yaml.safe_load(f)
+
     def applyYAML(self):
         print ('Create namespace: '+str(self.AppInfo['Namespace']))
         TmpResponse = self.k8sObj.createNamespace(name=self.AppInfo['Namespace'])
@@ -191,6 +194,20 @@ class SQLTool(object):
             return TmpResponse
 
         return TmpResponse
+
+
+    def getValues(self):
+        TmpTargetNamespaceDIR = os.path.join(self.AppInfo['TargetNamespaceDIR'], self.AppInfo['Namespace'],
+                                             self.AppInfo['AppName'])
+        TmpTargetNamespaceDIR = os.path.normpath(os.path.realpath(TmpTargetNamespaceDIR))
+
+
+        TmpValuse = None
+        if  os.path.isfile(os.path.join(TmpTargetNamespaceDIR, 'values.yaml')):
+
+            with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='rb') as f:
+                TmpValuse = yaml.safe_load(f)
+        return TmpValuse
 
 
 

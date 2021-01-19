@@ -104,6 +104,10 @@ class NacosTool(object):
                     with open(os.path.join(basepath, file), mode='wb') as f:
                         f.write(TmpContent)
 
+
+        with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='rb', encoding='utf-8') as f:
+            self.AppInfo = yaml.safe_load(f)
+
     def applyYAML(self):
         print ('Create namespace: '+str(self.AppInfo['Namespace']))
         TmpResponse = self.k8sObj.createNamespace(name=self.AppInfo['Namespace'])

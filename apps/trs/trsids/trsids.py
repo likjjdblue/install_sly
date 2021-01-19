@@ -8,7 +8,7 @@ from tools import k8s_tools
 from metadata import AppInfo
 from copy import deepcopy
 from apps import replaceDockerRepo
-from  tools import crypto_tools, ssh_tools
+from  tools import crypto_tools
 import jinja2
 import yaml
 import subprocess
@@ -16,12 +16,18 @@ from time import sleep
 from tools import k8s_tools
 from pprint import pprint
 from codecs import open as open
+import importlib
 
-class NginxTool(object):
-    def __init__(self, namespace='default', nginxdatapath='nginx-pv-web', nginxlogpath='nginx-pv-log',
-                 nginxconfigpath='nginx-pv-config', nfsinfo={},harbor=None, retrytimes=10):
+class TRSIDSTool(object):
+    def __init__(self, namespace='default', trsidsdatapath='trsids-pv-data', nfsinfo={},
+                 harbor=None, retrytimes=10, *args, **kwargs):
 
         namespace = namespace.strip()
+        kwargs['namespace'] = namespace
+        kwargs['nfsinfo'] = nfsinfo
+        kwargs['harbor'] = harbor
+        self.kwargs = kwargs
+
         self.RetryTimes = int(retrytimes)
         self.NFSAddr = nfsinfo['hostname']
         self.NFSPort = nfsinfo['port']
@@ -32,34 +38,27 @@ class NginxTool(object):
 
         self.AppInfo['NFSAddr'] = self.NFSAddr
         self.AppInfo['NFSBasePath'] = self.NFSBasePath
-        self.AppInfo['NginxDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, nginxdatapath]))
-        self.AppInfo['NginxLogDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, nginxlogpath]))
-        self.AppInfo['NginxConfigDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, nginxconfigpath]))
-
-
+        self.AppInfo['TRSIDSDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, trsidsdatapath]))
         self.AppInfo['Namespace'] = namespace
 
         self.AppInfo['HarborAddr'] = harbor
         self.k8sObj = k8s_tools.K8SClient()
 
         self.NFSObj = nfs.NFSTool(**nfsinfo)
-        self.SSHObj = ssh_tools.SSHTool(hostname=nfsinfo['hostname'], port=nfsinfo['port'], username=nfsinfo['username'],
-                                password=nfsinfo['password'])
+
+        self.DependencyDict ={}
+        self.BaseDIRPath= os.path.realpath('../../..')
 
     def setupNFS(self):
         TmpResponse = self.NFSObj.installNFS(basedir=self.AppInfo['NFSBasePath'])
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
-        print ('create Nginx NFS successfully')
+        print ('create TRS IDS NFS successfully')
 
-        self.NFSObj.createSubFolder(self.AppInfo['NginxDataPath'])
-        self.NFSObj.createSubFolder(self.AppInfo['NginxLogDataPath'])
-        self.NFSObj.createSubFolder(self.AppInfo['NginxConfigDataPath'])
+        self.NFSObj.createSubFolder(self.AppInfo['TRSIDSDataPath'])
 
-
-
-        print ('setup Nginx NFS successfully')
+        print ('setup TRS IDS NFS successfully')
 
         return {
             'ret_code': 0,
@@ -67,10 +66,10 @@ class NginxTool(object):
         }
 
     def generateValues(self):
-        self.AppInfo['NginxImage'] = replaceDockerRepo(self.AppInfo['NginxImage'], self.AppInfo['HarborAddr'])
+        self.AppInfo['TRSIDSImage'] = replaceDockerRepo(self.AppInfo['TRSIDSImage'], self.AppInfo['HarborAddr'])
         self.AppInfo['NFSProvisionerImage'] =replaceDockerRepo(self.AppInfo['NFSProvisionerImage'],
                                                                self.AppInfo['HarborAddr'])
-
+        self.AppInfo['TRSIDSPassword'] = crypto_tools.generateRandomAlphaNumericString(lenght=10)
 
 
     def renderTemplate(self):
@@ -123,11 +122,11 @@ class NginxTool(object):
             return TmpResponse
 
 
-        print ('Apply Nginx ....')
-        if not self.k8sObj.checkNamespacedResourceHealth(name='nginx-deploy', namespace=self.AppInfo['Namespace'],
+        print ('Apply TRS IDS ....')
+        if not self.k8sObj.checkNamespacedResourceHealth(name='ids-deploy', namespace=self.AppInfo['Namespace'],
                                                          kind='Deployment'):
             try:
-                self.k8sObj.deleteNamespacedDeployment(name='nginx-deploy', namespace=self.AppInfo['Namespace'])
+                self.k8sObj.deleteNamespacedDeployment(name='ids-deploy', namespace=self.AppInfo['Namespace'])
             except:
                 pass
 
@@ -136,29 +135,24 @@ class NginxTool(object):
             TmpTargetNamespaceDIR = os.path.normpath(os.path.realpath(TmpTargetNamespaceDIR))
 
 
-            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'nginx-pv.yaml'),
+
+            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mty-ids-cm.yaml'),
                                                namespace=self.AppInfo['Namespace']
                                                )
-            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'nginx-pvc.yaml'),
-                                               namespace=self.AppInfo['Namespace']
-                                               )
-            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'nginx-svc.yaml'),
-                                               namespace=self.AppInfo['Namespace']
-                                               )
-            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'nginx-cm-nginx.conf.yaml'),
+            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mty-ids-svc.yaml'),
                                                namespace=self.AppInfo['Namespace']
                                                )
 
 
-            TmpResponse = self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource',
-                                                        'nginx-deploy.yaml'),namespace=self.AppInfo['Namespace'])
+            TmpResponse = self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mty-ids-deploy.yaml'),
+                                                         namespace=self.AppInfo['Namespace'])
             if TmpResponse['ret_code'] != 0:
                 print (TmpResponse)
                 return TmpResponse
 
         isRunning=False
         for itime in range(self.RetryTimes):
-            TmpResponse = self.k8sObj.getNamespacedDeployment(name='nginx-deploy',
+            TmpResponse = self.k8sObj.getNamespacedDeployment(name='mariadb-deploy',
                                                                    namespace=self.AppInfo['Namespace'])['result'].to_dict()
 
             if (TmpResponse['status']['replicas'] != TmpResponse['status']['ready_replicas']) and \
@@ -180,7 +174,7 @@ class NginxTool(object):
                 'ret_code': 1,
                 'result': 'Failed to apply Deployment: %s'%(TmpResponse['metadata']['name'],)
             }
-        print ('Waitting Nginx for running....')
+        print ('Waitting MariaDB for running....')
         sleep(180)
 
         return {
@@ -196,30 +190,73 @@ class NginxTool(object):
 
         self.renderTemplate()
 
-        TmpResponse = self.applyYAML()
+        TmpResponse = self.PreInstall()
         if TmpResponse['ret_code'] != 0:
-            return TmpResponse
-
-        return TmpResponse
-
-
-    def getValues(self):
-        TmpTargetNamespaceDIR = os.path.join(self.AppInfo['TargetNamespaceDIR'], self.AppInfo['Namespace'],
-                                             self.AppInfo['AppName'])
-        TmpTargetNamespaceDIR = os.path.normpath(os.path.realpath(TmpTargetNamespaceDIR))
+            print ('Failed to install %s, because of preinstall failure'%(self.AppInfo['AppName'], ))
+            return {
+                'ret_code': 1,
+                'result': 'Failed to install %s, because of preinstall failure'%(self.AppInfo['AppName'], )
+            }
 
 
-        TmpValuse = None
-        if  os.path.isfile(os.path.join(TmpTargetNamespaceDIR, 'values.yaml')):
 
-            with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='rb') as f:
-                TmpValuse = yaml.safe_load(f)
-        return TmpValuse
+
+    def installDependences(self):
+        for TmpRawStr in self.AppInfo['dependences']:
+            TmpList = TmpRawStr.split('/')
+            print (TmpList)
+            TmpModuleName, TmpClsName = (TmpList[0], TmpList[1])
+            TmpModule = importlib.import_module(TmpModuleName)
+            TmpInstance = getattr(TmpModule, TmpClsName)(**self.kwargs)
+            TmpResponse = TmpInstance.start()
+
+            if TmpResponse['ret_code'] != 0:
+                print ('%s faild to install dependency %s '%(self.AppInfo['AppName'], TmpClsName))
+                return TmpResponse
+
+            print ('%s  install dependency %s  successfully' % (self.AppInfo['AppName'], TmpClsName))
+            TmpInfo = TmpInstance.getValues()
+
+            if TmpClsName == 'MariaDBTool':
+                self.DependencyDict['MariaDBPassword'] = TmpInfo['MariaDBPassword']
+            else:
+                pass
+        return {
+            'ret_code': 0,
+            'result': 'all dependencies installed'
+        }
+
+
+    def PreInstall(self):
+        TmpResponse = self.installDependences()
+        if TmpResponse['ret_code'] != 0:
+            print ('failed to install %s ,because of dependency failuere'%(self.AppInfo['AppName'], ))
+            return {
+                'ret_code': 1,
+                'result': 'failed to install %s ,because of dependency failuere'%(self.AppInfo['AppName'], )
+            }
+        if not os.path.isdir(os.path.join(self.BaseDIRPath, 'tmp')):
+            os.mkdir(os.path.join(self.BaseDIRPath, 'tmp'))
+
+        with open(os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'),mode='wb',encoding='utf-8') as f:
+            f.write('root root '+self.DependencyDict['MariaDBPassword']+'\n')
+            f.write('%s %s %s'%(self.AppInfo['TRSIDSDBName'], self.AppInfo['TRSIDSDBUser'], self.AppInfo['TRSIDSPassword'])+'\n')
+
+
+
+        return {
+            'ret_code': 0,
+            'result': '',
+        }
+
+
+
 
 
 
 
 if __name__ == "__main__":
-    tmp = NginxTool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.168', port=1022, username='root', password='!QAZ2wsx1234',
+    tmp = TRSIDSTool(namespace='sly2', nfsinfo=dict(hostname='192.168.24.13', port=22, username='root', password='Abc123',
                          basepath='/TRS/DATA'))
-    tmp.start()
+
+    print (tmp.start())

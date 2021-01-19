@@ -1,0 +1,31 @@
+# Source: wcm/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ids-deploy
+  labels:
+    app: ids
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ids
+  template:
+    metadata:
+      labels:
+        app: ids
+    spec:
+      containers:
+        - name: ids
+          image: registry.cn-hangzhou.aliyuncs.com/trsrd/trsids:5.1-134463-20210104-new1
+          envFrom:
+             - configMapRef:
+                 name: ids-configmap 
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8300
+              protocol: TCP
+            - name: sockport
+              containerPort: 2005
+              protocol: TCP
