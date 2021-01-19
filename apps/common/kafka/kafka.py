@@ -191,6 +191,21 @@ class KafkaTool(object):
 
 
 
+    def getValues(self):
+        TmpTargetNamespaceDIR = os.path.join(self.AppInfo['TargetNamespaceDIR'], self.AppInfo['Namespace'],
+                                             self.AppInfo['AppName'])
+        TmpTargetNamespaceDIR = os.path.normpath(os.path.realpath(TmpTargetNamespaceDIR))
+
+
+        TmpValuse = None
+        if  os.path.isfile(os.path.join(TmpTargetNamespaceDIR, 'values.yaml')):
+
+            with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='rb') as f:
+                TmpValuse = yaml.safe_load(f)
+        return TmpValuse
+
+
+
 
 if __name__ == "__main__":
     tmp = KafkaTool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.168', port=1022, username='root', password='!QAZ2wsx1234',

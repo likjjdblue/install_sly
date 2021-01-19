@@ -168,13 +168,14 @@ class MariaDBTool(object):
                 'result': 'Failed to apply Deployment: %s'%(TmpResponse['metadata']['name'],)
             }
         print ('Waitting MariaDB for running....')
-        sleep(180)
+        sleep(120)
 
         return {
             'ret_code': 0,
             'result': 'Deployment: %s is available;replicas: %s'%(TmpResponse['metadata']['name'],
                                                                     str(TmpResponse['status']['replicas']))
         }
+
 
     def start(self):
         TmpResponse = self.setupNFS()
@@ -188,6 +189,21 @@ class MariaDBTool(object):
             return TmpResponse
 
         return TmpResponse
+
+
+    def getValues(self):
+        TmpTargetNamespaceDIR = os.path.join(self.AppInfo['TargetNamespaceDIR'], self.AppInfo['Namespace'],
+                                             self.AppInfo['AppName'])
+        TmpTargetNamespaceDIR = os.path.normpath(os.path.realpath(TmpTargetNamespaceDIR))
+
+
+        TmpValuse = None
+        if  os.path.isfile(os.path.join(TmpTargetNamespaceDIR, 'values.yaml')):
+
+            with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='rb') as f:
+                TmpValuse = yaml.safe_load(f)
+        return TmpValuse
+
 
 
 

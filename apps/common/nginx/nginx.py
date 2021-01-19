@@ -199,6 +199,20 @@ class NginxTool(object):
         return TmpResponse
 
 
+    def getValues(self):
+        TmpTargetNamespaceDIR = os.path.join(self.AppInfo['TargetNamespaceDIR'], self.AppInfo['Namespace'],
+                                             self.AppInfo['AppName'])
+        TmpTargetNamespaceDIR = os.path.normpath(os.path.realpath(TmpTargetNamespaceDIR))
+
+
+        TmpValuse = None
+        if  os.path.isfile(os.path.join(TmpTargetNamespaceDIR, 'values.yaml')):
+
+            with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='rb') as f:
+                TmpValuse = yaml.safe_load(f)
+        return TmpValuse
+
+
 
 
 if __name__ == "__main__":
