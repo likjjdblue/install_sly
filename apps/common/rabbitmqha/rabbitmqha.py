@@ -18,7 +18,7 @@ from pprint import pprint
 from codecs import open as open
 
 class RabbitmqHATool(object):
-    def __init__(self, namespace='default', nfsinfo={},rabbitmqdatapath='nfs-provisioner',harbor=None, retrytimes=10):
+    def __init__(self, namespace='default', nfsinfo={},rabbitmqdatapath='nfs-provisioner',harbor=None, retrytimes=20):
 
         namespace = namespace.strip()
         self.RetryTimes = int(retrytimes)
