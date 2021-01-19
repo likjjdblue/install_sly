@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: trs-wcm-configmap
+data:
+  # 类属性键；每一个键都映射到一个简单的值
+# 大数据应用公有变量
+  wcm_db_url: "jdbc:mysql://{{ TRSWCMDBHost }}:3306"
+  wcm_db_username: "{{ TRSWCMDBUser }}"
+  wcm_db_password: "{{ TRSWCMDBPassword }}"
+  wcm_redis_host: "{{ TRSRedisHost }}"
+  wcm_redis_port: "{{ TRSRedisPort }}"
+  wcm_redis_password: "{{ TRSRedisPassword }}"
+  wcm_ids_host: "{{ PrivateURLHost }}"
+  wcm_ids_http_host: "http://{{ PublishURLHost }}"
+  wcm_rabbitmq_username: "{{ TRSMQUser }}"
+  wcm_rabbitmq_pwd: "{{ TRSMQPassword }}"

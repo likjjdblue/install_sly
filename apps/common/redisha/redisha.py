@@ -15,6 +15,7 @@ import subprocess
 from time import sleep
 from tools import k8s_tools
 from pprint import pprint
+from codecs import open as open
 
 class RedisHATool(object):
     def __init__(self, namespace='default', nfsinfo={},redisdatapath='nfs-provisioner',harbor=None, retrytimes=10):
