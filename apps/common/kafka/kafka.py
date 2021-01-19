@@ -190,8 +190,7 @@ class KafkaTool(object):
         self.renderTemplate()
 
         TmpResponse = self.applyYAML()
-        if TmpResponse['ret_code'] != 0:
-            return TmpResponse
+        return TmpResponse
 
 
 
