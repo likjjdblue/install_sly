@@ -10,6 +10,6 @@ AppInfo = {
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
-    'SQLToolImage': 'sql_tool:latest',
+    'SQLToolImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/sql_tool:latest',
     "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
 }

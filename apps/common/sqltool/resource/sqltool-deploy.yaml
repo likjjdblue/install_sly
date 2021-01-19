@@ -15,8 +15,8 @@ spec:
     env:
       - name: db_host
         value: "mariadb-svc"
-  nodeSelector:
-     kubernetes.io/hostname: "192.168.24.31"
+  #nodeSelector:
+   #  kubernetes.io/hostname: "192.168.24.31"
   restartPolicy: Never
   volumes:
   - name: pvc-sqltool-account
