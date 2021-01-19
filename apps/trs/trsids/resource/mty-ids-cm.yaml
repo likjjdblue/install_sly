@@ -4,7 +4,7 @@ metadata:
   name: ids-configmap
 data:
   TRS_IDS_DBPRODUCT: "mysql"
-  TRS_IDS_JDBCURL: "jdbc:mysql://mariadb-svc:3306/mty_ids"
-  TRS_IDS_DBUSER: "mtyids"
-  TRS_IDS_DBPASSWD: "Trs@admin123"
+  TRS_IDS_JDBCURL: "jdbc:mysql://mariadb-svc:3306/{{ TRSIDSDBName }}"
+  TRS_IDS_DBUSER: "{{ TRSIDSDBUser }}"
+  TRS_IDS_DBPASSWD: "{{ TRSIDSPassword }}"
   TRS_IDS_BACKPORT: "2005"

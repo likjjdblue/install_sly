@@ -3,8 +3,8 @@
 
 import sys, os
 sys.path.append('../../..')
-from apps.common import nfs, nfsprovisioner
-from tools import k8s_tools
+from apps.common import nfs, nfsprovisioner, sqltool
+from tools import k8s_tools, ssh_tools
 from metadata import AppInfo
 from copy import deepcopy
 from apps import replaceDockerRepo
@@ -45,6 +45,7 @@ class TRSIDSTool(object):
         self.k8sObj = k8s_tools.K8SClient()
 
         self.NFSObj = nfs.NFSTool(**nfsinfo)
+        self.SSHClient = ssh_tools.SSHTool(**nfsinfo)
 
         self.DependencyDict ={}
         self.BaseDIRPath= os.path.realpath('../../..')
@@ -56,7 +57,7 @@ class TRSIDSTool(object):
 
         print ('create TRS IDS NFS successfully')
 
-        self.NFSObj.createSubFolder(self.AppInfo['TRSIDSDataPath'])
+        #self.NFSObj.createSubFolder(self.AppInfo['TRSIDSDataPath'])
 
         print ('setup TRS IDS NFS successfully')
 
@@ -146,13 +147,16 @@ class TRSIDSTool(object):
 
             TmpResponse = self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mty-ids-deploy.yaml'),
                                                          namespace=self.AppInfo['Namespace'])
+
+            print (os.path.join(TmpTargetNamespaceDIR, 'resource', 'mty-ids-deploy.yaml'))
+            print (os.path.join(TmpTargetNamespaceDIR, 'resource', 'mty-ids-cm.yaml'))
             if TmpResponse['ret_code'] != 0:
                 print (TmpResponse)
                 return TmpResponse
 
         isRunning=False
         for itime in range(self.RetryTimes):
-            TmpResponse = self.k8sObj.getNamespacedDeployment(name='mariadb-deploy',
+            TmpResponse = self.k8sObj.getNamespacedDeployment(name='ids-deploy',
                                                                    namespace=self.AppInfo['Namespace'])['result'].to_dict()
 
             if (TmpResponse['status']['replicas'] != TmpResponse['status']['ready_replicas']) and \
@@ -174,7 +178,7 @@ class TRSIDSTool(object):
                 'ret_code': 1,
                 'result': 'Failed to apply Deployment: %s'%(TmpResponse['metadata']['name'],)
             }
-        print ('Waitting MariaDB for running....')
+        print ('Waitting TRS IDS for running....')
         sleep(180)
 
         return {
@@ -198,6 +202,19 @@ class TRSIDSTool(object):
                 'result': 'Failed to install %s, because of preinstall failure'%(self.AppInfo['AppName'], )
             }
 
+        TmpResponse = self.applyYAML()
+        if TmpResponse['ret_code'] != 0:
+            print ('failed to install TRS IDS')
+            return TmpResponse
+
+        print ('install %s successsfully')%(self.AppInfo['AppName'], )
+        print ('configging Nginx for %s')%(self.AppInfo['AppName'])
+        self.postInstall()
+
+        return {
+            'ret_code': 0,
+            'result': 'ok'
+        }
 
 
 
@@ -235,6 +252,9 @@ class TRSIDSTool(object):
                 'ret_code': 1,
                 'result': 'failed to install %s ,because of dependency failuere'%(self.AppInfo['AppName'], )
             }
+
+         ### export mysql SQL ##
+        print ('import Mysql SQL file....')
         if not os.path.isdir(os.path.join(self.BaseDIRPath, 'tmp')):
             os.mkdir(os.path.join(self.BaseDIRPath, 'tmp'))
 
@@ -242,13 +262,76 @@ class TRSIDSTool(object):
             f.write('root root '+self.DependencyDict['MariaDBPassword']+'\n')
             f.write('%s %s %s'%(self.AppInfo['TRSIDSDBName'], self.AppInfo['TRSIDSDBUser'], self.AppInfo['TRSIDSPassword'])+'\n')
 
+        TmpSQLToolAccountPath = '-'.join([self.AppInfo['Namespace'], 'sqltool-pv-account'])
+        TmpSQLToolAccountPath = os.path.realpath(os.path.join(self.AppInfo['NFSBasePath'], TmpSQLToolAccountPath))
+        TmpSQLToolSQLPath = '-'.join([self.AppInfo['Namespace'], 'sqltool-pv-sql'])
+        TmpSQLToolSQLPath = os.path.realpath(os.path.join(self.AppInfo['NFSBasePath'], TmpSQLToolSQLPath))
+
+        print (TmpSQLToolAccountPath)
+        print (TmpSQLToolSQLPath)
+
+        self.SSHClient.ExecCmd('mkdir -p %s'%(TmpSQLToolSQLPath, ))
+        self.SSHClient.ExecCmd('mkdir -p %s'%(TmpSQLToolAccountPath, ))
 
 
+
+        self.SSHClient.ExecCmd('rm -f -r %s/*'%(TmpSQLToolAccountPath, ))
+        self.SSHClient.ExecCmd('rm -f -r %s/*'%(TmpSQLToolSQLPath,))
+
+        print (os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'))
+        print (os.path.join(self.BaseDIRPath, 'downloads', 'mty_ids.sql'))
+
+        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'),
+                                  remotepath=os.path.join(TmpSQLToolAccountPath, 'account.txt')
+                                  )
+
+        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'mty_ids.sql'),
+                                  remotepath=os.path.join(TmpSQLToolSQLPath, 'mty_ids.sql')
+                                  )
+
+        TmpSQLToolObj = sqltool.SQLTool(**self.kwargs)
+        TmpResponse = TmpSQLToolObj.start()
+        if TmpResponse['ret_code'] != 0:
+            print ('Error occured while running SQL Tool')
+            return {
+                'ret_code': 1,
+                'result': 'Error occured while running SQL Tool'
+            }
+
+        ##### end ###
         return {
             'ret_code': 0,
             'result': '',
         }
 
+
+    def postInstall(self):
+        TmpNginxConfigPath = '-'.join([self.AppInfo['Namespace'], 'nginx-pv-config'])
+        TmpNginxConfigPath = os.path.realpath(os.path.join(self.AppInfo['NFSBasePath'], TmpNginxConfigPath))
+
+        print (TmpNginxConfigPath)
+        self.SSHClient.ExecCmd('mkdir -p %s' % (TmpNginxConfigPath, ))
+
+        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'trsids.conf'),
+                                  remotepath=os.path.join(TmpNginxConfigPath, 'trsids.conf')
+                                  )
+
+
+        TmpNginxPods = self.k8sObj.filterNamespacedPod(namespace=self.AppInfo['Namespace'], filters={
+            "run": "nginx"
+        })['result']
+
+        TmpPod = None
+        for _ in range(1):
+            for pod in TmpNginxPods:
+                print ('Config target Nginx POD: '+str(pod.to_dict()['metadata']['name']))
+                TmpPod = pod.to_dict()
+                break
+
+
+        self.k8sObj.execNamespacedPod(namespace=self.AppInfo['Namespace'], name=TmpPod['metadata']['name'],
+                                      cmd='nginx -s reload'
+                                      )
 
 
 
@@ -256,7 +339,7 @@ class TRSIDSTool(object):
 
 
 if __name__ == "__main__":
-    tmp = TRSIDSTool(namespace='sly2', nfsinfo=dict(hostname='192.168.24.13', port=22, username='root', password='Abc123',
+    tmp = TRSIDSTool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.168', port=1022, username='root', password='!QAZ2wsx1234',
                          basepath='/TRS/DATA'))
 
     print (tmp.start())

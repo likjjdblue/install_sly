@@ -41,6 +41,9 @@ data:
         keepalive_timeout  65;
 
         #gzip  on;
+    server {
+    listen       80;
+    server_name  _;
 
         include /etc/nginx/conf.d/*.conf;
     }

@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: ids
-          image: registry.cn-hangzhou.aliyuncs.com/trsrd/trsids:5.1-134463-20210104-new1
+          image: {{ TRSIDSImage }}
           envFrom:
              - configMapRef:
                  name: ids-configmap 
