@@ -70,7 +70,8 @@ class TRSIDSTool(object):
         self.AppInfo['TRSIDSImage'] = replaceDockerRepo(self.AppInfo['TRSIDSImage'], self.AppInfo['HarborAddr'])
         self.AppInfo['NFSProvisionerImage'] =replaceDockerRepo(self.AppInfo['NFSProvisionerImage'],
                                                                self.AppInfo['HarborAddr'])
-        self.AppInfo['TRSIDSPassword'] = crypto_tools.generateRandomAlphaNumericString(lenght=10)
+        if not self.AppInfo['TRSIDSPassword']:
+            self.AppInfo['TRSIDSPassword'] = crypto_tools.generateRandomAlphaNumericString(lenght=10)
 
 
     def renderTemplate(self):
@@ -254,6 +255,7 @@ class TRSIDSTool(object):
             }
 
          ### export mysql SQL ##
+        self.generateValues()
         print ('import Mysql SQL file....')
         if not os.path.isdir(os.path.join(self.BaseDIRPath, 'tmp')):
             os.mkdir(os.path.join(self.BaseDIRPath, 'tmp'))

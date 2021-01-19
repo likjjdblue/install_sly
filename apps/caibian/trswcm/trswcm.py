@@ -38,7 +38,7 @@ class TRSWCMTool(object):
 
         self.AppInfo['NFSAddr'] = self.NFSAddr
         self.AppInfo['NFSBasePath'] = self.NFSBasePath
-        self.AppInfo['TRSIDSDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, wcmdatapath]))
+        self.AppInfo['TRSWCMDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, wcmdatapath]))
         self.AppInfo['TRSWCMLogPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, wcmlogdata]))
         self.AppInfo['Namespace'] = namespace
 
@@ -58,7 +58,8 @@ class TRSWCMTool(object):
 
         print ('create TRS WCM NFS successfully')
 
-        #self.NFSObj.createSubFolder(self.AppInfo['TRSIDSDataPath'])
+        self.NFSObj.createSubFolder(self.AppInfo['TRSWCMDataPath'])
+        self.NFSObj.createSubFolder((self.AppInfo['TRSWCMLogPath']))
 
         print ('setup TRS WCM NFS successfully')
 
@@ -71,7 +72,8 @@ class TRSWCMTool(object):
         self.AppInfo['TRSWCMImage'] = replaceDockerRepo(self.AppInfo['TRSWCMImage'], self.AppInfo['HarborAddr'])
         self.AppInfo['NFSProvisionerImage'] =replaceDockerRepo(self.AppInfo['NFSProvisionerImage'],
                                                                self.AppInfo['HarborAddr'])
-        self.AppInfo['TRSWCMDBPassword'] = crypto_tools.generateRandomAlphaNumericString(lenght=10)
+        if not self.AppInfo['TRSWCMDBPassword']:
+            self.AppInfo['TRSWCMDBPassword'] = crypto_tools.generateRandomAlphaNumericString(lenght=10)
 
 
     def renderTemplate(self):
@@ -266,6 +268,7 @@ class TRSWCMTool(object):
 
          ### export mysql SQL ##
         print ('import Mysql SQL file....')
+        self.generateValues()
         if not os.path.isdir(os.path.join(self.BaseDIRPath, 'tmp')):
             os.mkdir(os.path.join(self.BaseDIRPath, 'tmp'))
 
@@ -323,8 +326,8 @@ class TRSWCMTool(object):
         print (TmpNginxConfigPath)
         self.SSHClient.ExecCmd('mkdir -p %s' % (TmpNginxConfigPath, ))
 
-        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'trsids.conf'),
-                                  remotepath=os.path.join(TmpNginxConfigPath, 'trsids.conf')
+        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'trswcm.conf'),
+                                  remotepath=os.path.join(TmpNginxConfigPath, 'trswcm.conf')
                                   )
 
 
@@ -350,7 +353,7 @@ class TRSWCMTool(object):
 
 
 if __name__ == "__main__":
-    tmp = TRSWCMTool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.168', port=1022, username='root', password='!QAZ2wsx1234',
+    tmp = TRSWCMTool(namespace='sly2', nfsinfo=dict(hostname='192.168.0.68', port=22, username='root', password='!QAZ2wsx1234',
                          basepath='/TRS/DATA'))
 
-    print (tmp.start())
+    tmp.start()
