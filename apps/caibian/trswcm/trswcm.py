@@ -266,6 +266,10 @@ class TRSWCMTool(object):
                 'result': 'failed to install %s ,because of dependency failuere'%(self.AppInfo['AppName'], )
             }
 
+        TmpIP = raw_input('input private IP: ')
+        self.AppInfo['PrivateURLHost'] = TmpIP
+        self.AppInfo['PublishURLHost'] = TmpIP
+
          ### export mysql SQL ##
         print ('import Mysql SQL file....')
         self.generateValues()
