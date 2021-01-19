@@ -181,7 +181,7 @@ class NginxTool(object):
                 'result': 'Failed to apply Deployment: %s'%(TmpResponse['metadata']['name'],)
             }
         print ('Waitting Nginx for running....')
-        sleep(180)
+        sleep(30)
 
         return {
             'ret_code': 0,
