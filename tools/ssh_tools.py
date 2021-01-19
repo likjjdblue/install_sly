@@ -4,7 +4,7 @@ from paramiko import SSHClient
 import paramiko
 
 class SSHTool(object):
-    def __init__(self, hostname, port, username, password, timeout=10):
+    def __init__(self, hostname, port, username, password, timeout=10, *args, **kwargs):
         self.Hostname = hostname
         self.Port = port
         self.Username = username
