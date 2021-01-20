@@ -40,6 +40,11 @@ class RedisHATool(object):
 
         self.NFSObj = nfs.NFSTool(**nfsinfo)
 
+
+        if  self.getValues():
+            print ('load from file....')
+            self.AppInfo = deepcopy(self.getValues())
+
     def setupNFS(self):
         TmpResponse = self.NFSObj.installNFS(basedir=self.AppInfo['NFSBasePath'])
         if TmpResponse['ret_code'] != 0:
