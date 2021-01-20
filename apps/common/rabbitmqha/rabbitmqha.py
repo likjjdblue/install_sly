@@ -284,9 +284,11 @@ class RabbitmqHATool(object):
             self.k8sObj.execNamespacedPod(namespace=self.AppInfo['Namespace'], name=TmpPod['metadata']['name'],
                                            cmd='rabbitmqctl add_vhost %s'%(vhost.strip(),)
                                            )
-            self.k8sObj.execNamespacedPod(namespace=self.AppInfo['Namespace'], name=TmpPod['metadata']['name'],
-                                           cmd='rabbitmqctl set_permissions -p "%s" "admin" ".*" ".*" ".*"'%(vhost.strip(),)
+            print ('rabbitmqctl set_permissions -p "%s" "admin" ".*" ".*" ".*"'%(vhost.strip(),))
+            tmp=self.k8sObj.execNamespacedPod(namespace=self.AppInfo['Namespace'], name=TmpPod['metadata']['name'],
+                                           cmd="rabbitmqctl set_permissions -p %s admin '.*' '.*' '.*'"%(vhost.strip(),)
                                            )
+            print (tmp['result'])
 
 
 
@@ -326,4 +328,4 @@ if __name__ == "__main__":
     tmp = RabbitmqHATool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.168', port=1022, username='root', password='!QAZ2wsx1234',
                          basepath='/TRS/DATA'))
     tmp.start()
-    tmp.createVhosts()
+    #tmp.createVhosts()

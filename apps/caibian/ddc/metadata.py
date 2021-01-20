@@ -20,7 +20,7 @@ AppInfo = {
     'DDCRedisPassword': None,
     'DDCMQUser': 'admin',
     'DDCMQPassword': None,
-    'dependences': ['apps.common.mariadb/MariaDBTool', 'apps.common.redisha/RedisHATool'
-                    'apps.common.rabbitmqha/RabbitmqHATool', 'apps.caibian.trwcm/TRSWCMTool',
+    'dependences': ['apps.common.mariadb/MariaDBTool', 'apps.common.redisha/RedisHATool',
+                    'apps.common.rabbitmqha/RabbitmqHATool', 'apps.caibian.trswcm/TRSWCMTool',
                     ]
 }
