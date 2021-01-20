@@ -1,0 +1,32 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mcn-pv-log
+spec:
+  capacity:
+    storage: 1000Gi
+  volumeMode: Filesystem
+  storageClassName: mcn-pv-log-class
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: {{ MCNLogPath }}
+    server: {{ NFSAddr }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mcn-pv-data
+spec:
+  capacity:
+    storage: 1000Gi
+  volumeMode: Filesystem
+  storageClassName: mcn-pv-data-class
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: {{ MCNDataPath }}
+    server: {{ NFSAddr }}

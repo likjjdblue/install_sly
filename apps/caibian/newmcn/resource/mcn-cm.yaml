@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mcn-configmap
+data:
+  # 类属性键；每一个键都映射到一个简单的值
+# 大数据应用公有变量
+  spring.datasource.main.url: "jdbc:mysql://mariadb-svc:3306/mcn_upc?useUnicode=true&characterEncoding=utf-8"
+  spring.datasource.main.username: "mcnupc"
+  spring.datasource.main.password: "{{ UPCDBPassword }}"
+  spring.datasource.tenant.url: "jdbc:mysql://mariadb-svc:3306/mcn_upc_mty?useUnicode=true&characterEncoding=utf-8"
+  spring.datasource.tenant.username: "mcnupc"
+  spring.datasource.tenant.password: "{{ UPCDBPassword }}"
+  spring.datasource.scheduler.url: "jdbc:mysql://mariadb-svc:3306/mcn_upc_quartz?useUnicode=true&characterEncoding=utf-8&useSSL=false"
+  spring.datasource.scheduler.username: "mcnupc"
+  spring.datasource.scheduler.password: "{{ UPCDBPassword }}"
+  spring.datasource.mrs.url: "jdbc:mysql://mariadb-svc:3306/mty_mrs?useUnicode=true&characterEncoding=utf-8&useSSL=false"
+  spring.datasource.mrs.username: "mtymrs"
+  spring.datasource.mrs.password: "{{ UPCDBPassword }}"
+  spring.redis.host: "redis-svc"
+  spring.redis.port: "6379"
+  spring.redis.password: "{{ UPCRedisPassword }}"
+  
+

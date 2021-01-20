@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcn-deploy
+  labels:
+    app: mcn
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mcn
+  template:
+    metadata:
+      labels:
+        app: mcn
+    spec:
+      volumes:
+      - name: pvc-mcnlog-slytest
+        persistentVolumeClaim:
+          claimName: mcn-pvc-log
+      - name: pvc-mcndata-slytest
+        persistentVolumeClaim:
+          claimName: mcn-pvc-data
+      containers:
+        - name: mcn
+          image: {{ MCNImage }}
+          envFrom:
+             - configMapRef:
+                 name: mcn-configmap
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+          - mountPath: /TRS/LOGS/mcn
+            name: pvc-mcnlog-slytest
+          - mountPath: /TRS/MCNData
+            name: pvc-mcndata-slytest
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 128Mi

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcn-svc
+  labels:
+    app: mcn
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9018
+      targetPort: 9018
+      protocol: TCP
+      name: http
+  selector:
+    app: mcn
