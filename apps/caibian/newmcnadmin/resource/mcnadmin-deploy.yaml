@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mcnadmin-deploy
+  labels:
+    app: mcnadmin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mcnadmin
+  template:
+    metadata:
+      labels:
+        app: mcnadmin
+    spec:
+      volumes:
+      - name: pvc-mcnadminlog-slytest
+        persistentVolumeClaim:
+          claimName: mcnadmin-pvc-log
+      - name: pvc-mcnadmindata-slytest
+        persistentVolumeClaim:
+          claimName: mcnadmin-pvc-data
+      containers:
+        - name: mcnadmin
+          image: {{ MCNAdminImage }}
+          envFrom:
+             - configMapRef:
+                 name: mcnadmin-configmap
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+          - mountPath: /TRS/LOGS/mcnadmin
+            name: pvc-mcnadminlog-slytest
+          - mountPath: /TRS/MCNData
+            name: pvc-mcnadmindata-slytest
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 128Mi

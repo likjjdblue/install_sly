@@ -18,8 +18,8 @@ from pprint import pprint
 from codecs import open as open
 import importlib
 
-class MCNTool(object):
-    def __init__(self, namespace='default', mcndatapath='mcn-pv-data/MCNData', mcnlogdata='mcn-pv-log' ,
+class MCNAdminTool(object):
+    def __init__(self, namespace='default', mcnadmindatapath='mcn-pv-data/MCNData', mcnadminlogdata='mcnadmin-pv-log' ,
                  nfsinfo={}, harbor=None, retrytimes=10, *args, **kwargs):
 
         namespace = namespace.strip()
@@ -39,9 +39,9 @@ class MCNTool(object):
         self.AppInfo['NFSAddr'] = self.NFSAddr
         self.AppInfo['NFSBasePath'] = self.NFSBasePath
 
-        TmpmcndatapathList = mcndatapath.split('/')
-        self.AppInfo['MCNDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, TmpmcndatapathList[0]]), TmpmcndatapathList[1])
-        self.AppInfo['MCNLogPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, mcnlogdata]))
+        TmpmcndatapathList = mcnadmindatapath.split('/')
+        self.AppInfo['MCNAdminDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, TmpmcndatapathList[0]]), TmpmcndatapathList[1])
+        self.AppInfo['MCNAdminLogPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, mcnadminlogdata]))
         self.AppInfo['Namespace'] = namespace
 
         self.AppInfo['HarborAddr'] = harbor
@@ -62,12 +62,12 @@ class MCNTool(object):
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
-        print ('create MCN NFS successfully')
+        print ('create MCN Admin NFS successfully')
 
-        self.NFSObj.createSubFolder(self.AppInfo['MCNDataPath'])
-        self.NFSObj.createSubFolder((self.AppInfo['MCNLogPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['MCNAdminDataPath'])
+        self.NFSObj.createSubFolder((self.AppInfo['MCNAdminLogPath']))
 
-        print ('setup MCN NFS successfully')
+        print ('setup MCN Admin NFS successfully')
 
         return {
             'ret_code': 0,
@@ -75,11 +75,11 @@ class MCNTool(object):
         }
 
     def generateValues(self):
-        self.AppInfo['MCNImage'] = replaceDockerRepo(self.AppInfo['MCNImage'], self.AppInfo['HarborAddr'])
+        self.AppInfo['MCNAdminImage'] = replaceDockerRepo(self.AppInfo['MCNAdminImage'], self.AppInfo['HarborAddr'])
         self.AppInfo['NFSProvisionerImage'] =replaceDockerRepo(self.AppInfo['NFSProvisionerImage'],
                                                                self.AppInfo['HarborAddr'])
-        if not self.AppInfo['UPCDBPassword']:
-            self.AppInfo['UPCDBPassword'] = crypto_tools.generateRandomAlphaNumericString(lenght=10)
+        if not self.AppInfo['UPCAdminDBPassword']:
+            self.AppInfo['UPCAdminDBPassword'] = crypto_tools.generateRandomAlphaNumericString(lenght=10)
 
         '''if not self.AppInfo['UPC_MtyDBPassword']:
             self.AppInfo['UPC_MtyDBPassword'] = crypto_tools.generateRandomAlphaNumericString(lenght=10)
@@ -143,11 +143,11 @@ class MCNTool(object):
             return TmpResponse
 
 
-        print ('Apply TRS MCN ....')
-        if not self.k8sObj.checkNamespacedResourceHealth(name='mcn-deploy', namespace=self.AppInfo['Namespace'],
+        print ('Apply TRS MCN Admin ....')
+        if not self.k8sObj.checkNamespacedResourceHealth(name='mcnadmin-deploy', namespace=self.AppInfo['Namespace'],
                                                          kind='Deployment'):
             try:
-                self.k8sObj.deleteNamespacedDeployment(name='mcn-deploy', namespace=self.AppInfo['Namespace'])
+                self.k8sObj.deleteNamespacedDeployment(name='mcnadmin-deploy', namespace=self.AppInfo['Namespace'])
             except:
                 pass
 
@@ -157,21 +157,21 @@ class MCNTool(object):
 
 
 
-            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mcn-cm.yaml'),
+            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mcnadmin-cm.yaml'),
                                                namespace=self.AppInfo['Namespace']
                                                )
-            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mcn-svc.yaml'),
+            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mcnadmin-svc.yaml'),
                                                namespace=self.AppInfo['Namespace']
                                                )
-            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'pv/mcn-pv.yaml'),
+            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'pv/mcnadmin-pv.yaml'),
                                                namespace=self.AppInfo['Namespace']
                                                )
-            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'pv/mcn-pvc.yaml'),
+            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'pv/mcnadmin-pvc.yaml'),
                                                namespace=self.AppInfo['Namespace']
                                                )
 
 
-            TmpResponse = self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mcn-deploy.yaml'),
+            TmpResponse = self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mcnadmin-deploy.yaml'),
                                                          namespace=self.AppInfo['Namespace'])
 
             #print (os.path.join(TmpTargetNamespaceDIR, 'resource', 'mty-ids-deploy.yaml'))
@@ -182,7 +182,7 @@ class MCNTool(object):
 
         isRunning=False
         for itime in range(self.RetryTimes):
-            TmpResponse = self.k8sObj.getNamespacedDeployment(name='mcn-deploy',
+            TmpResponse = self.k8sObj.getNamespacedDeployment(name='mcnadmin-deploy',
                                                                    namespace=self.AppInfo['Namespace'])['result'].to_dict()
 
             if (TmpResponse['status']['replicas'] != TmpResponse['status']['ready_replicas']) and \
@@ -204,7 +204,7 @@ class MCNTool(object):
                 'ret_code': 1,
                 'result': 'Failed to apply Deployment: %s'%(TmpResponse['metadata']['name'],)
             }
-        print ('Waitting TRS MCN for running....')
+        print ('Waitting TRS MCN Admin for running....')
         sleep(120)
 
         return {
@@ -231,7 +231,7 @@ class MCNTool(object):
 
         TmpResponse = self.applyYAML()
         if TmpResponse['ret_code'] != 0:
-            print ('failed to install TRS MCN ')
+            print ('failed to install TRS MCN Admin')
             return TmpResponse
 
         print ('install %s successsfully')%(self.AppInfo['AppName'], )
@@ -264,7 +264,7 @@ class MCNTool(object):
             if TmpClsName == 'MariaDBTool':
                 self.DependencyDict['MariaDBPassword'] = TmpInfo['MariaDBPassword']
             elif TmpClsName == 'RedisTool':
-                self.AppInfo['UPCRedisPassword'] = TmpInfo['RedisStandAlonePassword']
+                self.AppInfo['UPCAdminRedisPassword'] = TmpInfo['RedisStandAlonePassword']
             '''elif TmpClsName == 'RabbitmqHATool':
                 self.AppInfo['TRSMQPassword'] = crypto_tools.DecodeBase64(TmpInfo['RabbitmqPassword'])'''
 
@@ -292,10 +292,10 @@ class MCNTool(object):
 
         with open(os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'),mode='wb',encoding='utf-8') as f:
             f.write('root root '+self.DependencyDict['MariaDBPassword']+'\n')
-            f.write('%s %s %s'%(self.AppInfo['UPCDBName'], self.AppInfo['UPCDBUser'], self.AppInfo['UPCDBPassword'])+'\n')
-            f.write('%s %s %s'%(self.AppInfo['UPC_MtyDBName'], self.AppInfo['UPC_MtyDBUser'], self.AppInfo['UPCDBPassword'])+'\n')
-            f.write('%s %s %s'%(self.AppInfo['UPC_QuartzDBName'], self.AppInfo['UPC_QuartzDBUser'], self.AppInfo['UPCDBPassword'])+'\n')
-            f.write('%s %s %s'%(self.AppInfo['UPC_MrsDBName'], self.AppInfo['UPC_MrsDBUser'], self.AppInfo['UPCDBPassword'])+'\n')
+            f.write('%s %s %s'%(self.AppInfo['UPCAdminDBName'], self.AppInfo['UPCAdminDBUser'], self.AppInfo['UPCAdminDBPassword'])+'\n')
+            f.write('%s %s %s'%(self.AppInfo['UPCAdmin_MtyDBName'], self.AppInfo['UPCAdmin_MtyDBUser'], self.AppInfo['UPCAdminDBPassword'])+'\n')
+            f.write('%s %s %s'%(self.AppInfo['UPCAdmin_QuartzDBName'], self.AppInfo['UPCAdmin_QuartzDBUser'], self.AppInfo['UPCAdminDBPassword'])+'\n')
+            f.write('%s %s %s'%(self.AppInfo['UPCAdmin_MrsDBName'], self.AppInfo['UPCAdmin_MrsDBUser'], self.AppInfo['UPCAdminDBPassword'])+'\n')
 
 
         TmpSQLToolAccountPath = '-'.join([self.AppInfo['Namespace'], 'sqltool-pv-account'])
@@ -314,16 +314,18 @@ class MCNTool(object):
         self.SSHClient.ExecCmd('rm -f -r %s/*'%(TmpSQLToolAccountPath, ))
         self.SSHClient.ExecCmd('rm -f -r %s/*'%(TmpSQLToolSQLPath,))
 
-        print (os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'))
+        '''print (os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'))
         print (os.path.join(self.BaseDIRPath, 'downloads', 'mcn_upc_quartz.sql'))
+        '''
 
         self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'),
                                   remotepath=os.path.join(TmpSQLToolAccountPath, 'account.txt')
                                   )
 
-        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'mcn_upc_quartz.sql'),
+        '''self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'mcn_upc_quartz.sql'),
                                   remotepath=os.path.join(TmpSQLToolSQLPath, 'mcn_upc_quartz.sql')
                                   )
+        '''
 
         TmpSQLToolObj = sqltool.SQLTool(**self.kwargs)
         TmpResponse = TmpSQLToolObj.start()
@@ -386,7 +388,7 @@ class MCNTool(object):
 
 
 if __name__ == "__main__":
-    tmp = MCNTool(namespace='sly2', nfsinfo=dict(hostname='192.168.0.68', port=22, username='root', password='!QAZ2wsx1234',
+    tmp = MCNAdminTool(namespace='sly2', nfsinfo=dict(hostname='192.168.0.68', port=22, username='root', password='!QAZ2wsx1234',
                          basepath='/TRS/DATA'))
 
     tmp.start()
