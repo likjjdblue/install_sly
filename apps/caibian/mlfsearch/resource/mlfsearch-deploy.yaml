@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mlfsearch-deploy
+  labels:
+    app: mlfsearch
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mlfsearch
+  template:
+    metadata:
+      labels:
+        app: mlfsearch
+    spec:
+      volumes:
+      - name: mlfsearch-pvc-log
+        persistentVolumeClaim:
+          claimName: mlfsearch-pvc-log
+      containers:
+        - name: mlfsearch
+          image: {{ MLFSearchImage }}
+          envFrom:
+             - configMapRef:
+                 name: mlfsearch-configmap
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+          - mountPath: /TRS/LOGS/mlfsearch
+            name: mlfsearch-pvc-log
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 128Mi
