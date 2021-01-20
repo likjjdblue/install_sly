@@ -244,8 +244,8 @@ class DDCTool(object):
 
             if TmpClsName == 'MariaDBTool':
                 self.DependencyDict['MariaDBPassword'] = TmpInfo['MariaDBPassword']
-            elif TmpClsName == 'RedisHATool':
-                self.AppInfo['DDCRedisPassword'] = crypto_tools.DecodeBase64(TmpInfo['RedisPassword'])
+            elif TmpClsName == 'RedisTool':
+                self.AppInfo['DDCRedisPassword'] = TmpInfo['RedisStandAlonePassword']
             elif TmpClsName == 'RabbitmqHATool':
                 self.AppInfo['DDCMQPassword'] = crypto_tools.DecodeBase64(TmpInfo['RabbitmqPassword'])
             elif TmpClsName == 'TRSWCMTool':

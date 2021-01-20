@@ -266,8 +266,8 @@ class TRSWCMTool(object):
                 'result': 'failed to install %s ,because of dependency failuere'%(self.AppInfo['AppName'], )
             }
 
-        Tmp = self.getValues()
-        if not Tmp:
+
+        if not self.AppInfo['PrivateURLHost']:
             TmpIP = raw_input('input private IP: ')
             self.AppInfo['PrivateURLHost'] = TmpIP
             self.AppInfo['PublishURLHost'] = TmpIP
