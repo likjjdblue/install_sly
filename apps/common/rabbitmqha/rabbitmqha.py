@@ -284,6 +284,9 @@ class RabbitmqHATool(object):
             self.k8sObj.execNamespacedPod(namespace=self.AppInfo['Namespace'], name=TmpPod['metadata']['name'],
                                            cmd='rabbitmqctl add_vhost %s'%(vhost.strip(),)
                                            )
+            self.k8sObj.execNamespacedPod(namespace=self.AppInfo['Namespace'], name=TmpPod['metadata']['name'],
+                                           cmd='rabbitmqctl set_permissions -p "%s" "admin" ".*" ".*" ".*"'%(vhost.strip(),)
+                                           )
 
 
 
