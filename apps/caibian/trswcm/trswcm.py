@@ -36,6 +36,10 @@ class TRSWCMTool(object):
         self.NFSBasePath = nfsinfo['basepath']
         self.AppInfo = deepcopy(AppInfo)
 
+        TmpHistoryInfo = self.getValues()
+        if not TmpHistoryInfo:
+            self.AppInfo = deepcopy(TmpHistoryInfo)
+
         self.AppInfo['NFSAddr'] = self.NFSAddr
         self.AppInfo['NFSBasePath'] = self.NFSBasePath
         self.AppInfo['TRSWCMDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, wcmdatapath]))
