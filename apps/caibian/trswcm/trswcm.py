@@ -36,9 +36,6 @@ class TRSWCMTool(object):
         self.NFSBasePath = nfsinfo['basepath']
         self.AppInfo = deepcopy(AppInfo)
 
-        TmpHistoryInfo = self.getValues()
-        if not TmpHistoryInfo:
-            self.AppInfo = deepcopy(TmpHistoryInfo)
 
         self.AppInfo['NFSAddr'] = self.NFSAddr
         self.AppInfo['NFSBasePath'] = self.NFSBasePath
@@ -54,6 +51,10 @@ class TRSWCMTool(object):
 
         self.DependencyDict ={}
         self.BaseDIRPath= os.path.realpath('../../..')
+
+        if  self.getValues():
+            print ('load from file....')
+            self.AppInfo = deepcopy(self.getValues())
 
     def setupNFS(self):
         TmpResponse = self.NFSObj.installNFS(basedir=self.AppInfo['NFSBasePath'])
