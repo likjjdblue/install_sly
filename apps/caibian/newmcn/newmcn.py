@@ -263,8 +263,8 @@ class MCNTool(object):
 
             if TmpClsName == 'MariaDBTool':
                 self.DependencyDict['MariaDBPassword'] = TmpInfo['MariaDBPassword']
-            elif TmpClsName == 'RedisHATool':
-                self.AppInfo['UPCRedisPassword'] = crypto_tools.DecodeBase64(TmpInfo['RedisPassword'])
+            elif TmpClsName == 'RedisTool':
+                self.AppInfo['UPCRedisPassword'] = TmpInfo['RedisStandAlonePassword']
             '''elif TmpClsName == 'RabbitmqHATool':
                 self.AppInfo['TRSMQPassword'] = crypto_tools.DecodeBase64(TmpInfo['RabbitmqPassword'])'''
 
