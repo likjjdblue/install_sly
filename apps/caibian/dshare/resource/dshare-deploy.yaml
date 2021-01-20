@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dshare-deploy
+  labels:
+    app: dshare
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dshare
+  template:
+    metadata:
+      labels:
+        app: dshare
+    spec:
+      volumes:
+      - name: dshare-pvc-log
+        persistentVolumeClaim:
+          claimName: dshare-pvc-log
+      containers:
+        - name: dshare
+          image: {{ DshareImage }}
+          envFrom:
+             - configMapRef:
+                 name: dshare-configmap
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+          - mountPath: /TRS/LOGS/dshare
+            name: dshare-pvc-log
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 128Mi

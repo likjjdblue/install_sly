@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: dshare-svc
+  labels:
+    app: dshare
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9014
+      targetPort: 9014
+      protocol: TCP
+      name: http
+  selector:
+    app: dshare
