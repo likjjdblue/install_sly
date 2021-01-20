@@ -24,6 +24,6 @@ AppInfo = {
     'PrivateURLHost': None,
     'PublishURLHost': None,
     'dependences': ['apps.common.mariadb/MariaDBTool', 'apps.common.nginx/NginxTool',
-                    'apps.common.redisha/RedisHATool', 'apps.common.rabbitmqha/RabbitmqHATool',
+                    'apps.common.redis/RedisTool', 'apps.common.rabbitmqha/RabbitmqHATool',
                     ]
 }

@@ -246,8 +246,8 @@ class TRSWCMTool(object):
 
             if TmpClsName == 'MariaDBTool':
                 self.DependencyDict['MariaDBPassword'] = TmpInfo['MariaDBPassword']
-            elif TmpClsName == 'RedisHATool':
-                self.AppInfo['TRSRedisPassword'] = crypto_tools.DecodeBase64(TmpInfo['RedisPassword'])
+            elif TmpClsName == 'RedisTool':
+                self.AppInfo['TRSRedisPassword'] = crypto_tools.DecodeBase64(TmpInfo['RedisStandAlonePassword'])
             elif TmpClsName == 'RabbitmqHATool':
                 self.AppInfo['TRSMQPassword'] = crypto_tools.DecodeBase64(TmpInfo['RabbitmqPassword'])
 
