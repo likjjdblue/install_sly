@@ -212,6 +212,10 @@ class RabbitmqHATool(object):
             except:
                 pass
 
+            self.k8sObj.createResourceFromYaml(
+                filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'rabbitmq-svc.yaml'),
+                namespace=self.AppInfo['Namespace'])
+
             TmpResponse = self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'rabbitmq-ha.yaml'),
                                                          namespace=self.AppInfo['Namespace'])
             if TmpResponse['ret_code'] != 0:
@@ -313,7 +317,7 @@ class RabbitmqHATool(object):
 
 
 if __name__ == "__main__":
-    tmp = RabbitmqHATool(namespace='sly2', nfsinfo=dict(hostname='192.168.0.68', port=22, username='root', password='!QAZ2wsx1234',
+    tmp = RabbitmqHATool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.168', port=1022, username='root', password='!QAZ2wsx1234',
                          basepath='/TRS/DATA'))
     tmp.start()
     tmp.createVhosts()
