@@ -1,0 +1,26 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tmyimgcenter-pvc-log
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  storageClassName: tmyimgcenter-pv-log-class
+  resources:
+     requests:
+       storage: 1000Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: tmyimgcenter-pvc-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  storageClassName: tmyimgcenter-pv-data-class
+  resources:
+     requests:
+       storage: 1000Gi

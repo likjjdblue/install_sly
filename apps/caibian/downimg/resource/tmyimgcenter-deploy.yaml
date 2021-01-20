@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tmyimgcenter-deploy
+  labels:
+    app: tmyimgcenter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tmyimgcenter
+  template:
+    metadata:
+      labels:
+        app: tmyimgcenter
+    spec:
+      volumes:
+      - name: pvc-tmyimgcenterlog-slytest
+        persistentVolumeClaim:
+          claimName: tmyimgcenter-pvc-log
+      - name: pvc-tmyimgcenterdata-slytest
+        persistentVolumeClaim:
+          claimName: tmyimgcenter-pvc-data
+      containers:
+        - name: tmyimgcenter
+          image: {{ DownImgImage }}
+          envFrom:
+             - configMapRef:
+                 name: tmyimgcenter-configmap
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+          - mountPath: /TRS/LOGS/tmyimgcenter
+            name: pvc-tmyimgcenterlog-slytest
+          - mountPath: /TRS/DATA/WCMData/webpic
+            name: pvc-tmyimgcenterdata-slytest
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 128Mi
