@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ddc-pv-log
+spec:
+  capacity:
+    storage: 1000Gi
+  volumeMode: Filesystem
+  storageClassName: ddc-pv-log-class
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: {{ DDCLogPath }}
+    server: {{ NFSAddr }}

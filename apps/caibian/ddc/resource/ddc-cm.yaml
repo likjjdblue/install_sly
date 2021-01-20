@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ddc-configmap
+data:
+  # 类属性键；每一个键都映射到一个简单的值
+# 大数据应用公有变量
+  spring.datasource.primary.url: "jdbc:mysql://{{ DDCDBHost }}:3306/{{ DDCDBName }}?useUnicode=true&characterEncoding=utf-8&useSSL=false"
+  spring.datasource.primary.username: "{{ DDCDBUser }}"
+  spring.datasource.primary.password: "{{ DDCDBPassword }}"
+  spring.datasource.second.url: "jdbc:mysql://{{ TRSWCMDBHost }}:3306/{{ TRSWCMDBName }}?useUnicode=true&characterEncoding=utf-8&useSSL=false"
+  spring.datasource.second.username: "{{ TRSWCMDBUser }}"
+  spring.datasource.second.password: "{{ TRSWCMDBPassword }}"
+  spring.redis.host: "{{ DDCRedisHost }}"
+  spring.redis.port: "{{ DDCRedisPort }}"
+  spring.redis.password: "{{ DDCRedisPassword }}"
+  spring.rabbitmq.host: "rabbitmq-svc"
+  spring.rabbitmq.port: "5672"
+  spring.rabbitmq.username: "{{ DDCMQUser }}"
+  spring.rabbitmq.password: "{{ DDCMQPassword }}"

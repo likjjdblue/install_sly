@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ddc-deploy
+  labels:
+    app: ddc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ddc
+  template:
+    metadata:
+      labels:
+        app: ddc
+    spec:
+      volumes:
+      - name: pvc-ddclog-slytest
+        persistentVolumeClaim:
+          claimName: ddc-pvc-log
+      containers:
+        - name: ddc
+          image: {{ DDCImage }}
+          envFrom:
+             - configMapRef:
+                 name: ddc-configmap
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+          - mountPath: /TRS/LOGS/ddc
+            name: pvc-ddclog-slytest
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 128Mi
