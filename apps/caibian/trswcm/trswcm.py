@@ -247,7 +247,7 @@ class TRSWCMTool(object):
             if TmpClsName == 'MariaDBTool':
                 self.DependencyDict['MariaDBPassword'] = TmpInfo['MariaDBPassword']
             elif TmpClsName == 'RedisTool':
-                self.AppInfo['TRSRedisPassword'] = crypto_tools.DecodeBase64(TmpInfo['RedisStandAlonePassword'])
+                self.AppInfo['TRSRedisPassword'] = TmpInfo['RedisStandAlonePassword']
             elif TmpClsName == 'RabbitmqHATool':
                 self.AppInfo['TRSMQPassword'] = crypto_tools.DecodeBase64(TmpInfo['RabbitmqPassword'])
 
@@ -368,7 +368,7 @@ class TRSWCMTool(object):
 
 
 if __name__ == "__main__":
-    tmp = TRSWCMTool(namespace='sly2', nfsinfo=dict(hostname='192.168.0.68', port=22, username='root', password='!QAZ2wsx1234',
+    tmp = TRSWCMTool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.168', port=1022, username='root', password='!QAZ2wsx1234',
                          basepath='/TRS/DATA'))
 
     tmp.start()
