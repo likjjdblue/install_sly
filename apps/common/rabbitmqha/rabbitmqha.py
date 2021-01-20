@@ -299,6 +299,9 @@ class RabbitmqHATool(object):
         self.renderTemplate()
 
         TmpResponse = self.applyYAML()
+
+        if TmpResponse['ret_code'] == 0:
+            self.createVhosts()
         return TmpResponse
 
 
