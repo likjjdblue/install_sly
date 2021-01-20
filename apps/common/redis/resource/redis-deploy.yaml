@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: redis
+  name: redis-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: redis
+  template:
+    metadata:
+      labels:
+        run: redis
+    spec:
+      volumes:
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: redis-pvc-data
+      containers:
+      - image: {{ RedisImage }}
+        name: redis
+        ports:
+        - containerPort: 6379
+        command: ['sh', '-c', 'redis-server --port 6379 --requirepass {{ RedisStandAlonePassword }} --appendonly yes']
+        volumeMounts:
+        - mountPath: "/data"
+          name: redis-data
+      restartPolicy: Always
+

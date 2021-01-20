@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-pvc-data
+spec:
+  accessModes:
+     - ReadWriteOnce
+  volumeMode: Filesystem
+  storageClassName: redis-pv-data-class
+  resources:
+     requests:
+       storage: 20Gi
