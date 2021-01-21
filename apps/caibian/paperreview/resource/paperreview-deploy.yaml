@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paperreview-deploy
+  labels:
+    app: paperreview
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: paperreview
+  template:
+    metadata:
+      labels:
+        app: paperreview
+    spec:
+      volumes:
+      - name: pvc-paperreviewlog-slytest
+        persistentVolumeClaim:
+          claimName: paperreview-pvc-log
+      containers:
+        - name: paperreview
+          image: {{ PaperReviewImage }}
+          envFrom:
+             - configMapRef:
+                 name: paperreview-configmap
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+          - mountPath: /TRS/LOGS/paperreview
+            name: pvc-paperreviewlog-slytest
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 128Mi
