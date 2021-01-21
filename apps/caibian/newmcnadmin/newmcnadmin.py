@@ -388,7 +388,7 @@ class MCNAdminTool(object):
 
 
 if __name__ == "__main__":
-    tmp = MCNAdminTool(namespace='sly2', nfsinfo=dict(hostname='192.168.0.68', port=22, username='root', password='!QAZ2wsx1234',
+    tmp = MCNAdminTool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.168', port=1022, username='root', password='!QAZ2wsx1234',
                          basepath='/TRS/DATA'))
 
     tmp.start()

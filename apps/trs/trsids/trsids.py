@@ -50,6 +50,11 @@ class TRSIDSTool(object):
         self.DependencyDict ={}
         self.BaseDIRPath= os.path.realpath('../../..')
 
+        if  self.getValues():
+            print ('load from file....')
+            self.AppInfo = deepcopy(self.getValues())
+
+
     def setupNFS(self):
         TmpResponse = self.NFSObj.installNFS(basedir=self.AppInfo['NFSBasePath'])
         if TmpResponse['ret_code'] != 0:
@@ -334,6 +339,20 @@ class TRSIDSTool(object):
         self.k8sObj.execNamespacedPod(namespace=self.AppInfo['Namespace'], name=TmpPod['metadata']['name'],
                                       cmd='nginx -s reload'
                                       )
+
+
+    def getValues(self):
+        TmpTargetNamespaceDIR = os.path.join(self.AppInfo['TargetNamespaceDIR'], self.AppInfo['Namespace'],
+                                             self.AppInfo['AppName'])
+        TmpTargetNamespaceDIR = os.path.normpath(os.path.realpath(TmpTargetNamespaceDIR))
+
+
+        TmpValuse = None
+        if  os.path.isfile(os.path.join(TmpTargetNamespaceDIR, 'values.yaml')):
+
+            with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='rb') as f:
+                TmpValuse = yaml.safe_load(f)
+        return TmpValuse
 
 
 
