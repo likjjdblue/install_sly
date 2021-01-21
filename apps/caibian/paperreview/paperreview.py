@@ -329,8 +329,7 @@ class PaperReviewTool(object):
         TmpNacosToolDataPath = os.path.realpath(os.path.join(self.AppInfo['NFSBasePath'], TmpNacosToolDataPath))
 
 
-        print (TmpSQLToolAccountPath)
-        print (TmpSQLToolSQLPath)
+        print (TmpNacosToolDataPath)
 
         self.SSHClient.ExecCmd('mkdir -p %s'%(TmpNacosToolDataPath, ))
 
@@ -343,11 +342,11 @@ class PaperReviewTool(object):
         #print (os.path.join(self.BaseDIRPath, 'downloads', 'mty_wcm.sql'))
 
         self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'tmp', 'namespace.txt'),
-                                  remotepath=os.path.join(TmpSQLToolAccountPath, 'namespace.txt')
+                                  remotepath=os.path.join(TmpNacosToolDataPath, 'namespace.txt')
                                   )
 
         self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'nacos.tar.gz'),
-                                  remotepath=os.path.join(TmpSQLToolSQLPath, 'nacos.tar.gz')
+                                  remotepath=os.path.join(TmpNacosToolDataPath, 'nacos.tar.gz')
                                   )
 
         self.SSHClient.ExecCmd('cd %s;tar -xvzf nacos.tar.gz'%(TmpNacosToolDataPath, ))
@@ -414,7 +413,7 @@ class PaperReviewTool(object):
 
 
 if __name__ == "__main__":
-    tmp = PaperReviewTool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.168', port=1022, username='root', password='!QAZ2wsx1234',
+    tmp = PaperReviewTool(namespace='sly2', nfsinfo=dict(hostname='192.168.0.68', port=22, username='root', password='!QAZ2wsx1234',
                          basepath='/TRS/DATA'))
 
     tmp.start()
