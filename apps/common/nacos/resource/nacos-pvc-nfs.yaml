@@ -150,3 +150,24 @@ spec:
   selector:
     matchLabels:
       app: nacos
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nacos-svc
+  labels:
+    app: nacos
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+spec:
+  ports:
+    - port: 8848
+      name: server
+      targetPort: 8848
+      nodePort: 38848
+    - port: 7848
+      name: rpc
+      targetPort: 7848
+  type: NodePort
+  selector:
+    app: nacos
