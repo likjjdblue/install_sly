@@ -1,0 +1,171 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  namespace: {{ Namespace }}
+  annotations:
+  labels:
+    app: ckm
+  name: ckm
+rules:
+- apiGroups:
+  - apps
+  - extensions
+  resources:
+  - deployments
+  verbs:
+  - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  namespace: {{ Namespace }}
+  annotations:
+  labels:
+    app: ckm
+  name: ckm
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ckm
+subjects:
+- kind: ServiceAccount
+  name: ckm
+  namespace: {{ Namespace }}
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  namespace: {{ Namespace }}
+  labels:
+    app: ckm
+  name: ckm
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: {{ Namespace }}
+  annotations:
+  labels:
+    app: ckm
+  name: ckm
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: ckm
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+      labels:
+        app: ckm
+    spec:
+      containers:
+      - image: {{ CKMImage }}
+        imagePullPolicy: IfNotPresent
+        name: ckm
+        ports:
+        - containerPort: 8120
+          name: 8120tcp00
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /ckm/rs/about
+            port: 8120
+            scheme: HTTP
+          initialDelaySeconds: 20
+          periodSeconds: 60
+          successThreshold: 1
+          timeoutSeconds: 2
+        resources:
+          requests:
+            cpu: "1"
+        securityContext:
+          allowPrivilegeEscalation: false
+          privileged: false
+          procMount: Default
+          readOnlyRootFilesystem: false
+          runAsNonRoot: false
+        stdin: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        tty: true
+        volumeMounts:
+        - mountPath: /opt/ckm-rest/data
+          name: ckm-vol
+          subPath: data
+        - mountPath: /opt/ckm-rest/DICT
+          name: ckm-vol
+          subPath: DICT
+        - mountPath: /opt/ckm-rest/plugins
+          name: ckm-vol
+          subPath: plugins
+        - mountPath: /opt/ckm-rest/config
+          name: ckm-vol
+          subPath: config
+        - mountPath: /opt/ckm-rest/temp
+          name: ckm-vol
+          subPath: temp
+        - mountPath: /opt/ckm-rest/PYDLServer/tfmodels
+          name: ckm-vol
+          subPath: tfmodels
+      - image: {{ CKMPydlServerImage }}
+        imagePullPolicy: IfNotPresent
+        name: pydlserver
+        ports:
+        - containerPort: 8405
+          name: pydlserver
+          protocol: TCP
+        resources: {}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities: {}
+          privileged: false
+          procMount: Default
+          readOnlyRootFilesystem: false
+          runAsNonRoot: false
+        stdin: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        tty: true
+        volumeMounts:
+        - mountPath: /opt/PYDLServer/tfmodels
+          name: ckm-vol
+          subPath: tfmodels
+      dnsConfig: {}
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      serviceAccount: ckm
+      serviceAccountName: ckm
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: ckm-vol
+        persistentVolumeClaim:
+          claimName: ckm-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ckm
+  name: ckm-svc
+  namespace: {{ Namespace }}
+spec:
+  ports:
+  - nodePort: 30120
+    port: 8120
+    protocol: TCP
+    targetPort: 8120
+  selector:
+    app: ckm
+  sessionAffinity: None
+  type: NodePort
