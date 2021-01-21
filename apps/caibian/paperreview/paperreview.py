@@ -3,7 +3,7 @@
 
 import sys, os
 sys.path.append('../../..')
-from apps.common import nfs, nfsprovisioner, sqltool
+from apps.common import nfs, nfsprovisioner, nacostool, sqltool
 from tools import k8s_tools, ssh_tools
 from metadata import AppInfo
 from copy import deepcopy
@@ -315,6 +315,52 @@ class PaperReviewTool(object):
                 'ret_code': 1,
                 'result': 'Error occured while running SQL Tool'
             }
+
+
+        print ('import Nacos  configuration.....')
+        self.generateValues()
+        if not os.path.isdir(os.path.join(self.BaseDIRPath, 'tmp')):
+            os.mkdir(os.path.join(self.BaseDIRPath, 'tmp'))
+
+        with open(os.path.join(self.BaseDIRPath, 'tmp', 'namespace.txt'),mode='wb',encoding='utf-8') as f:
+            f.write('bigdata %s'%(self.AppInfo['PaperReviewNacosID'], )+'\n')
+
+        TmpNacosToolDataPath = '-'.join([self.AppInfo['Namespace'], 'nacostool'])
+        TmpNacosToolDataPath = os.path.realpath(os.path.join(self.AppInfo['NFSBasePath'], TmpNacosToolDataPath))
+
+
+        print (TmpSQLToolAccountPath)
+        print (TmpSQLToolSQLPath)
+
+        self.SSHClient.ExecCmd('mkdir -p %s'%(TmpNacosToolDataPath, ))
+
+
+
+        self.SSHClient.ExecCmd('rm -f -r %s/*'%(TmpNacosToolDataPath, ))
+
+
+        print (os.path.join(self.BaseDIRPath, 'tmp', 'namespace.txt'))
+        #print (os.path.join(self.BaseDIRPath, 'downloads', 'mty_wcm.sql'))
+
+        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'tmp', 'namespace.txt'),
+                                  remotepath=os.path.join(TmpSQLToolAccountPath, 'namespace.txt')
+                                  )
+
+        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'nacos.tar.gz'),
+                                  remotepath=os.path.join(TmpSQLToolSQLPath, 'nacos.tar.gz')
+                                  )
+
+        self.SSHClient.ExecCmd('cd %s;tar -xvzf nacos.tar.gz'%(TmpNacosToolDataPath, ))
+
+        TmpNacosToolObj = nacostool.NacosTool(**self.kwargs)
+        TmpResponse = TmpNacosToolObj.start()
+        if TmpResponse['ret_code'] != 0:
+            print ('Error occured while running Nacos Tool')
+            return {
+                'ret_code': 1,
+                'result': 'Error occured while running Nacos Tool'
+            }
+
 
         ##### end ###
         return {

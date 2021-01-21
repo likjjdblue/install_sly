@@ -21,7 +21,6 @@ AppInfo = {
     'PaperReviewNacosAddr': 'nacos-svc',
     'PaperReviewNacosID': '8953ca45-4cfb-469a-bc55-7e3bce569994',
     'dependences': ['apps.common.mariadb/MariaDBTool', 'apps.common.redis/RedisTool',
-                    'apps.common.rabbitmqha/RabbitmqHATool', 'apps.common.nacos/NacosTool',
-                    'apps.caibian.trswcm/TRSWCMTool',
+                    'apps.common.nacos/NacosTool', 'apps.caibian.trswcm/TRSWCMTool',
                     ]
 }
