@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tenantcenter-deploy
+  labels:
+    app: tenantcenter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tenantcenter
+  template:
+    metadata:
+      labels:
+        app: tenantcenter
+    spec:
+      volumes:
+      - name: pvc-tenantcenterlog-slytest
+        persistentVolumeClaim:
+          claimName: tenantcenter-pvc-log
+      containers:
+        - name: tenantcenter
+          image: {{ TenantCenterImage }}
+          envFrom:
+             - configMapRef:
+                 name: tenantcenter-configmap
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+          - mountPath: /TRS/LOGS/tenantcenterjpa
+            name: pvc-tenantcenterlog-slytest
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 128Mi
