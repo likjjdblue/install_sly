@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bigdata-access-deploy
+  labels:
+    app: bigdata-access
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bigdata-access
+  template:
+    metadata:
+      labels:
+        app: bigdata-access
+    spec:
+      volumes:
+      - name: pvc-bigdata-accesslog-slytest
+        persistentVolumeClaim:
+          claimName: bigdata-access-pvc-log
+      containers:
+        - name: bigdata-access
+          image: {{ BigdataAccessImage }}
+          envFrom:
+             - configMapRef:
+                 name: bigdata-access-configmap
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+          - mountPath: /TRS/LOGS/bigdata-access
+            name: pvc-bigdata-accesslog-slytest
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 128Mi

@@ -1,0 +1,20 @@
+---
+# Source: dicttool/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: dicttool-svc
+  labels:
+    app: dicttool
+    chart: "dicttool-1.0.0"
+    release: "dicttool"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8090
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: dicttool
+    release: "dicttool"
