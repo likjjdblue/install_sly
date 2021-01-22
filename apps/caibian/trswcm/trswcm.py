@@ -335,11 +335,15 @@ class TRSWCMTool(object):
         TmpNginxConfigPath = os.path.realpath(os.path.join(self.AppInfo['NFSBasePath'], TmpNginxConfigPath))
 
         TmpNginxDataPath =  '-'.join([self.AppInfo['Namespace'], 'nginx-pv-web'])
-        TmpNginxDataPath = os.path.realpath(os.path.join(self.AppInfo['NFSBasePath'], TmpNginxConfigPath))
+        TmpNginxDataPath = os.path.realpath(os.path.join(self.AppInfo['NFSBasePath'], TmpNginxDataPath))
 
         print (TmpNginxConfigPath)
+        print (TmpNginxDataPath)
+
         self.SSHClient.ExecCmd('mkdir -p %s' % (TmpNginxDataPath, ))
         self.SSHClient.ExecCmd('mkdir -p %s' % (TmpNginxConfigPath,))
+        print (os.path.join(self.BaseDIRPath, 'downloads', 'nginx-web.tar.gz'))
+        print (os.path.join(TmpNginxDataPath, 'nginx-web.tar.gz'))
 
         self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'trswcm.conf'),
                                   remotepath=os.path.join(TmpNginxConfigPath, 'trswcm.conf')
