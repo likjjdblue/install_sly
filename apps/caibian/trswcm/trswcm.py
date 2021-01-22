@@ -334,12 +334,22 @@ class TRSWCMTool(object):
         TmpNginxConfigPath = '-'.join([self.AppInfo['Namespace'], 'nginx-pv-config'])
         TmpNginxConfigPath = os.path.realpath(os.path.join(self.AppInfo['NFSBasePath'], TmpNginxConfigPath))
 
+        TmpNginxDataPath =  '-'.join([self.AppInfo['Namespace'], 'nginx-pv-web'])
+        TmpNginxDataPath = os.path.realpath(os.path.join(self.AppInfo['NFSBasePath'], TmpNginxConfigPath))
+
         print (TmpNginxConfigPath)
-        self.SSHClient.ExecCmd('mkdir -p %s' % (TmpNginxConfigPath, ))
+        self.SSHClient.ExecCmd('mkdir -p %s' % (TmpNginxDataPath, ))
+        self.SSHClient.ExecCmd('mkdir -p %s' % (TmpNginxConfigPath,))
 
         self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'trswcm.conf'),
                                   remotepath=os.path.join(TmpNginxConfigPath, 'trswcm.conf')
                                   )
+
+        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'nginx-web.tar.gz'),
+                                  remotepath=os.path.join(TmpNginxDataPath, 'nginx-web.tar.gz')
+                                  )
+        self.SSHClient.ExecCmd('cd  %s;tar -xvzf nginx-web.tar.gz' % (TmpNginxDataPath,))
+
 
 
         TmpNginxPods = self.k8sObj.filterNamespacedPod(namespace=self.AppInfo['Namespace'], filters={
