@@ -370,7 +370,7 @@ class DicttoolTool(object):
 
 
 if __name__ == "__main__":
-    tmp = DicttoolTool(namespace='sly2', nfsinfo=dict(hostname='192.168.0.68', port=22, username='root', password='!QAZ2wsx1234',
+    tmp = DicttoolTool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.74', port=1022, username='root', password='!QAZ2wsx1234',
                          basepath='/TRS/DATA'))
 
     tmp.start()

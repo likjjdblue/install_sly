@@ -1,8 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: mcb-dicttool-configmap
-  namespace: sly
+  name: mcb-dicttool-configmaps
 data:
   # 类属性键；每一个键都映射到一个简单的值
 # 大数据应用公有变量
