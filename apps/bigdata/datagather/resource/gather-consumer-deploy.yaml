@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gather-consumer-deploy
+  labels:
+    app: gather-consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gather-consumer
+  template:
+    metadata:
+      labels:
+        app: gather-consumer
+    spec:
+      volumes:
+      - name: pvc-gather-consumerlog-slytest
+        persistentVolumeClaim:
+          claimName: gather-consumer-pvc-log
+      - name: pvc-gather-consumerdata-slytest
+        persistentVolumeClaim:
+          claimName: gather-consumer-pvc-data
+      containers:
+        - name: gather-consumer
+          image: {{ DataGatherImage }}
+          envFrom:
+             - configMapRef:
+                 name: gather-consumer-configmap
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+          - mountPath: /TRS/LOGS/gather-consumer
+            name: pvc-gather-consumerlog-slytest
+          - mountPath: /TRS/APP/gather_producer
+            name: pvc-gather-consumerdata-slytest
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 128Mi
