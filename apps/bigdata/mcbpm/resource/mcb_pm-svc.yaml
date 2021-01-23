@@ -1,0 +1,17 @@
+---
+# Source: mcb-pm/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: mcb-pm-svc
+  labels:
+    app: mcb-pm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8095
+      targetPort: 8095
+      protocol: TCP
+      name: http
+  selector:
+    app: mcb-pm
