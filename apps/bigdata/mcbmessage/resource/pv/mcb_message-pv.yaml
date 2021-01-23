@@ -1,0 +1,32 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mcb-message-pv-log
+spec: 
+  capacity: 
+    storage: 200Gi
+  volumeMode: Filesystem
+  storageClassName: mcb-message-pv-log-class
+  accessModes: 
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: {{ MCBMessageLogPath }}
+    server: {{ NFSAddr }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mcb-message-pv-data
+spec: 
+  capacity: 
+    storage: 200Gi
+  volumeMode: Filesystem
+  storageClassName: mcb-message-pv-data-class
+  accessModes: 
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: {{ MCBMessageDataPath }}
+    server: {{ NFSAddr }}
