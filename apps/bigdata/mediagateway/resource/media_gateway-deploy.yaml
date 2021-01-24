@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: media-gateway-deploy
+  labels:
+    app: media-gateway
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: media-gateway
+  template:
+    metadata:
+      labels:
+        app: media-gateway
+    spec:
+      volumes:
+      - name: pvc-media-gatewaylog-slytest
+        persistentVolumeClaim:
+          claimName: media-gateway-pvc-log
+      containers:
+        - name: media-gateway
+          image: {{ MediaGatewayImage }}
+          envFrom:
+             - configMapRef:
+                 name: media-gateway-configmap
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+          - mountPath: /TRS/LOGS/bigscreen-gateway
+            name: pvc-media-gatewaylog-slytest
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 128Mi

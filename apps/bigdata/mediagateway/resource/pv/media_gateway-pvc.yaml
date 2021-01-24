@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: media-gateway-pvc-log
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  storageClassName: media-gateway-pv-log-class
+  resources:
+     requests:
+       storage: 1000Gi

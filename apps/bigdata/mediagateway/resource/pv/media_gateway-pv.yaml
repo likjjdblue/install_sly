@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: media-gateway-pv-log
+spec:
+  capacity:
+    storage: 1000Gi
+  volumeMode: Filesystem
+  storageClassName: media-gateway-pv-log-class
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: {{ MediaGatewayLogPath }}
+    server: {{ NFSAddr }}
+

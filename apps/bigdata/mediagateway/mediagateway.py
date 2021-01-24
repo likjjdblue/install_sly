@@ -18,9 +18,9 @@ from pprint import pprint
 from codecs import open as open
 import importlib
 
-class MCBPMTool(object):
-    def __init__(self, namespace='default', mcbmessagelog='mcb-pm-pv-log' , mcbmessagedata='mcb-pm-pv-data', nfsinfo={},
-                 harbor=None, retrytimes=10, *args, **kwargs):
+class MediaGatewayTool(object):
+    def __init__(self, namespace='default', mediagatewayklog='media-gateway-pv-log' ,
+                 nfsinfo={}, harbor=None, retrytimes=10, *args, **kwargs):
 
         namespace = namespace.strip()
         kwargs['namespace'] = namespace
@@ -39,8 +39,8 @@ class MCBPMTool(object):
 
         self.AppInfo['NFSAddr'] = self.NFSAddr
         self.AppInfo['NFSBasePath'] = self.NFSBasePath
-        self.AppInfo['MCBPMLogPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, mcbmessagelog]))
-        self.AppInfo['MCBPMDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, mcbmessagedata]))
+        self.AppInfo['MediaGatewayLogPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, mediagatewayklog]))
+
         self.AppInfo['Namespace'] = namespace
 
         self.AppInfo['HarborAddr'] = harbor
@@ -61,13 +61,12 @@ class MCBPMTool(object):
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
-        print ('create MCBPM NFS successfully')
+        print ('create MediaGateway NFS successfully')
 
 
-        self.NFSObj.createSubFolder((self.AppInfo['MCBPMLogPath']))
-        self.NFSObj.createSubFolder((self.AppInfo['MCBPMDataPath']))
+        self.NFSObj.createSubFolder((self.AppInfo['MediaGatewayLogPath']))
 
-        print ('setup MCBPM NFS successfully')
+        print ('setup MediaGateway NFS successfully')
 
         return {
             'ret_code': 0,
@@ -75,11 +74,11 @@ class MCBPMTool(object):
         }
 
     def generateValues(self):
-        self.AppInfo['MCBPMImage'] = replaceDockerRepo(self.AppInfo['MCBPMImage'], self.AppInfo['HarborAddr'])
+        self.AppInfo['MediaGatewayImage'] = replaceDockerRepo(self.AppInfo['MediaGatewayImage'], self.AppInfo['HarborAddr'])
         self.AppInfo['NFSProvisionerImage'] =replaceDockerRepo(self.AppInfo['NFSProvisionerImage'],
                                                                self.AppInfo['HarborAddr'])
-        if not self.AppInfo['MCBPMPrimaryDBPassword']:
-            self.AppInfo['MCBPMPrimaryDBPassword'] = crypto_tools.generateRandomAlphaNumericString(lenght=10)
+        if not self.AppInfo['MediaGatewayDBPassword']:
+            self.AppInfo['MediaGatewayDBPassword'] = crypto_tools.generateRandomAlphaNumericString(lenght=10)
 
 
     def renderTemplate(self):
@@ -132,11 +131,11 @@ class MCBPMTool(object):
             return TmpResponse
 
 
-        print ('Apply MCBPM ....')
-        if not self.k8sObj.checkNamespacedResourceHealth(name='mcb-pm-deploy', namespace=self.AppInfo['Namespace'],
+        print ('Apply MediaGateway ....')
+        if not self.k8sObj.checkNamespacedResourceHealth(name='media-gateway-deploy', namespace=self.AppInfo['Namespace'],
                                                          kind='Deployment'):
             try:
-                self.k8sObj.deleteNamespacedDeployment(name='mcb-pm-deploy', namespace=self.AppInfo['Namespace'])
+                self.k8sObj.deleteNamespacedDeployment(name='media-gateway-deploy', namespace=self.AppInfo['Namespace'])
             except:
                 pass
 
@@ -146,21 +145,21 @@ class MCBPMTool(object):
 
 
 
-            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mcb_pm-cm.yaml'),
+            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'media_gateway-cm.yaml'),
                                                namespace=self.AppInfo['Namespace']
                                                )
-            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mcb_pm-svc.yaml'),
+            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'media_gateway-svc.yaml'),
                                                namespace=self.AppInfo['Namespace']
                                                )
-            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'pv/mcb_pm-pv.yaml'),
+            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'pv/media_gateway-pv.yaml'),
                                                namespace=self.AppInfo['Namespace']
                                                )
-            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'pv/mcb_pm-pvc.yaml'),
+            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'pv/media_gateway-pvc.yaml'),
                                                namespace=self.AppInfo['Namespace']
                                                )
 
 
-            TmpResponse = self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mcb_pm-deploy.yaml'),
+            TmpResponse = self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'media_gateway-deploy.yaml'),
                                                          namespace=self.AppInfo['Namespace'])
 
             #print (os.path.join(TmpTargetNamespaceDIR, 'resource', 'mty-ids-deploy.yaml'))
@@ -171,7 +170,7 @@ class MCBPMTool(object):
 
         isRunning=False
         for itime in range(self.RetryTimes):
-            TmpResponse = self.k8sObj.getNamespacedDeployment(name='mcb-pm-deploy',
+            TmpResponse = self.k8sObj.getNamespacedDeployment(name='media-gateway-deploy',
                                                                    namespace=self.AppInfo['Namespace'])['result'].to_dict()
 
             if (TmpResponse['status']['replicas'] != TmpResponse['status']['ready_replicas']) and \
@@ -193,7 +192,7 @@ class MCBPMTool(object):
                 'ret_code': 1,
                 'result': 'Failed to apply Deployment: %s'%(TmpResponse['metadata']['name'],)
             }
-        print ('Waitting MCBPM for running....')
+        print ('Waitting MediaGateway for running....')
         sleep(120)
 
         return {
@@ -220,7 +219,7 @@ class MCBPMTool(object):
 
         TmpResponse = self.applyYAML()
         if TmpResponse['ret_code'] != 0:
-            print ('failed to install MCBPM')
+            print ('failed to install MediaGateway')
             return TmpResponse
 
         print ('install %s successsfully')%(self.AppInfo['AppName'], )
@@ -254,12 +253,7 @@ class MCBPMTool(object):
                 self.DependencyDict['MariaDBPassword'] = TmpInfo['MariaDBPassword']
             elif TmpClsName == 'RedisTool':
                 self.AppInfo['TRSRedisPassword'] = TmpInfo['RedisStandAlonePassword']
-            elif TmpClsName == 'RabbitmqHATool':
-                self.AppInfo['TRSMQPassword'] = crypto_tools.DecodeBase64(TmpInfo['RabbitmqPassword'])
-            elif TmpClsName == 'TRSWCMTool':
-                self.AppInfo['MCBPMSecondDBPassword'] = TmpInfo['TRSWCMDBPassword']
-            elif TmpClsName == 'RedisHATool':
-                self.AppInfo['RedisHAPassword'] = crypto_tools.DecodeBase64(TmpInfo['RedisPassword'])
+
 
         return {
             'ret_code': 0,
@@ -286,7 +280,7 @@ class MCBPMTool(object):
 
         with open(os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'),mode='wb',encoding='utf-8') as f:
             f.write('root root '+self.DependencyDict['MariaDBPassword']+'\n')
-            f.write('%s %s %s'%(self.AppInfo['MCBPMPrimaryDBName'], self.AppInfo['MCBPMPrimaryDBUser'], self.AppInfo['MCBPMPrimaryDBPassword'])+'\n')
+            f.write('%s %s %s'%(self.AppInfo['MediaGatewayDBName'], self.AppInfo['MediaGatewayDBUser'], self.AppInfo['MediaGatewayDBPassword'])+'\n')
 
         TmpSQLToolAccountPath = '-'.join([self.AppInfo['Namespace'], 'sqltool-pv-account'])
         TmpSQLToolAccountPath = os.path.realpath(os.path.join(self.AppInfo['NFSBasePath'], TmpSQLToolAccountPath))
@@ -305,11 +299,12 @@ class MCBPMTool(object):
         self.SSHClient.ExecCmd('rm -f -r %s/*'%(TmpSQLToolSQLPath,))
 
         print (os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'))
-        #print (os.path.join(self.BaseDIRPath, 'downloads', 'mcb_dicttool.sql'))
+        print (os.path.join(self.BaseDIRPath, 'downloads', 'mcb_dicttool.sql'))
 
         self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'),
                                   remotepath=os.path.join(TmpSQLToolAccountPath, 'account.txt')
                                   )
+
         '''
         self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'mcb_dicttool.sql'),
                                   remotepath=os.path.join(TmpSQLToolSQLPath, 'mcb_dicttool.sql')
@@ -339,8 +334,8 @@ class MCBPMTool(object):
         print (TmpNginxConfigPath)
         self.SSHClient.ExecCmd('mkdir -p %s' % (TmpNginxConfigPath, ))
 
-        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'mcbpm.conf'),
-                                  remotepath=os.path.join(TmpNginxConfigPath, 'mcbpm.conf')
+        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'mediagateway.conf'),
+                                  remotepath=os.path.join(TmpNginxConfigPath, 'mediagateway.conf')
                                   )
 
 
@@ -377,7 +372,7 @@ class MCBPMTool(object):
 
 
 if __name__ == "__main__":
-    tmp = MCBPMTool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.74', port=1022, username='root', password='!QAZ2wsx1234',
+    tmp = MediaGatewayTool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.74', port=1022, username='root', password='!QAZ2wsx1234',
                          basepath='/TRS/DATA'))
 
     tmp.start()
