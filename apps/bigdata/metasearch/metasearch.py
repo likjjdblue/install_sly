@@ -76,7 +76,6 @@ class MetaSearchTool(object):
     def generateValues(self):
         self.AppInfo['MetaSearchImage'] = replaceDockerRepo(self.AppInfo['MetaSearchImage'], self.AppInfo['HarborAddr'])
         self.AppInfo['NFSProvisionerImage'] =replaceDockerRepo(self.AppInfo['NFSProvisionerImage'],
-
                                                                self.AppInfo['HarborAddr'])
 
         if not self.AppInfo['MetaSearchPrimaryDBPassword']:
