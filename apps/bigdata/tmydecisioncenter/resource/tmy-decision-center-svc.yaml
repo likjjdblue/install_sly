@@ -1,0 +1,32 @@
+---
+# Source: tmy-decision-center/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: tmy-decision-center-svc
+  labels:
+    app: tmy-decision-center
+    chart: "tmy-decision-center-1.0.0"
+    release: "tmy-decision-center"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 58223
+      targetPort: 58223
+      protocol: TCP
+      name: http58223
+    - port: 3004
+      targetPort: 3004
+      protocol: TCP
+      name: http3004
+    - port: 3005
+      targetPort: 3005
+      protocol: TCP
+      name: http3005
+    - port: 3579
+      targetPort: 3579
+      protocol: TCP
+      name: http3579
+  selector:
+    app: tmy-decision-center
+    release: "tmy-decision-center"

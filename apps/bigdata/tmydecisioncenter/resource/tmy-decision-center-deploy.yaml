@@ -1,0 +1,62 @@
+# Source: tmy-decision-center/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tmy-decision-center-deploy
+  labels:
+    app: tmy-decision-center
+    chart: "tmy-decision-center-1.0.0"
+    release: "tmy-decision-center"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tmy-decision-center
+      release: "tmy-decision-center"
+  template:
+    metadata:
+      labels:
+        app: tmy-decision-center
+        release: "tmy-decision-center"
+    spec:
+     # nodeSelector:
+     #   kubernetes.io/hostname: 192.168.200.94
+      volumes:
+      - name: tmy-decision-center-pvc-log
+        persistentVolumeClaim:
+          claimName: tmy-decision-center-pvc-log
+     # hostAliases:
+     # - ip: "10.6.42.1"
+     #   hostnames:
+     #   - "nginx.nyrb-test.com"
+      containers:
+      - name: tmy-decision-center
+        image: {{ TmyDecisionCenterImage }}
+        envFrom:
+        - configMapRef:
+            name: tmy-decision-center-configmap
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /TRS/LOGS/tmy-decision-center 
+          name: tmy-decision-center-pvc-log
+        ports:
+          - name: http
+            containerPort: 8090
+            protocol: TCP
+        livenessProbe:
+          tcpSocket:
+            port: http
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        readinessProbe:
+          tcpSocket:
+            port: http
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 256Mi
