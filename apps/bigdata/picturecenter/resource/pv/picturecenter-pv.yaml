@@ -1,0 +1,32 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: picturecenter-data
+spec: 
+  capacity: 
+    storage: 200Gi
+  volumeMode: Filesystem
+  storageClassName: picturecenter-pv-data-class
+  accessModes: 
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: {{ PictureCenterDataPath }}
+    server: {{ NFSAddr }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: picturecenter-log
+spec: 
+  capacity: 
+    storage: 300Gi
+  volumeMode: Filesystem
+  storageClassName: picturecenter-pv-log-class
+  accessModes: 
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: {{ PictureCenterLogPath }}
+    server: {{ NFSAddr }}

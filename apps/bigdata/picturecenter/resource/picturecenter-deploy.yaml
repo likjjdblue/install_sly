@@ -1,0 +1,61 @@
+---
+# Source: picturecenter/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: picturecenter-deploy
+  labels:
+    app: picturecenter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: picturecenter
+  template:
+    metadata:
+      labels:
+        app: picturecenter
+    spec:
+#      nodeSelector:
+#        kubernetes.io/hostname: 192.168.200.92
+      volumes:
+      - name: pvc-picturecenter-log
+        persistentVolumeClaim: 
+          claimName: picturecenter-pvc-log
+      - name: pvc-picturecenter-data
+        persistentVolumeClaim:
+          claimName: picturecenter-pvc-data
+#      hostAliases:
+#      - ip: "192.168.200.32"
+#        hostnames:
+#        - "nginx.slyk8s.com"
+      containers:
+        - name: picturecenter
+          image: {{ PictureCenterImage }}
+          envFrom:
+          - configMapRef:
+              name: picturecenter-configmap
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+          - mountPath: /TRS/LOGS/picture-center
+            name: pvc-picturecenter-log
+          - mountPath: /TRS/web/upload/oss_temp_file
+            name: pvc-picturecenter-data
+          ports:
+            - name: port1
+              containerPort: 58400
+              protocol: TCP
+            - name: port2
+              containerPort: 58401
+              protocol: TCP
+            - name: port3
+              containerPort: 58402
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+

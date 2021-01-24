@@ -1,0 +1,25 @@
+---
+# Source: picturecenter/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: picturecenter-svc
+  labels:
+    app: picturecenter
+spec:
+  type: ClusterIP
+  ports:
+    - port: 58400
+      targetPort: 58400
+      protocol: TCP
+      name: port1
+    - port: 58401
+      targetPort: 58401
+      protocol: TCP
+      name: port2
+    - port: 58402
+      targetPort: 58402
+      protocol: TCP
+      name: port3
+  selector:
+    app: picturecenter
