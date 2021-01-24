@@ -1,0 +1,62 @@
+# Source: metasearch/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: metasearch-deploy
+  labels:
+    app: metasearch
+    chart: "metasearch-1.0.0"
+    release: "metasearch"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: metasearch
+      release: "metasearch"
+  template:
+    metadata:
+      labels:
+        app: metasearch
+        release: "metasearch"
+    spec:
+     # nodeSelector:
+     #   kubernetes.io/hostname: 192.168.200.94
+      volumes:
+      - name: metasearch-pvc-log
+        persistentVolumeClaim:
+          claimName: metasearch-pvc-log
+     # hostAliases:
+     # - ip: "10.6.42.1"
+     #   hostnames:
+     #   - "nginx.nyrb-test.com"
+      containers:
+      - name: metasearch
+        image: {{ MetaSearchImage }}
+        envFrom:
+        - configMapRef:
+            name: metasearch-configmap
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /TRS/DATA/metasearch/logs
+          name: metasearch-pvc-log
+        #ports:
+        #  - name: http
+        #    containerPort: 8090
+        #    protocol: TCP
+        #livenessProbe:
+        #  tcpSocket:
+        #    port: http
+        #  initialDelaySeconds: 60
+        #  periodSeconds: 10
+        #readinessProbe:
+        #  tcpSocket:
+        #    port: http
+        #  initialDelaySeconds: 60
+        #  periodSeconds: 10
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 256Mi

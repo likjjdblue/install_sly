@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: metasearch-pvc-log
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeMode: Filesystem
+  storageClassName: metasearch-pv-log-class
+  resources:
+     requests:
+       storage: 200Gi

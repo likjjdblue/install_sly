@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: metasearch-pv-log
+spec: 
+  capacity: 
+    storage: 200Gi
+  volumeMode: Filesystem
+  storageClassName: metasearch-pv-log-class
+  accessModes: 
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: {{ MetaSearchLogPath }}
+    server: {{ NFSAddr }}

@@ -1,0 +1,20 @@
+---
+# Source: metasearch/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: metasearch-svc
+  labels:
+    app: metasearch
+    chart: "metasearch-1.0.0"
+    release: "metasearch"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8650
+      targetPort: 8650
+      protocol: TCP
+      name: http
+  selector:
+    app: metasearch
+    release: "metasearch"
