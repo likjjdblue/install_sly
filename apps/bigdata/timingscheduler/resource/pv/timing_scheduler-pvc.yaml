@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: timing-scheduler-pvc-log
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeMode: Filesystem
+  storageClassName: timing-scheduler-pv-log-class
+  resources:
+     requests:
+       storage: 200Gi

@@ -1,0 +1,20 @@
+---
+# Source: timing-scheduler/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: timing-scheduler-svc
+  labels:
+    app: timing-scheduler
+    chart: "timing-scheduler-1.0.0"
+    release: "timing-scheduler"
+spec:
+  type: ClusterIP
+  ports:
+  - port: 9009
+    targetPort: 9009
+    protocol: TCP
+    name: http
+  selector:
+    app: timing-scheduler
+    release: "timing-scheduler"
