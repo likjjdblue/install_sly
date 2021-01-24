@@ -1,0 +1,32 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: media-resource-pv-log
+spec: 
+  capacity: 
+    storage: 200Gi
+  volumeMode: Filesystem
+  storageClassName: media-resource-pv-log-class
+  accessModes: 
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: {{ MediaResourceLogPath }}
+    server: {{ NFSAddr }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: media-resource-pv-data
+spec: 
+  capacity: 
+    storage: 200Gi
+  volumeMode: Filesystem
+  storageClassName: media-resource-pv-data-class
+  accessModes: 
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: {{ MediaResourceDataPath }}
+    server: {{ NFSAddr }}

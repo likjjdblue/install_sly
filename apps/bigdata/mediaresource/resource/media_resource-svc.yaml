@@ -1,0 +1,17 @@
+---
+# Source: media-resource/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: media-resource-svc
+  labels:
+    app: media-resource
+spec:
+  type: ClusterIP
+  ports:
+  - port: 52618
+    targetPort: 52618
+    protocol: TCP
+    name: http
+  selector:
+    app: media-resource

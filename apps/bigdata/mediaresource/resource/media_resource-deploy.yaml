@@ -1,0 +1,70 @@
+---
+# Source: resource/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: media-resource-deploy
+  labels:
+    app: media-resource
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: media-resource
+  template:
+    metadata:
+      labels:
+        app: media-resource
+    spec:
+#      nodeSelector:
+#        kubernetes.io/hostname: 192.168.200.94
+      volumes:
+      - name: pvc-media-resource-log
+        persistentVolumeClaim:
+          claimName: media-resource-pvc-log
+      - name: pvc-media-resource-data
+        persistentVolumeClaim:
+          claimName: media-resource-pvc-data
+#      - name: pvc-media-resource-mediadata
+#        persistentVolumeClaim:
+#          claimName: media-resource-pvc-mediadata
+#      hostAliases:
+#      - ip: "10.6.42.1"
+#        hostnames:
+#        - "nginx.nyrb-test.com"
+      containers:
+      - name: media-resource
+        image: {{ MediaResourceImage }}
+        envFrom:
+        - configMapRef:
+            name: media-resource-configmap
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /TRS/LOGS/media_resource
+          name: pvc-media-resource-log
+        - mountPath: /TRS/DATA/media_resource_data
+          name: pvc-media-resource-data
+#        - mountPath: /TRS/DATA/media_resource_data
+#          name: pvc-media-resource-mediadata
+        #ports:
+        #  - name: http
+        #    containerPort: 6083
+        #    protocol: TCP
+        #livenessProbe:
+        #  tcpSocket:
+        #    port: http
+        #  initialDelaySeconds: 60
+        #  periodSeconds: 10
+        #readinessProbe:
+        #  tcpSocket:
+        #    port: http
+        #  initialDelaySeconds: 60
+        #  periodSeconds: 10
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+
