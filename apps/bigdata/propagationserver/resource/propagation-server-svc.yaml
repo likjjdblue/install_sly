@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: propagation-server-svc
+  labels:
+    app: propagation-server
+spec:
+  type: ClusterIP
+  ports:
+    - port: 58101
+      targetPort: 58101
+      protocol: TCP
+      name: http
+  selector:
+    app: propagation-server

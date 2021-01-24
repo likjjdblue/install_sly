@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: propagation-server-deploy
+  labels:
+    app: propagation-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: propagation-server
+  template:
+    metadata:
+      labels:
+        app: propagation-server
+    spec:
+      volumes:
+      - name: pvc-propagation-serverlog-slytest
+        persistentVolumeClaim:
+          claimName: propagation-server-pvc-log
+      containers:
+        - name: propagation-server
+          image: {{ PropagationServerImage }}
+          envFrom:
+             - configMapRef:
+                 name: propagation-server-configmap
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+          - mountPath: /TRS/LOGS/propagation-server
+            name: pvc-propagation-serverlog-slytest
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 128Mi

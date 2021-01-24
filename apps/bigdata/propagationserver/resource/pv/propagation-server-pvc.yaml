@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: propagation-server-pvc-log
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  storageClassName: propagation-server-pv-log-class
+  resources:
+     requests:
+       storage: 1000Gi
