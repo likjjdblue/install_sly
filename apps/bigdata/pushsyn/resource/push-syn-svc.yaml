@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: push-syn-svc
+  labels:
+    app: push-syn
+spec:
+  type: ClusterIP
+  ports:
+    - port: 58105 
+      targetPort: 58105
+      protocol: TCP
+      name: http58105
+    - port: 50000
+      targetPort: 50000
+      protocol: TCP
+      name: http50000
+    - port: 51000
+      targetPort: 51000
+      protocol: TCP
+      name: http51000
+    - port: 50001
+      targetPort: 50001
+      protocol: TCP
+      name: http50001
+  selector:
+    app: push-syn

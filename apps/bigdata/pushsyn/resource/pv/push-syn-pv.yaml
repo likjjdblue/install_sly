@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: push-syn-pv-log
+spec:
+  capacity:
+    storage: 1000Gi
+  volumeMode: Filesystem
+  storageClassName: push-syn-pv-log-class
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: {{ PushSynLogPath }}
+    server: {{ NFSAddr }}
+

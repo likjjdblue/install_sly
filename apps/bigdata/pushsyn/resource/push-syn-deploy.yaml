@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: push-syn-deploy
+  labels:
+    app: push-syn
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: push-syn
+  template:
+    metadata:
+      labels:
+        app: push-syn
+    spec:
+      volumes:
+      - name: pvc-push-synlog-slytest
+        persistentVolumeClaim:
+          claimName: push-syn-pvc-log
+      containers:
+        - name: push-syn
+          image: {{ PushSynImage }}
+          envFrom:
+             - configMapRef:
+                 name: push-syn-configmap
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+          - mountPath: /TRS/LOGS/push-syn
+            name: pvc-push-synlog-slytest
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 128Mi
