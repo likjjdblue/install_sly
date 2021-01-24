@@ -1,0 +1,231 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sdm-website-svc
+  labels:
+    app: sdm-website
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9017
+      targetPort: 9017
+      protocol: TCP
+      name: http
+  selector:
+    app: sdm-website
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sdm-weibo-svc
+  labels:
+    app: sdm-weibo
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9009
+      targetPort: 9009
+      protocol: TCP
+      name: http
+  selector:
+    app: sdm-weibo
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sdm-websitetoutiao-svc
+  labels:
+    app: sdm-websitetoutiao
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9004
+      targetPort: 9004
+      protocol: TCP
+      name: http
+  selector:
+    app: sdm-websitetoutiao
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sdm-push-app-svc
+  labels:
+    app: sdm-push-app
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9016
+      targetPort: 9016
+      protocol: TCP
+      name: http
+  selector:
+    app: sdm-push-app
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sdm-epaperbm-svc
+  labels:
+    app: sdm-epaperbm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9018
+      targetPort: 9018
+      protocol: TCP
+      name: http
+  selector:
+    app: sdm-epaperbm
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sdm-szboriginal-svc
+  labels:
+    app: sdm-szboriginal
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9000
+      targetPort: 9000
+      protocol: TCP
+      name: http
+  selector:
+    app: sdm-szboriginal
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sdm-feifan-app-svc
+  labels:
+    app: sdm-feifan-app
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9015
+      targetPort: 9015
+      protocol: TCP
+      name: http
+  selector:
+    app: sdm-feifan-app
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sdm-traditionalyuqing-svc
+  labels:
+    app: sdm-traditionalyuqing
+spec:
+  type: ClusterIP
+  ports:
+    - port: 7911
+      targetPort: 7911
+      protocol: TCP
+      name: http
+  selector:
+    app: sdm-traditionalyuqing
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sdm-weiboyuqing-svc
+  labels:
+    app: sdm-weiboyuqing
+spec:
+  type: ClusterIP
+  ports:
+    - port: 7908
+      targetPort: 7908
+      protocol: TCP
+      name: http
+  selector:
+    app: sdm-weiboyuqing
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sdm-weixinyuqing-svc
+  labels:
+    app: sdm-weixinyuqing
+spec:
+  type: ClusterIP
+  ports:
+    - port: 7910
+      targetPort: 7910
+      protocol: TCP
+      name: http
+  selector:
+    app: sdm-weixinyuqing
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sdm-weixin-svc
+  labels:
+    app: sdm-weixin
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9010
+      targetPort: 9010
+      protocol: TCP
+      name: http
+  selector:
+    app: sdm-weixin
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sdm-product-svc
+  labels:
+    app: sdm-product
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9020
+      targetPort: 9020
+      protocol: TCP
+      name: http
+  selector:
+    app: sdm-product
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sdm-newmedia-svc
+  labels:
+    app: sdm-newmedia
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9040
+      targetPort: 9040
+      protocol: TCP
+      name: http
+  selector:
+    app: sdm-newmedia
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sdm-meizi-svc
+  labels:
+    app: sdm-meizi
+spec:
+  type: ClusterIP
+  ports:
+    - port: 2050
+      targetPort: 2050
+      protocol: TCP
+      name: port1
+    - port: 9031
+      targetPort: 9031
+      protocol: TCP
+      name: port2
+    - port: 9032
+      targetPort: 9032
+      protocol: TCP
+      name: port3
+  selector:
+    app: sdm-meizi

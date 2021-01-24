@@ -1,0 +1,26 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mcb-sdm-schedule-pvc-log
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  storageClassName: mcb-sdm-schedule-pv-log-class
+  resources:
+     requests:
+       storage: 1000Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mcb-sdm-schedule-pvc-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  storageClassName: mcb-sdm-schedule-pv-data-class
+  resources:
+     requests:
+       storage: 1000Gi

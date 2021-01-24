@@ -1,0 +1,664 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sdm-push-app
+  labels:
+    app: sdm-push-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sdm-push-app
+  template:
+    metadata:
+      labels:
+        app: sdm-push-app
+    spec:
+      volumes:
+      - name: sdm-log
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-log
+      - name: sdm-data
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-data
+      containers:
+      - name: sdm-push-app
+        image: {{ MCBSDMPushAppImage }}
+        envFrom:
+        - configMapRef:
+            name: mcb-sdm-schedule-configmap
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /logs
+          name: sdm-log
+        - mountPath: /TRS/DATA/sdm_newmedia_data
+          name: sdm-data
+#        ports:
+#          - name: http
+#            containerPort: 9016
+#            protocol: TCP
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sdm-websitetoutiao
+  labels:
+    app: sdm-websitetoutiao
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sdm-websitetoutiao
+  template:
+    metadata:
+      labels:
+        app: sdm-websitetoutiao
+    spec:
+      volumes:
+      - name: sdm-log
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-log
+      - name: sdm-data
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-data
+      containers:
+      - name: sdm-websitetoutiao
+        image: {{ MCBSDMWebiteTouTiaoImage }}
+        envFrom:
+        - configMapRef:
+            name: mcb-sdm-schedule-configmap
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /logs
+          name: sdm-log
+        - mountPath: /TRS/DATA/sdm_newmedia_data
+          name: sdm-data
+#        ports:
+#          - name: http
+#            containerPort: 9004
+#            protocol: TCP
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sdm-feifan-app
+  labels:
+    app: sdm-feifan-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sdm-feifan-app
+  template:
+    metadata:
+      labels:
+        app: sdm-feifan-app
+    spec:
+      volumes:
+      - name: sdm-log
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-log
+      - name: sdm-data
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-data
+      containers:
+      - name: sdm-feifan-app
+        image: {{ MCBSDMFeifanImage }}
+        envFrom:
+        - configMapRef:
+            name: mcb-sdm-schedule-configmap
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /logs
+          name: sdm-log
+        - mountPath: /TRS/DATA/sdm_newmedia_data
+          name: sdm-data
+#        ports:
+#          - name: http
+#            containerPort: 9015
+#            protocol: TCP
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sdm-weixin
+  labels:
+    app: sdm-weixin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sdm-weixin
+  template:
+    metadata:
+      labels:
+        app: sdm-weixin
+    spec:
+      volumes:
+      - name: sdm-log
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-log
+      - name: sdm-data
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-data
+      containers:
+      - name: sdm-weixin
+        image: {{ MCBSDMWeixinImage }}
+        envFrom:
+        - configMapRef:
+            name: mcb-sdm-schedule-configmap
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /logs
+          name: sdm-log
+        - mountPath: /TRS/DATA/sdm_newmedia_data
+          name: sdm-data
+#        ports:
+#          - name: http
+#            containerPort: 9010
+#            protocol: TCP
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sdm-szboriginal
+  labels:
+    app: sdm-szboriginal
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sdm-szboriginal
+  template:
+    metadata:
+      labels:
+        app: sdm-szboriginal
+    spec:
+      volumes:
+      - name: sdm-log
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-log
+      - name: sdm-data
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-data
+      containers:
+      - name: sdm-szboriginal
+        image: {{ MCBSDMSZBOriginalImage }}
+        envFrom:
+        - configMapRef:
+            name: mcb-sdm-schedule-configmap
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /logs
+          name: sdm-log
+        - mountPath: /TRS/DATA/sdm_newmedia_data
+          name: sdm-data
+#       ports:
+#          - name: http
+#            containerPort: 9000
+#            protocol: TCP
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sdm-product
+  labels:
+    app: sdm-product
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sdm-product
+  template:
+    metadata:
+      labels:
+        app: sdm-product
+    spec:
+      volumes:
+      - name: sdm-log
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-log
+      - name: sdm-data
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-data
+      containers:
+      - name: sdm-product
+        image: {{ MCBSDMProductImage }}
+        envFrom:
+        - configMapRef:
+            name: mcb-sdm-schedule-configmap
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /logs
+          name: sdm-log
+        - mountPath: /TRS/DATA/sdm_newmedia_data
+          name: sdm-data
+#        ports:
+#          - name: http
+#            containerPort: 9020
+#            protocol: TCP
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sdm-weiboyuqing
+  labels:
+    app: sdm-weiboyuqing
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sdm-weiboyuqing
+  template:
+    metadata:
+      labels:
+        app: sdm-weiboyuqing
+    spec:
+      volumes:
+      - name: sdm-log
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-log
+      - name: sdm-data
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-data
+      containers:
+      - name: sdm-weiboyuqing
+        image: {{ MCBSDMWeiBoYuQingImage }}
+        envFrom:
+        - configMapRef:
+            name: mcb-sdm-schedule-configmap
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /logs
+          name: sdm-log
+        - mountPath: /TRS/DATA/sdm_newmedia_data
+          name: sdm-data
+#        ports:
+#          - name: http
+#            containerPort: 7908
+#            protocol: TCP
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sdm-newmedia
+  labels:
+    app: sdm-newmedia
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sdm-newmedia
+  template:
+    metadata:
+      labels:
+        app: sdm-newmedia
+    spec:
+      volumes:
+      - name: sdm-log
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-log
+      - name: sdm-data
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-data
+      containers:
+      - name: sdm-newmedia
+        image: {{ MCBSDMNewMediaImage }}
+        envFrom:
+        - configMapRef:
+            name: mcb-sdm-schedule-configmap
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /logs
+          name: sdm-log
+        - mountPath: /TRS/DATA/sdm_newmedia_data
+          name: sdm-data
+#        ports:
+#          - name: http
+#            containerPort: 9040
+#            protocol: TCP
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sdm-traditionalyuqing
+  labels:
+    app: sdm-traditionalyuqing
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sdm-traditionalyuqing
+  template:
+    metadata:
+      labels:
+        app: sdm-traditionalyuqing
+    spec:
+      volumes:
+      - name: sdm-log
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-log
+      - name: sdm-data
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-data
+      containers:
+      - name: sdm-traditionalyuqing
+        image: {{ MCBSDMTraditionalYuQingImage }}
+        envFrom:
+        - configMapRef:
+            name: mcb-sdm-schedule-configmap
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /logs
+          name: sdm-log
+        - mountPath: /TRS/DATA/sdm_newmedia_data
+          name: sdm-data
+#        ports:
+#          - name: http
+#            containerPort: 7911
+#            protocol: TCP
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sdm-weibo
+  labels:
+    app: sdm-weibo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sdm-weibo
+  template:
+    metadata:
+      labels:
+        app: sdm-weibo
+    spec:
+      volumes:
+      - name: sdm-log
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-log
+      - name: sdm-data
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-data
+      containers:
+      - name: sdm-weibo
+        image: {{ MCBSDMWeiboImage }}
+        envFrom:
+        - configMapRef:
+            name: mcb-sdm-schedule-configmap
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /logs
+          name: sdm-log
+        - mountPath: /TRS/DATA/sdm_newmedia_data
+          name: sdm-data
+#        ports:
+#          - name: http
+#            containerPort: 9009
+#            protocol: TCP
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sdm-website
+  labels:
+    app: sdm-website
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sdm-website
+  template:
+    metadata:
+      labels:
+        app: sdm-website
+    spec:
+      volumes:
+      - name: sdm-log
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-log
+      - name: sdm-data
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-data
+      containers:
+      - name: sdm-website
+        image: {{ MCBSDMWebiteImage }}
+        envFrom:
+        - configMapRef:
+            name: mcb-sdm-schedule-configmap
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /logs
+          name: sdm-log
+        - mountPath: /TRS/DATA/sdm_newmedia_data
+          name: sdm-data
+#        ports:
+#          - name: http
+#            containerPort: 9017
+#            protocol: TCP
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sdm-weixinyuqing
+  labels:
+    app: sdm-weixinyuqing
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sdm-weixinyuqing
+  template:
+    metadata:
+      labels:
+        app: sdm-weixinyuqing
+    spec:
+      volumes:
+      - name: sdm-log
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-log
+      - name: sdm-data
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-data
+      containers:
+      - name: sdm-weixinyuqing
+        image: {{ MCBSDMWeixinYuQingImage }}
+        envFrom:
+        - configMapRef:
+            name: mcb-sdm-schedule-configmap
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /logs
+          name: sdm-log
+        - mountPath: /TRS/DATA/sdm_newmedia_data
+          name: sdm-data
+#        ports:
+#          - name: http
+#            containerPort: 7910
+#            protocol: TCP
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sdm-epaperbm
+  labels:
+    app: sdm-epaperbm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sdm-epaperbm
+  template:
+    metadata:
+      labels:
+        app: sdm-epaperbm
+    spec:
+      volumes:
+      - name: sdm-log
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-log
+      - name: sdm-data
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-data
+      containers:
+      - name: sdm-epaperbm
+        image: {{ MCBSDMEpaperbmImage }}
+        envFrom:
+        - configMapRef:
+            name: mcb-sdm-schedule-configmap
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /logs
+          name: sdm-log
+        - mountPath: /TRS/DATA/sdm_newmedia_data
+          name: sdm-data
+#        ports:
+#          - name: http
+#            containerPort: 9018
+#            protocol: TCP
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sdm-meizi
+  labels:
+    app: sdm-meizi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sdm-meizi
+  template:
+    metadata:
+      labels:
+        app: sdm-meizi
+    spec:
+      volumes:
+      - name: sdm-log
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-log
+      - name: sdm-data
+        persistentVolumeClaim:
+          claimName: mcb-sdm-schedule-pvc-data
+      containers:
+      - name: sdm-meizi
+        image: {{ MCBSDMMeiziImage }}
+        envFrom:
+        - configMapRef:
+            name: mcb-sdm-schedule-configmap
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /logs
+          name: sdm-log
+        - mountPath: /TRS/DATA/sdm_newmedia_data
+          name: sdm-data
+#        ports:
+#          - name: http1
+#            containerPort: 2050
+#            protocol: TCP
+#          - name: http2
+#            containerPort: 9031
+#            protocol: TCP
+#          - name: http3
+#            containerPort: 9032
+#            protocol: TCP           
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 256Mi
+            
