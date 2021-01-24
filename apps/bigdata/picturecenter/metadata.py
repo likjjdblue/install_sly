@@ -33,6 +33,6 @@ AppInfo = {
     'dependences': ['apps.common.mariadb/MariaDBTool', 'apps.common.nginx/NginxTool',
                     'apps.common.mongodb/MongodbTool', 'apps.common.nacos/NacosTool',
                     'apps.common.zookeeper/ZookeeperTool', 'apps.common.kafka/KafkaTool',
-                    'apps.common.redisha/RedisHATool',
+                    'apps.common.redisha/RedisHATool', 'apps.bigdata.bigdataaccess/BigdataAccessTool',
                     ]
 }

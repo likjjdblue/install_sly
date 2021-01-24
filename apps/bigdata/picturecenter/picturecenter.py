@@ -78,9 +78,11 @@ class PictureCenterTool(object):
         self.AppInfo['PictureCenterImage'] = replaceDockerRepo(self.AppInfo['PictureCenterImage'], self.AppInfo['HarborAddr'])
         self.AppInfo['NFSProvisionerImage'] =replaceDockerRepo(self.AppInfo['NFSProvisionerImage'],
                                                                self.AppInfo['HarborAddr'])
+
+        '''
         if not self.AppInfo['PictureCenterPrimaryDBPassword']:
             self.AppInfo['PictureCenterPrimaryDBPassword'] = crypto_tools.generateRandomAlphaNumericString(lenght=10)
-
+        '''
 
     def renderTemplate(self):
         if not os.path.isdir(os.path.realpath(self.AppInfo['TargetNamespaceDIR'])):
@@ -256,6 +258,8 @@ class PictureCenterTool(object):
                 self.AppInfo['RedisHAPassword'] = crypto_tools.DecodeBase64(TmpInfo['RedisPassword'])
             elif TmpClsName == 'MongodbTool':
                 self.AppInfo['PictureCenterMongoDBPassword'] = crypto_tools.DecodeBase64(TmpInfo['MongoPassword'])
+            elif TmpClsName == 'BigdataAccessTool':
+                self.AppInfo['PictureCenterPrimaryDBPassword'] = TmpInfo['BigdataAccessDBPassword']
 
         return {
             'ret_code': 0,
