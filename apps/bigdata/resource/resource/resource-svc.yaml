@@ -1,0 +1,20 @@
+---
+# Source: resource/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: resource-svc
+  labels:
+    app: resource
+    chart: "resource-1.0.0"
+    release: "resource"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 6083
+      targetPort: 6083
+      protocol: TCP
+      name: http
+  selector:
+    app: resource
+    release: "resource"

@@ -2,5 +2,5 @@
 # -*- coding: utf-8 -*-
 __all__ = ['dicttool', 'bigdataaccess', 'datagather', 'mcbmessage', 'mcbpm', 'mcbsdmschedule',
            'mediagateway', 'mediaresource', 'metasearch', 'picturecenter', 'propagationserver',
-           'pushsyn',
+           'pushsyn', 'resource'
            ]
