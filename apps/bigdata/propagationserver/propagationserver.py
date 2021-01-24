@@ -252,7 +252,7 @@ class PropagationServerTool(object):
             if TmpClsName == 'MariaDBTool':
                 self.DependencyDict['MariaDBPassword'] = TmpInfo['MariaDBPassword']
             elif TmpClsName == 'RedisTool':
-                self.AppInfo['RedisPassword'] = TmpInfo['RedisPassword']
+                self.AppInfo['RedisPassword'] = TmpInfo['RedisStandAlonePassword']
 
 
         return {
