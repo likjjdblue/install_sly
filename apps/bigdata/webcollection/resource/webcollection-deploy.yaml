@@ -1,0 +1,54 @@
+---
+# Source: webcollection/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webcollection-deploy
+  labels:
+    app: webcollection
+spec:
+  selector:
+    matchLabels:
+      app: webcollection
+  template:
+    metadata:
+      labels:
+        app: webcollection
+    spec:
+#      nodeSelector:
+#        kubernetes.io/hostname: 192.168.200.93
+      volumes:
+      - name: pvc-webcollection-log
+        persistentVolumeClaim:
+          claimName: webcollection-pvc-log
+      containers:
+        - name: webcollection
+          image: {{ WebCollectionImage }}
+          envFrom:
+          - configMapRef:
+              name: websitecollection-configmap
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+          - mountPath: /TRS/DATA/webcollection
+            name: pvc-webcollection-log
+          #ports:
+          #  - name: http
+          #    containerPort: 7176
+          #    protocol: TCP
+          #livenessProbe:
+          #  tcpSocket:
+          #    port: http
+          #  initialDelaySeconds: 60
+          #  periodSeconds: 10
+          #readinessProbe:
+          #  tcpSocket:
+          #    port: http
+          #  initialDelaySeconds: 60
+          #  periodSeconds: 10
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 256Mi
