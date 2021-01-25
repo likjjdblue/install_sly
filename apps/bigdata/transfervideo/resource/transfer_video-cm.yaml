@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: transfer-video-configmap
+data:
+  # 类属性键；每一个键都映射到一个简单的值
+# 大数据应用公有变量
+  spring.datasource.url: "jdbc:mysql://mariadb-svc:3306/transfer?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&allowMultiQueries=true&useSSL=false&serverTimezone=GMT%2b8"
+  spring.datasource.username: "transfer"
+  spring.datasource.password: "{{ TransferVideoPrimaryDBPassword }}"
+
+  spring.cloud.nacos.config.namespace: "8953ca45-4cfb-469a-bc55-7e3bce569994"
+  spring.cloud.nacos.config.server-addr: "nacos-svc:8848"
+  spring.cloud.nacos.discovery.server-addr: "nacos-svc:8848"
+  hybase.database.url: "hybase-svc"
+  hybase.database.port: "5555"
+  hybase.database.user: "admin"
+  hybase.database.password: "hiWjOXrAM6kpsOtA"
+  spring.kafka.bootstrap-servers: "kafka-svc"
+  spring.redis.masterName: "mymaster"
+  spring.redis.nodes: "redis-ha-announce-0:26379,redis-ha-announce-1:26379,redis-ha-announce-2:26379"
+  spring.redis.pwd: "{{ RedisHAPassword }}"
+  ckm.database.url: "ckm-svc"
+  ckm.database.password: "trsadmin"
+  ckm.database.user: "admin"
+  isWork: "false"
+  isHreat: "false"
+  systemName: "cd.transfer-video.test"

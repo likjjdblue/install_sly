@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: transfer-video-pvc-log
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeMode: Filesystem
+  storageClassName: transfer-video-pv-log-class
+  resources:
+     requests:
+       storage: 200Gi

@@ -1,0 +1,20 @@
+---
+# Source: transfer-video/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: transfer-video-svc
+  labels:
+    app: transfer-video
+    chart: "transfer-video-1.0.0"
+    release: "transfer-video"
+spec:
+  type: ClusterIP
+  ports:
+  - port: 56021
+    targetPort: 56021
+    protocol: TCP
+    name: http
+  selector:
+    app: transfer-video
+    release: "transfer-video"
