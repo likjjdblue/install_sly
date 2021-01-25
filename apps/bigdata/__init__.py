@@ -2,5 +2,6 @@
 # -*- coding: utf-8 -*-
 __all__ = ['dicttool', 'bigdataaccess', 'datagather', 'mcbmessage', 'mcbpm', 'mcbsdmschedule',
            'mediagateway', 'mediaresource', 'metasearch', 'picturecenter', 'propagationserver',
-           'pushsyn', 'resource', 'timingscheduler', 'tmydecisioncenter', 'transferresourceai'
+           'pushsyn', 'resource', 'timingscheduler', 'tmydecisioncenter', 'transferresourceai',
+           'transfervideo', 'webcollection'
            ]

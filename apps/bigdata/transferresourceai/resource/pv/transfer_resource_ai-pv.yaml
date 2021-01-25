@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: transfer-resource-ai-pv-log
+spec: 
+  capacity: 
+    storage: 200Gi
+  volumeMode: Filesystem
+  storageClassName: transfer-resource-ai-pv-log-class
+  accessModes: 
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: {{ TransferResourceAILogPath }}
+    server: {{ NFSAddr }}

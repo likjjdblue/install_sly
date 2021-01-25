@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: transfer-resource-ai-pvc-log
+spec:
+  accessModes:
+    - ReadWriteMany
+  volumeMode: Filesystem
+  storageClassName: transfer-resource-ai-pv-log-class
+  resources:
+     requests:
+       storage: 200Gi

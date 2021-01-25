@@ -1,0 +1,62 @@
+# Source: transfer-resource-ai/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: transfer-resource-ai-deploy
+  labels:
+    app: transfer-resource-ai
+    chart: "transfer-resource-ai-1.0.0"
+    release: "transfer-resource-ai"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: transfer-resource-ai
+      release: "transfer-resource-ai"
+  template:
+    metadata:
+      labels:
+        app: transfer-resource-ai
+        release: "transfer-resource-ai"
+    spec:
+     # nodeSelector:
+     #   kubernetes.io/hostname: 192.168.200.94
+      volumes:
+      - name: transfer-resource-ai-pvc-log
+        persistentVolumeClaim:
+          claimName: transfer-resource-ai-pvc-log
+     # hostAliases:
+     # - ip: "10.6.42.1"
+     #   hostnames:
+     #   - "nginx.nyrb-test.com"
+      containers:
+      - name: transfer-resource-ai
+        image: {{ TransferResourceAIImage }}
+        envFrom:
+        - configMapRef:
+            name: transfer-resource-ai-configmap
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /TRS/DATA/transfer-resource-ai/logs
+          name: transfer-resource-ai-pvc-log
+       # ports:
+       #   - name: http
+       #     containerPort: 8090
+       #     protocol: TCP
+       # livenessProbe:
+       #   tcpSocket:
+       #     port: http
+       #   initialDelaySeconds: 60
+       #   periodSeconds: 10
+       # readinessProbe:
+       #   tcpSocket:
+       #     port: http
+       #   initialDelaySeconds: 60
+       #   periodSeconds: 10
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 256Mi
