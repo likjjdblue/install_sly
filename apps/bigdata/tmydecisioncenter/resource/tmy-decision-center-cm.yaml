@@ -7,7 +7,7 @@ data:
 # 大数据应用公有变量
   spring.datasource.url: "jdbc:mysql://mariadb-svc:3306/tmy_decision_center"
   spring.datasource.username: "decisioncenter"
-  spring.datasource.password: "{{ TmyDecisionCenterPrimaryDBName }}"
+  spring.datasource.password: "{{ TmyDecisionCenterPrimaryDBPassword }}"
   spring.cloud.nacos.config.namespace: "8953ca45-4cfb-469a-bc55-7e3bce569994"
   spring.cloud.nacos.config.server-addr: "nacos-svc:8848"
   spring.cloud.nacos.discovery.server-addr: "nacos-svc:8848"
