@@ -35,7 +35,11 @@ class NFSTool(object):
 
         elif TmpResult['ret_code'] == 0 and TmpResult['result']['exitcode'] != 0:
             print ('Going to install NFS service...')
-            TmpResult = self.SSHClient.uploadFile(localpath='resource/nfs_rpm.tar.gz',
+
+            TmpCWDPath = os.path.abspath(__file__)
+            TmpCWDPath = os.path.dirname(TmpCWDPath)
+
+            TmpResult = self.SSHClient.uploadFile(localpath=os.path.join(TmpCWDPath, 'resource', 'nfs_rpm.tar.gz'),
                                                   remotepath='/tmp/nfs_rpm.tar.gz')
 
             if TmpResult['ret_code'] != 0:
