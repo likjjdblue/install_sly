@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: im-server-deploy
+  labels:
+    app: im-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: im-server
+  template:
+    metadata:
+      labels:
+        app: im-server
+    spec:
+      volumes:
+      - name: pvc-im-serverlog-slytest
+        persistentVolumeClaim:
+          claimName: im-server-pvc-log
+      containers:
+        - name: im-server
+          image: {{ IMServerImage }}
+          envFrom:
+             - configMapRef:
+                 name: im-server-configmap
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+          - mountPath: /TRS/LOGS/im-server
+            name: pvc-im-serverlog-slytest
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 128Mi
