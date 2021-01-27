@@ -10,7 +10,7 @@ AppInfo = {
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
-    'MediaResourceImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/media-resource:v2',
+    'MediaResourceImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/media-resource:v3',
     "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
 
     'MediaResourcePrimaryDBHost': 'mariadb-svc',
