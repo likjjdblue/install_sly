@@ -10,7 +10,7 @@ AppInfo = {
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
-    'MCNImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/mcn:v1',
+    'MCNImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/mcn:v2',
     "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
     'UPCDBHost': 'mariadb-svc',
     'UPCDBName': 'mcn_upc',
