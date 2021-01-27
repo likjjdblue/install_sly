@@ -10,7 +10,7 @@ AppInfo = {
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
-    'TRSWCMImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/wcm:v6',
+    'TRSWCMImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/wcm:v22',
     "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
     'TRSWCMDBHost': 'mariadb-svc',
     'TRSWCMDBName': 'mty_wcm',
