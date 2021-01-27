@@ -48,7 +48,9 @@ class TenantCenterTool(object):
         self.SSHClient = ssh_tools.SSHTool(**nfsinfo)
 
         self.DependencyDict ={}
-        self.BaseDIRPath= os.path.realpath('../../..')
+        TmpCWDPath = os.path.abspath(__file__)
+        TmpCWDPath = os.path.dirname(TmpCWDPath)
+        self.BaseDIRPath= os.path.realpath(os.path.join(TmpCWDPath, '../../..'))
 
     def setupNFS(self):
         TmpResponse = self.NFSObj.installNFS(basedir=self.AppInfo['NFSBasePath'])
@@ -75,6 +77,10 @@ class TenantCenterTool(object):
         '''
 
     def renderTemplate(self):
+        TmpCWDPath = os.path.abspath(__file__)
+        TmpCWDPath = os.path.dirname(TmpCWDPath)
+        self.AppInfo['TargetNamespaceDIR'] = os.path.join(TmpCWDPath, self.AppInfo['TargetNamespaceDIR'])
+
         if not os.path.isdir(os.path.realpath(self.AppInfo['TargetNamespaceDIR'])):
             os.mkdir(os.path.realpath(self.AppInfo['TargetNamespaceDIR']))
         if not os.path.isdir(os.path.realpath(os.path.join(self.AppInfo['TargetNamespaceDIR'],
