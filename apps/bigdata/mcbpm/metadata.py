@@ -10,7 +10,7 @@ AppInfo = {
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
-    'MCBPMImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/message:v2',
+    'MCBPMImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/pm:v4',
     "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
 
     'MCBPMPrimaryDBHost': 'mariadb-svc',
