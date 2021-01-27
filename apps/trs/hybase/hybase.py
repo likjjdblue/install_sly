@@ -74,7 +74,7 @@ class TRSIDSTool(object):
                                                                self.AppInfo['HarborAddr'])
 
         if not self.AppInfo['HyBaseIP']:
-            TmpHyBaseIP = raw_input('input hybase IP Address(e.g 192.168.200.17): ')
+            self.AppInfo['HyBaseIP'] = raw_input('input hybase IP Address(e.g 192.168.200.17): ')
 
 
 
@@ -149,8 +149,7 @@ class TRSIDSTool(object):
 
         return {
             'ret_code': 0,
-            'result': 'Deployment: %s is available;replicas: %s'%(TmpResponse['metadata']['name'],
-                                                                    str(TmpResponse['status']['replicas']))
+            'result': 'ok',
         }
 
     def start(self):
@@ -220,50 +219,7 @@ class TRSIDSTool(object):
             }
 
          ### export mysql SQL ##
-        self.generateValues()
-        print ('import Mysql SQL file....')
-        if not os.path.isdir(os.path.join(self.BaseDIRPath, 'tmp')):
-            os.mkdir(os.path.join(self.BaseDIRPath, 'tmp'))
 
-        with open(os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'),mode='wb',encoding='utf-8') as f:
-            f.write('root root '+self.DependencyDict['MariaDBPassword']+'\n')
-            f.write('%s %s %s'%(self.AppInfo['TRSIDSDBName'], self.AppInfo['TRSIDSDBUser'], self.AppInfo['TRSIDSPassword'])+'\n')
-
-        TmpSQLToolAccountPath = '-'.join([self.AppInfo['Namespace'], 'sqltool-pv-account'])
-        TmpSQLToolAccountPath = os.path.realpath(os.path.join(self.AppInfo['NFSBasePath'], TmpSQLToolAccountPath))
-        TmpSQLToolSQLPath = '-'.join([self.AppInfo['Namespace'], 'sqltool-pv-sql'])
-        TmpSQLToolSQLPath = os.path.realpath(os.path.join(self.AppInfo['NFSBasePath'], TmpSQLToolSQLPath))
-
-        print (TmpSQLToolAccountPath)
-        print (TmpSQLToolSQLPath)
-
-        self.SSHClient.ExecCmd('mkdir -p %s'%(TmpSQLToolSQLPath, ))
-        self.SSHClient.ExecCmd('mkdir -p %s'%(TmpSQLToolAccountPath, ))
-
-
-
-        self.SSHClient.ExecCmd('rm -f -r %s/*'%(TmpSQLToolAccountPath, ))
-        self.SSHClient.ExecCmd('rm -f -r %s/*'%(TmpSQLToolSQLPath,))
-
-        print (os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'))
-        print (os.path.join(self.BaseDIRPath, 'downloads', 'mty_ids.sql'))
-
-        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'),
-                                  remotepath=os.path.join(TmpSQLToolAccountPath, 'account.txt')
-                                  )
-
-        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'mty_ids.sql'),
-                                  remotepath=os.path.join(TmpSQLToolSQLPath, 'mty_ids.sql')
-                                  )
-
-        TmpSQLToolObj = sqltool.SQLTool(**self.kwargs)
-        TmpResponse = TmpSQLToolObj.start()
-        if TmpResponse['ret_code'] != 0:
-            print ('Error occured while running SQL Tool')
-            return {
-                'ret_code': 1,
-                'result': 'Error occured while running SQL Tool'
-            }
 
         ##### end ###
         return {
@@ -279,9 +235,11 @@ class TRSIDSTool(object):
         print (TmpNginxConfigPath)
         self.SSHClient.ExecCmd('mkdir -p %s' % (TmpNginxConfigPath, ))
 
+        '''
         self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'trsids.conf'),
                                   remotepath=os.path.join(TmpNginxConfigPath, 'trsids.conf')
                                   )
+        '''
 
 
         TmpNginxPods = self.k8sObj.filterNamespacedPod(namespace=self.AppInfo['Namespace'], filters={
