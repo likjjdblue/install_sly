@@ -295,6 +295,12 @@ class RabbitmqHATool(object):
             print (tmp['result'])
 
 
+        return {
+            'ret_code': 0,
+            'result': 'successfully create rabbitmq Vhost'
+        }
+
+
 
 
     def start(self):
@@ -307,7 +313,7 @@ class RabbitmqHATool(object):
         TmpResponse = self.applyYAML()
 
         if TmpResponse['ret_code'] == 0:
-            self.createVhosts()
+            TmpResponse = self.createVhosts()
         return TmpResponse
 
 
