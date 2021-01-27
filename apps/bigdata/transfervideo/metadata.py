@@ -9,7 +9,7 @@ AppInfo = {
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
-    'TransferVideoImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/transfer_video:v1',
+    'TransferVideoImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/transfer_video:v2',
     "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
 
     'TransferVideoPrimaryDBHost': 'mariadb-svc',
