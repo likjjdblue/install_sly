@@ -19,7 +19,7 @@ data:
   spring.redis.masterName: "mymaster" 
   spring.redis.nodes: "redis-ha-announce-0:26379,redis-ha-announce-1:26379,redis-ha-announce-2:26379"
   spring.redis.pwd: "{{ RedisHAPassword }}"
-  ckm.database.url: "ckm-svc"
+  ckm.database.url: "http://ckm6-svc:8001"
   ckm.database.password: "trsadmin"
   ckm.database.user: "admin"
 # resource 特有变量

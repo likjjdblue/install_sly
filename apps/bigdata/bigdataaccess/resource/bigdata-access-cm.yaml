@@ -19,7 +19,7 @@ data:
   spring.redis.masterName: ""
   spring.redis.nodes: "redis-svc:6379"
   spring.redis.pwd: "{{ TRSRedisPassword }}"
-  ckm.database.url: "ckm-svc"
+  ckm.database.url: "http://ckm6-svc:8001"
   ckm.database.user: "admin"
   ckm.database.password: "trsadmin"
   isWork: "true"
