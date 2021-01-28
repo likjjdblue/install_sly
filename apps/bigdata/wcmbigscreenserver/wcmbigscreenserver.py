@@ -161,7 +161,7 @@ class WCMBigScreenServerTool(object):
             self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'pv/wcm-bigscreen-server-pv.yaml'),
                                                namespace=self.AppInfo['Namespace']
                                                )
-            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'pv/wcm-bigscreen-server.yaml'),
+            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'pv/wcm-bigscreen-server-pvc.yaml'),
                                                namespace=self.AppInfo['Namespace']
                                                )
 
