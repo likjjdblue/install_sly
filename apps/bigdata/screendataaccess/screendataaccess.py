@@ -344,11 +344,11 @@ class ScreenDataAccessTool(object):
         self.SSHClient.ExecCmd('mkdir -p %s' % (TmpNginxConfigPath, ))
 
 
-
+        '''
         self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'screendataaccess.conf'),
                                   remotepath=os.path.join(TmpNginxConfigPath, 'screendataaccess.conf')
                                   )
-
+        '''
 
         TmpNginxPods = self.k8sObj.filterNamespacedPod(namespace=self.AppInfo['Namespace'], filters={
             "run": "nginx"
