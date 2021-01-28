@@ -11,7 +11,7 @@ AppInfo = {
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
 
-    'PictureCenterImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/picturecenter:v8',
+    'PictureCenterImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/picturecenter:v9',
     "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
 
     'PictureCenterPrimaryDBHost': 'mariadb-svc',
