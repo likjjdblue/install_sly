@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: screen-data-access-svc
+  labels:
+    app: screen-data-access
+spec:
+  type: ClusterIP
+  ports:
+  - port: 9995
+    targetPort: 9995
+    protocol: TCP
+    name: http
+  selector:
+    app: screen-data-access

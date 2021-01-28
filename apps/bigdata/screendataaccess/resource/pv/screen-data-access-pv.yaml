@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: screen-data-access-pv-data
+spec:
+  capacity:
+    storage: 1000Gi
+  volumeMode: Filesystem
+  storageClassName: screen-data-access-data-class
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: {{ ScreenDataAccessDataPath }}
+    server: {{ NFSAddr }}
+

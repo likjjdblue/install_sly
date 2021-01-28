@@ -18,9 +18,9 @@ from pprint import pprint
 from codecs import open as open
 import importlib
 
-class IMServerTool(object):
-    def __init__(self, namespace='default', imserverlogpath='im-server-pv-log',
-                 nfsinfo={}, harbor=None, retrytimes=10, *args, **kwargs):
+class ScreenDataAccessTool(object):
+    def __init__(self, namespace='default', screendataaccessdata='screen-data-access-pv-data', nfsinfo={},
+                 harbor=None, retrytimes=10, *args, **kwargs):
 
         namespace = namespace.strip()
         kwargs['namespace'] = namespace
@@ -36,10 +36,10 @@ class IMServerTool(object):
         self.NFSBasePath = nfsinfo['basepath']
         self.AppInfo = deepcopy(AppInfo)
 
+
         self.AppInfo['NFSAddr'] = self.NFSAddr
         self.AppInfo['NFSBasePath'] = self.NFSBasePath
-
-        self.AppInfo['IMServerLogPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, imserverlogpath]))
+        self.AppInfo['ScreenDataAccessDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, screendataaccessdata]))
         self.AppInfo['Namespace'] = namespace
 
         self.AppInfo['HarborAddr'] = harbor
@@ -62,11 +62,12 @@ class IMServerTool(object):
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
-        print ('create IMServer NFS successfully')
+        print ('create ScreenDataAccess NFS successfully')
 
-        self.NFSObj.createSubFolder(self.AppInfo['IMServerLogPath'])
 
-        print ('setup IMServer NFS successfully')
+        self.NFSObj.createSubFolder(self.AppInfo['ScreenDataAccessDataPath'])
+
+        print ('setup ScreenDataAccess NFS successfully')
 
         return {
             'ret_code': 0,
@@ -74,11 +75,11 @@ class IMServerTool(object):
         }
 
     def generateValues(self):
-        self.AppInfo['IMServerImage'] = replaceDockerRepo(self.AppInfo['IMServerImage'], self.AppInfo['HarborAddr'])
+        self.AppInfo['ScreenDataAccessImage'] = replaceDockerRepo(self.AppInfo['ScreenDataAccessImage'], self.AppInfo['HarborAddr'])
         self.AppInfo['NFSProvisionerImage'] =replaceDockerRepo(self.AppInfo['NFSProvisionerImage'],
                                                                self.AppInfo['HarborAddr'])
-        if not self.AppInfo['IMServerDBPassword']:
-            self.AppInfo['IMServerDBPassword'] = crypto_tools.generateRandomAlphaNumericString(lenght=10)
+        if not self.AppInfo['ScreenDataAccessSecondDBPassword']:
+            self.AppInfo['ScreenDataAccessSecondDBPassword'] = crypto_tools.generateRandomAlphaNumericString(lenght=10)
 
 
     def renderTemplate(self):
@@ -135,11 +136,11 @@ class IMServerTool(object):
             return TmpResponse
 
 
-        print ('Apply TRS IMServer ....')
-        if not self.k8sObj.checkNamespacedResourceHealth(name='im-server-deploy', namespace=self.AppInfo['Namespace'],
+        print ('Apply ScreenDataAccess ....')
+        if not self.k8sObj.checkNamespacedResourceHealth(name='screen-data-access-deploy', namespace=self.AppInfo['Namespace'],
                                                          kind='Deployment'):
             try:
-                self.k8sObj.deleteNamespacedDeployment(name='im-server-deploy', namespace=self.AppInfo['Namespace'])
+                self.k8sObj.deleteNamespacedDeployment(name='screen-data-access-deploy', namespace=self.AppInfo['Namespace'])
             except:
                 pass
 
@@ -149,21 +150,21 @@ class IMServerTool(object):
 
 
 
-            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'im_server-cm.yaml'),
+            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'screen-data-access-cm.yaml'),
                                                namespace=self.AppInfo['Namespace']
                                                )
-            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'im_server-svc.yaml'),
+            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'screen-data-access-svc.yaml'),
                                                namespace=self.AppInfo['Namespace']
                                                )
-            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'pv/im_server-pv.yaml'),
+            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'pv/screen-data-access-pv.yaml'),
                                                namespace=self.AppInfo['Namespace']
                                                )
-            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'pv/im_server-pvc.yaml'),
+            self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'pv/screen-data-access-pvc.yaml'),
                                                namespace=self.AppInfo['Namespace']
                                                )
 
 
-            TmpResponse = self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'im_server-deploy.yaml'),
+            TmpResponse = self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'screen-data-access-deploy.yaml'),
                                                          namespace=self.AppInfo['Namespace'])
 
             #print (os.path.join(TmpTargetNamespaceDIR, 'resource', 'mty-ids-deploy.yaml'))
@@ -174,7 +175,7 @@ class IMServerTool(object):
 
         isRunning=False
         for itime in range(self.RetryTimes):
-            TmpResponse = self.k8sObj.getNamespacedDeployment(name='im-server-deploy',
+            TmpResponse = self.k8sObj.getNamespacedDeployment(name='screen-data-access-deploy',
                                                                    namespace=self.AppInfo['Namespace'])['result'].to_dict()
 
             if (TmpResponse['status']['replicas'] != TmpResponse['status']['ready_replicas']) and \
@@ -196,7 +197,7 @@ class IMServerTool(object):
                 'ret_code': 1,
                 'result': 'Failed to apply Deployment: %s'%(TmpResponse['metadata']['name'],)
             }
-        print ('Waitting TRS IMServer for running....')
+        print ('Waitting ScreenDataAccess for running....')
         sleep(120)
 
         return {
@@ -223,7 +224,7 @@ class IMServerTool(object):
 
         TmpResponse = self.applyYAML()
         if TmpResponse['ret_code'] != 0:
-            print ('failed to install TRS IMServer')
+            print ('failed to install ScreenDataAccess')
             return TmpResponse
 
         print ('install %s successsfully')%(self.AppInfo['AppName'], )
@@ -255,10 +256,12 @@ class IMServerTool(object):
 
             if TmpClsName == 'MariaDBTool':
                 self.DependencyDict['MariaDBPassword'] = TmpInfo['MariaDBPassword']
-            '''elif TmpClsName == 'RedisHATool':
-                self.AppInfo['TRSRedisPassword'] = crypto_tools.DecodeBase64(TmpInfo['RedisPassword'])
+            elif TmpClsName == 'RedisTool':
+                self.AppInfo['TRSRedisPassword'] = TmpInfo['RedisStandAlonePassword']
             elif TmpClsName == 'RabbitmqHATool':
-                self.AppInfo['TRSMQPassword'] = crypto_tools.DecodeBase64(TmpInfo['RabbitmqPassword'])'''
+                self.AppInfo['TRSMQPassword'] = crypto_tools.DecodeBase64(TmpInfo['RabbitmqPassword'])
+            elif  TmpClsName == 'TmyDecisionCenterTool':
+                self.AppInfo['ScreenDataAccessPrimaryDBPassword'] = TmpInfo['TmyDecisionCenterPrimaryDBPassword']
 
         return {
             'ret_code': 0,
@@ -276,6 +279,7 @@ class IMServerTool(object):
             }
 
 
+
          ### export mysql SQL ##
         print ('import Mysql SQL file....')
         self.generateValues()
@@ -284,7 +288,9 @@ class IMServerTool(object):
 
         with open(os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'),mode='wb',encoding='utf-8') as f:
             f.write('root root '+self.DependencyDict['MariaDBPassword']+'\n')
-            f.write('%s %s %s'%(self.AppInfo['IMServerDBName'], self.AppInfo['IMServerDBUser'], self.AppInfo['IMServerDBPassword'])+'\n')
+            f.write('%s %s %s'%(self.AppInfo['ScreenDataAccessPrimaryDBName'], self.AppInfo['ScreenDataAccessPrimaryDBUser'], self.AppInfo['ScreenDataAccessPrimaryDBPassword'])+'\n')
+            f.write('%s %s %s' % (self.AppInfo['ScreenDataAccessSecondDBName'], self.AppInfo['ScreenDataAccessSecondDBUser'],self.AppInfo['ScreenDataAccessSecondDBPassword']) + '\n')
+
 
         TmpSQLToolAccountPath = '-'.join([self.AppInfo['Namespace'], 'sqltool-pv-account'])
         TmpSQLToolAccountPath = os.path.realpath(os.path.join(self.AppInfo['NFSBasePath'], TmpSQLToolAccountPath))
@@ -303,15 +309,14 @@ class IMServerTool(object):
         self.SSHClient.ExecCmd('rm -f -r %s/*'%(TmpSQLToolSQLPath,))
 
         print (os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'))
-        print (os.path.join(self.BaseDIRPath, 'downloads', 'mty_wcm.sql'))
+        print (os.path.join(self.BaseDIRPath, 'downloads', 'mcb_dicttool.sql'))
 
         self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'),
                                   remotepath=os.path.join(TmpSQLToolAccountPath, 'account.txt')
                                   )
-
         '''
-        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'mty_wcm.sql'),
-                                  remotepath=os.path.join(TmpSQLToolSQLPath, 'mty_wcm.sql')
+        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'mcb_dicttool.sql'),
+                                  remotepath=os.path.join(TmpSQLToolSQLPath, 'mcb_dicttool.sql')
                                   )
         '''
 
@@ -339,10 +344,10 @@ class IMServerTool(object):
         self.SSHClient.ExecCmd('mkdir -p %s' % (TmpNginxConfigPath, ))
 
 
-        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'instantmessageservice.conf'),
-                                  remotepath=os.path.join(TmpNginxConfigPath, 'instantmessageservice.conf')
-                                  )
 
+        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'screendataaccess.conf'),
+                                  remotepath=os.path.join(TmpNginxConfigPath, 'screendataaccess.conf')
+                                  )
 
 
         TmpNginxPods = self.k8sObj.filterNamespacedPod(namespace=self.AppInfo['Namespace'], filters={
@@ -378,7 +383,7 @@ class IMServerTool(object):
 
 
 if __name__ == "__main__":
-    tmp = IMServerTool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.74', port=1022, username='root', password='!QAZ2wsx1234',
+    tmp = ScreenDataAccessTool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.74', port=1022, username='root', password='!QAZ2wsx1234',
                          basepath='/TRS/DATA'))
 
     tmp.start()

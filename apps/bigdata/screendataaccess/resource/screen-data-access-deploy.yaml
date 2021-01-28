@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: screen-data-access-deploy
+  labels:
+    app: screen-data-access
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: screen-data-access
+  template:
+    metadata:
+      labels:
+        app: screen-data-access
+    spec:
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: screen-data-access-pvc-data
+      containers:
+        - name: screen-data-access
+          image: {{ ScreenDataAccessImage }}
+          envFrom:
+          - configMapRef:
+              name: screen-data-access-configmap
+          #- secretRef:
+          #    name: screen-data-access-secret
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+          - mountPath: /TRS/DATA/web/bigscreen/
+            name: data
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 128Mi
