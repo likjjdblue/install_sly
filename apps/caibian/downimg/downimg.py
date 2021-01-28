@@ -19,7 +19,7 @@ from codecs import open as open
 import importlib
 
 class DownImgTool(object):
-    def __init__(self, namespace='default', downimgdatapath='trswcm-pv-data/webpic', downimglogdata='tmyimgcenter-pv-log' ,
+    def __init__(self, namespace='default', downimgdatapath='trswcm-pv-data/WCMData/webpic', downimglogdata='tmyimgcenter-pv-log' ,
                  nfsinfo={}, harbor=None, retrytimes=10, *args, **kwargs):
 
         namespace = namespace.strip()
@@ -40,7 +40,7 @@ class DownImgTool(object):
         self.AppInfo['NFSBasePath'] = self.NFSBasePath
 
         TmpdownimgdatapathList = downimgdatapath.split('/')
-        self.AppInfo['DownImgDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, TmpdownimgdatapathList[0]]), TmpdownimgdatapathList[1])
+        self.AppInfo['DownImgDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, TmpdownimgdatapathList[0]]), *TmpdownimgdatapathList[1])
         self.AppInfo['DownImgLogPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, downimglogdata]))
         self.AppInfo['Namespace'] = namespace
 

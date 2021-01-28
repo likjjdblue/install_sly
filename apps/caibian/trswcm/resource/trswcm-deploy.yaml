@@ -15,6 +15,10 @@ spec:
       labels:
         app: wcm
     spec:
+      hostAliases:
+      - ip: "192.168.200.99"
+        hostnames:
+        - "sly.trscd.com.cn"
       volumes:
       - name: pvc-wcmdata
         persistentVolumeClaim:
@@ -22,30 +26,37 @@ spec:
       - name: pvc-wcmlog
         persistentVolumeClaim:
           claimName: pvc-wcmlog-slytest
+      #- name: pvc-webapps
+      #  persistentVolumeClaim:
+      #    claimName: pvc-webapps
       containers:
         - name: wcm
-          image: registry.cn-hangzhou.aliyuncs.com/trssly/wcm:v6
+          #image: registry.cn-hangzhou.aliyuncs.com/trssly/wcm:2.22.14-jindie
+          image: {{ TRSWCMImage }}
+          #image: registry.cn-hangzhou.aliyuncs.com/trssly/wcm:v9-null
           envFrom:
              - configMapRef:
                  name: trs-wcm-configmap
           imagePullPolicy: IfNotPresent
           volumeMounts:
-          - mountPath: /TRS/DATA/WCMData/
+          - mountPath: /TRS/DATA
             name: pvc-wcmdata
           - mountPath: /TRS/TRSWCM/logs/
             name: pvc-wcmlog
+          #- mountPath: /TRS/TRSWCM/webapps
+          #  name: pvc-webapps
           ports:
             - name: http
               containerPort: 8080
               protocol: TCP
           livenessProbe:
             tcpSocket:
-              port: http
+              port: 8080
             initialDelaySeconds: 60
             periodSeconds: 10
           readinessProbe:
             tcpSocket:
-              port: http
+              port: 8080
             initialDelaySeconds: 60
             periodSeconds: 10
           resources:
