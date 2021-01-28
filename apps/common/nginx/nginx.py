@@ -46,6 +46,15 @@ class NginxTool(object):
         self.SSHObj = ssh_tools.SSHTool(hostname=nfsinfo['hostname'], port=nfsinfo['port'], username=nfsinfo['username'],
                                 password=nfsinfo['password'])
 
+
+        TmpCWDPath = os.path.abspath(__file__)
+        TmpCWDPath = os.path.dirname(TmpCWDPath)
+        self.BaseDIRPath= os.path.realpath(os.path.join(TmpCWDPath, '../../..'))
+
+        if  self.getValues():
+            print ('load from file....')
+            self.AppInfo = deepcopy(self.getValues())
+
     def setupNFS(self):
         TmpResponse = self.NFSObj.installNFS(basedir=self.AppInfo['NFSBasePath'])
         if TmpResponse['ret_code'] != 0:
@@ -205,7 +214,7 @@ class NginxTool(object):
 
 
     def getValues(self):
-        TmpTargetNamespaceDIR = os.path.join(self.AppInfo['TargetNamespaceDIR'], self.AppInfo['Namespace'],
+        TmpTargetNamespaceDIR = os.path.join(self.BaseDIRPath, 'namespaces', self.AppInfo['Namespace'],
                                              self.AppInfo['AppName'])
         TmpTargetNamespaceDIR = os.path.normpath(os.path.realpath(TmpTargetNamespaceDIR))
 
