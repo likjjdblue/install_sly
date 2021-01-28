@@ -66,7 +66,7 @@ class MediaGatewayTool(object):
         print ('create MediaGateway NFS successfully')
 
 
-        self.NFSObj.createSubFolder((self.AppInfo['MediaGatewayLogPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['MediaGatewayLogPath'])
 
         print ('setup MediaGateway NFS successfully')
 

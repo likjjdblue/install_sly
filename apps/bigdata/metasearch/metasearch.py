@@ -66,7 +66,7 @@ class MetaSearchTool(object):
         print ('create MetaSearch NFS successfully')
 
 
-        self.NFSObj.createSubFolder((self.AppInfo['MetaSearchLogPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['MetaSearchLogPath'])
 
         print ('setup MetaSearch NFS successfully')
 

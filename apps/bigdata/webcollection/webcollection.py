@@ -65,7 +65,7 @@ class WebCollectionTool(object):
         print ('create WebCollection NFS successfully')
 
 
-        self.NFSObj.createSubFolder((self.AppInfo['WebCollectionLogPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['WebCollectionLogPath'])
 
         print ('setup WebCollection NFS successfully')
 

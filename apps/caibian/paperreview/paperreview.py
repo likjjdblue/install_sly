@@ -59,7 +59,7 @@ class PaperReviewTool(object):
 
         print ('create PaperReview NFS successfully')
 
-        self.NFSObj.createSubFolder((self.AppInfo['PaperReviewLogPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['PaperReviewLogPath'])
 
         print ('setup PaperReview NFS successfully')
 

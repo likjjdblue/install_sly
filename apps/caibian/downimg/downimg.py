@@ -67,7 +67,7 @@ class DownImgTool(object):
         print ('create Down Img NFS successfully')
 
         self.NFSObj.createSubFolder(self.AppInfo['DownImgDataPath'])
-        self.NFSObj.createSubFolder((self.AppInfo['DownImgLogPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['DownImgLogPath'])
 
         print ('setup Down Img NFS successfully')
 

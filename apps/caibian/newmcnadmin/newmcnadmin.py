@@ -67,7 +67,7 @@ class MCNAdminTool(object):
         print ('create MCN Admin NFS successfully')
 
         self.NFSObj.createSubFolder(self.AppInfo['MCNAdminDataPath'])
-        self.NFSObj.createSubFolder((self.AppInfo['MCNAdminLogPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['MCNAdminLogPath'])
 
         print ('setup MCN Admin NFS successfully')
 

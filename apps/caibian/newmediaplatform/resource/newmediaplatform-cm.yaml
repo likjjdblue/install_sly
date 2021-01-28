@@ -2,7 +2,6 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: newmediaplatform-configmap
-  namespace: sly
 data:
   spring.datasource.url: "jdbc:mysql://mariadb-svc:3306/new_media_platform?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai"
   spring.datasource.username: "newmedia"

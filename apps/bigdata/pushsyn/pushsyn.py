@@ -65,7 +65,7 @@ class PushSynTool(object):
         print ('create PushSyn NFS successfully')
 
 
-        self.NFSObj.createSubFolder((self.AppInfo['PushSynLogPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['PushSynLogPath'])
 
 
         print ('setup PushSyn NFS successfully')

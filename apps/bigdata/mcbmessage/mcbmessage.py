@@ -66,8 +66,8 @@ class MCBMessageTool(object):
         print ('create MCBMessage NFS successfully')
 
 
-        self.NFSObj.createSubFolder((self.AppInfo['MCBMessageLogPath']))
-        self.NFSObj.createSubFolder((self.AppInfo['MCBMessageDataPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['MCBMessageLogPath'])
+        self.NFSObj.createSubFolder(self.AppInfo['MCBMessageDataPath'])
 
         print ('setup MCBMessage NFS successfully')
 

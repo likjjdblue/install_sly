@@ -66,7 +66,7 @@ class TransferVideoTool(object):
         print ('create TransferVideo NFS successfully')
 
 
-        self.NFSObj.createSubFolder((self.AppInfo['TransferVideoLogPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['TransferVideoLogPath'])
 
         print ('setup TransferVideo NFS successfully')
 

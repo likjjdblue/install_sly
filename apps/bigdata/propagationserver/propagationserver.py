@@ -65,7 +65,7 @@ class PropagationServerTool(object):
         print ('create PropagationServer NFS successfully')
 
 
-        self.NFSObj.createSubFolder((self.AppInfo['PropagationServerLogPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['PropagationServerLogPath'])
 
 
         print ('setup PropagationServer NFS successfully')

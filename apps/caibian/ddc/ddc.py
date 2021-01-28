@@ -59,7 +59,7 @@ class DDCTool(object):
 
         print ('create DDC NFS successfully')
 
-        self.NFSObj.createSubFolder((self.AppInfo['DDCLogPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['DDCLogPath'])
 
         print ('setup DDC NFS successfully')
 

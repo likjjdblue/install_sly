@@ -67,7 +67,7 @@ class MCNTool(object):
         print ('create MCN NFS successfully')
 
         self.NFSObj.createSubFolder(self.AppInfo['MCNDataPath'])
-        self.NFSObj.createSubFolder((self.AppInfo['MCNLogPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['MCNLogPath'])
 
         print ('setup MCN NFS successfully')
 

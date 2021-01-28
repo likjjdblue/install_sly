@@ -66,7 +66,7 @@ class TransferResourceAITool(object):
         print ('create TransferResourceAI NFS successfully')
 
 
-        self.NFSObj.createSubFolder((self.AppInfo['TransferResourceAILogPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['TransferResourceAILogPath'])
 
         print ('setup TransferResourceAI NFS successfully')
 

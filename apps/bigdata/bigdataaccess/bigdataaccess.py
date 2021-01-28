@@ -65,7 +65,7 @@ class BigdataAccessTool(object):
         print ('create BigdataAccess NFS successfully')
 
 
-        self.NFSObj.createSubFolder((self.AppInfo['BigdataAccessLogPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['BigdataAccessLogPath'])
 
         print ('setup BigdataAccess NFS successfully')
 

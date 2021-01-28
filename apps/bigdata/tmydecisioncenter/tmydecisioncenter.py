@@ -66,7 +66,7 @@ class TmyDecisionCenterTool(object):
         print ('create TmyDecisionCenter NFS successfully')
 
 
-        self.NFSObj.createSubFolder((self.AppInfo['TmyDecisionCenterLogPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['TmyDecisionCenterLogPath'])
 
         print ('setup TmyDecisionCenter NFS successfully')
 

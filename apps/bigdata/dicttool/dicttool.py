@@ -65,7 +65,7 @@ class DicttoolTool(object):
         print ('create Dicttool NFS successfully')
 
 
-        self.NFSObj.createSubFolder((self.AppInfo['DicttoolLogPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['DicttoolLogPath'])
 
         print ('setup Dicttool NFS successfully')
 

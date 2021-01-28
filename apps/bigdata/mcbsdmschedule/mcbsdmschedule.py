@@ -66,8 +66,8 @@ class MCBSDMScheduleTool(object):
         print ('create MCBSDMSchedule NFS successfully')
 
 
-        self.NFSObj.createSubFolder((self.AppInfo['MCBSDMScheduleLogPath']))
-        self.NFSObj.createSubFolder((self.AppInfo['MCBSDMScheduleDataPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['MCBSDMScheduleLogPath'])
+        self.NFSObj.createSubFolder(self.AppInfo['MCBSDMScheduleDataPath'])
 
         print ('setup MCBSDMSchedule NFS successfully')
 

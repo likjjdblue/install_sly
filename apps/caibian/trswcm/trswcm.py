@@ -66,7 +66,7 @@ class TRSWCMTool(object):
         print ('create TRS WCM NFS successfully')
 
         self.NFSObj.createSubFolder(self.AppInfo['TRSWCMDataPath'])
-        self.NFSObj.createSubFolder((self.AppInfo['TRSWCMLogPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['TRSWCMLogPath'])
 
         print ('setup TRS WCM NFS successfully')
 

@@ -64,7 +64,7 @@ class MLFSearchTool(object):
 
         print ('create MLFSearch NFS successfully')
 
-        self.NFSObj.createSubFolder((self.AppInfo['MLFSearchLogPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['MLFSearchLogPath'])
 
         print ('setup MLFSearch NFS successfully')
 

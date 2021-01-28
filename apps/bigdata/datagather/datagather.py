@@ -66,7 +66,7 @@ class DataGatherTool(object):
         print ('create DataGather NFS successfully')
 
 
-        self.NFSObj.createSubFolder((self.AppInfo['DataGatherLogPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['DataGatherLogPath'])
         self.NFSObj.createSubFolder(self.AppInfo['DataGatherDataPath'])
 
         print ('setup DataGather NFS successfully')

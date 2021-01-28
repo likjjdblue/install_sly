@@ -66,8 +66,8 @@ class MediaResourceTool(object):
         print ('create MediaResource NFS successfully')
 
 
-        self.NFSObj.createSubFolder((self.AppInfo['MediaResourceLogPath']))
-        self.NFSObj.createSubFolder((self.AppInfo['MediaResourceDataPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['MediaResourceLogPath'])
+        self.NFSObj.createSubFolder(self.AppInfo['MediaResourceDataPath'])
 
         print ('setup MediaResource NFS successfully')
 

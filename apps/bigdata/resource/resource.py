@@ -69,9 +69,9 @@ class ResourceTool(object):
         print ('create Resource NFS successfully')
 
 
-        self.NFSObj.createSubFolder((self.AppInfo['ResourceLogPath']))
-        self.NFSObj.createSubFolder((self.AppInfo['ResourceDataPath']))
-        self.NFSObj.createSubFolder((self.AppInfo['ResourceMediaDataPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['ResourceLogPath'])
+        self.NFSObj.createSubFolder(self.AppInfo['ResourceDataPath'])
+        self.NFSObj.createSubFolder(self.AppInfo['ResourceMediaDataPath'])
 
         print ('setup Resource NFS successfully')
 

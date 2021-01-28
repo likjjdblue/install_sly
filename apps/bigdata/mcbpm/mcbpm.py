@@ -66,8 +66,8 @@ class MCBPMTool(object):
         print ('create MCBPM NFS successfully')
 
 
-        self.NFSObj.createSubFolder((self.AppInfo['MCBPMLogPath']))
-        self.NFSObj.createSubFolder((self.AppInfo['MCBPMDataPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['MCBPMLogPath'])
+        self.NFSObj.createSubFolder(self.AppInfo['MCBPMDataPath'])
 
         print ('setup MCBPM NFS successfully')
 

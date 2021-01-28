@@ -66,8 +66,8 @@ class PictureCenterTool(object):
         print ('create PictureCenter NFS successfully')
 
 
-        self.NFSObj.createSubFolder((self.AppInfo['PictureCenterLogPath']))
-        self.NFSObj.createSubFolder((self.AppInfo['PictureCenterDataPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['PictureCenterLogPath'])
+        self.NFSObj.createSubFolder(self.AppInfo['PictureCenterDataPath'])
 
         print ('setup PictureCenter NFS successfully')
 

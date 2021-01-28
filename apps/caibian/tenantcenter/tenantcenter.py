@@ -59,7 +59,7 @@ class TenantCenterTool(object):
 
         print ('create TenantCenter NFS successfully')
 
-        self.NFSObj.createSubFolder((self.AppInfo['TenantCenterLogPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['TenantCenterLogPath'])
 
         print ('setup TenantCenter NFS successfully')
 

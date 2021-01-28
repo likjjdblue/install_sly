@@ -64,7 +64,7 @@ class IMServerTool(object):
 
         print ('create IMServer NFS successfully')
 
-        self.NFSObj.createSubFolder((self.AppInfo['IMServerLogPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['IMServerLogPath'])
 
         print ('setup IMServer NFS successfully')
 

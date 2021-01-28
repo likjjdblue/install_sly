@@ -64,7 +64,7 @@ class DshareTool(object):
 
         print ('create Dshare NFS successfully')
 
-        self.NFSObj.createSubFolder((self.AppInfo['DshareLogPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['DshareLogPath'])
 
         print ('setup Dshare NFS successfully')
 

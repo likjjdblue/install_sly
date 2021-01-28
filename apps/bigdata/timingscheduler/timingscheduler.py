@@ -66,7 +66,7 @@ class TimingSchedulerTool(object):
         print ('create TimingScheduler NFS successfully')
 
 
-        self.NFSObj.createSubFolder((self.AppInfo['TimingSchedulerLogPath']))
+        self.NFSObj.createSubFolder(self.AppInfo['TimingSchedulerLogPath'])
 
         print ('setup TimingScheduler NFS successfully')
 
