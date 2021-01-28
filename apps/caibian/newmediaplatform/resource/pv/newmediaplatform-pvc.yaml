@@ -1,0 +1,26 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: newmediaplatform-pvc-log
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  storageClassName: newmediaplatform-pv-log-class
+  resources:
+     requests:
+       storage: 1000Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: newmediaplatform-pvc-data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  storageClassName: newmediaplatform-pv-data-class
+  resources:
+     requests:
+       storage: 1000Gi

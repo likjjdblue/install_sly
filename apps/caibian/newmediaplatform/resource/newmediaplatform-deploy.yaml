@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: newmediaplatform-deploy
+  labels:
+    app: newmediaplatform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: newmediaplatform
+  template:
+    metadata:
+      labels:
+        app: newmediaplatform
+    spec:
+      volumes:
+      - name: newmediaplatform-pvc-log
+        persistentVolumeClaim:
+          claimName: newmediaplatform-pvc-log
+      - name: newmediaplatform-pvc-data
+        persistentVolumeClaim:
+          claimName: newmediaplatform-pvc-data
+      containers:
+        - name: newmediaplatform
+          image: {{ NewMediaPlatformImage }}
+          envFrom:
+             - configMapRef:
+                 name: newmediaplatform-configmap
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+          - mountPath: /TRS/LOGS/NewMediaPlatform
+            name: newmediaplatform-pvc-log
+          - mountPath: /TRS/DATA/NewMedia
+            name: newmediaplatform-pvc-data
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 128Mi
