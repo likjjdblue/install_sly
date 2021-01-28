@@ -204,6 +204,11 @@ class NacosTool(object):
             }'''
 
         print ('Apply Nacos Mysql....')
+
+        TmpTargetNamespaceDIR = os.path.join(self.AppInfo['TargetNamespaceDIR'], self.AppInfo['Namespace'],
+                                             self.AppInfo['AppName'])
+        TmpTargetNamespaceDIR = os.path.normpath(os.path.realpath(TmpTargetNamespaceDIR))
+
         if not self.k8sObj.checkNamespacedResourceHealth(name='mysql', namespace=self.AppInfo['Namespace'],
                                                          kind='ReplicationController'):
             try:
@@ -211,9 +216,7 @@ class NacosTool(object):
             except:
                 pass
 
-            TmpTargetNamespaceDIR = os.path.join(self.AppInfo['TargetNamespaceDIR'], self.AppInfo['Namespace'],
-                                                 self.AppInfo['AppName'])
-            TmpTargetNamespaceDIR = os.path.normpath(os.path.realpath(TmpTargetNamespaceDIR))
+
 
             TmpResponse = self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mysql-nfs.yaml'),
                                                          namespace=self.AppInfo['Namespace'])
