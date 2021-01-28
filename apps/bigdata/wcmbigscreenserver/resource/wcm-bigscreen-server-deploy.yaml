@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wcm-bigscreen-server-deploy
+  labels:
+    app: wcm-bigscreen-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wcm-bigscreen-server
+  template:
+    metadata:
+      labels:
+        app: wcm-bigscreen-server
+    spec:
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: wcm-bigscreen-server-pvc-data
+      containers:
+        - name: wcm-bigscreen-server
+          image: {{ WCMBigScreenServerImage }}
+          envFrom:
+          - configMapRef:
+              name: wcm-bigscreen-server-configmap
+          #- secretRef:
+          #    name: wcm-bigscreen-server-secret
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+          - mountPath: /TRS/DATA/web/bigscreen/
+            name: data
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 128Mi

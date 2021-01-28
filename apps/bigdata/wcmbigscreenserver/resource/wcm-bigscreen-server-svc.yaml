@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: wcm-bigscreen-server-svc
+  labels:
+    app: wcm-bigscreen-server
+spec:
+  type: ClusterIP
+  ports:
+  - port: 9994
+    targetPort: 9994
+    protocol: TCP
+    name: http
+  selector:
+    app: wcm-bigscreen-server
