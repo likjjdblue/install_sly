@@ -636,7 +636,8 @@ class K8SClient(object):
             if hasattr(self, RawNamespacedFuncName):
                 TmpResponse = getattr(self, RawNamespacedFuncName)(name=name, namespace=namespace)
                 TmpResponse = TmpResponse['result'].to_dict()
-                return TmpResponse['status']['replicas'] == TmpResponse['status']['ready_replicas']
+                return ((TmpResponse['status']['replicas'] == TmpResponse['status']['ready_replicas']) \
+                        and  (TmpResponse['status']['replicas'] is not None))
 
 
         except Exception as e:
