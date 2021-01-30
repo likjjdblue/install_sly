@@ -2,5 +2,5 @@
 # -*- coding: utf-8 -*-
 __all__ = [
     'nfs', 'nacos', 'redisha', 'mongodb', 'nfsprovisioner','zookeeper', 'kafka', 'rabbitmqha',
-    'mariadb', 'nginx', 'sqltool', 'nacos', 'redis', 'servciestatecheck',
+    'mariadb', 'nginx', 'sqltool', 'nacos', 'redis', 'servicestatecheck',
 ]

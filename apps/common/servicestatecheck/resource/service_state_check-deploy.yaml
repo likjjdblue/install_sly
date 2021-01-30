@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    appName: service_state_check
+    appType: flaskApp
+  name: service-state-check-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      appName: service_state_check
+      appType: flaskApp
+  template:
+    metadata:
+      labels:
+        appName: service_state_check
+        appType: flaskApp
+    spec:
+      containers:
+      - image: {{ ServiceStateCheckImage }}
+        imagePullPolicy: IfNotPresent
+        name: service-state-check
+        env:
+        - name: RetryInterval
+          value: '{{ RetryInterval }}'
+        - name: RetryTimes
+          value: '{{ RetryTimes }}'
+        - name: ConnectionTimeOut
+          value: '{{ ConnectionTimeOut }}'
+        ports:
+        - containerPort: 5000
+      restartPolicy: Always
