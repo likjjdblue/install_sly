@@ -39,28 +39,17 @@ def sendHttpRequest(host='127.0.0.1', port=9200, url='/', method='GET', body={},
 
 
 class ServiceStateCheckTool(object):
-    def __init__(self, namespace='default', nfsinfo={},harbor=None, retrytimes=10):
+    def __init__(self, namespace='default', harbor=None, retrytimes=10):
 
         namespace = namespace.strip()
         self.RetryTimes = int(retrytimes)
-        self.NFSAddr = nfsinfo['hostname']
-        self.NFSPort = nfsinfo['port']
-        self.NFSUsername = nfsinfo['username']
-        self.NFSPassword = nfsinfo['password']
-        self.NFSBasePath = nfsinfo['basepath']
         self.AppInfo = deepcopy(AppInfo)
-
-        self.AppInfo['NFSAddr'] = self.NFSAddr
-        self.AppInfo['NFSBasePath'] = self.NFSBasePath
 
         self.AppInfo['Namespace'] = namespace
 
         self.AppInfo['HarborAddr'] = harbor
         self.k8sObj = k8s_tools.K8SClient()
 
-        self.NFSObj = nfs.NFSTool(**nfsinfo)
-        self.SSHObj = ssh_tools.SSHTool(hostname=nfsinfo['hostname'], port=nfsinfo['port'], username=nfsinfo['username'],
-                                password=nfsinfo['password'])
 
         TmpCWDPath = os.path.abspath(__file__)
         TmpCWDPath = os.path.dirname(TmpCWDPath)
@@ -71,16 +60,6 @@ class ServiceStateCheckTool(object):
             self.AppInfo = deepcopy(self.getValues())
 
     def setupNFS(self):
-        TmpResponse = self.NFSObj.installNFS(basedir=self.AppInfo['NFSBasePath'])
-        if TmpResponse['ret_code'] != 0:
-            return TmpResponse
-
-        print ('create ServiceStateCheck NFS successfully')
-
-
-
-        print ('setup ServiceStateCheck NFS successfully')
-
         return {
             'ret_code': 0,
             'result': ''
@@ -232,8 +211,7 @@ class ServiceStateCheckTool(object):
 
 
     def close(self):
-        self.NFSObj.close()
-        self.SSHObj.closeConnection()
+        pass
 
     def getK8sNodeIP(self):
         TmpRawNodesInfo = self.k8sObj.getNodes()['result'].to_dict()
@@ -253,6 +231,8 @@ class ServiceStateCheckTool(object):
 
 
     def checkServicePortState(self, targetaddress):
+        self.start()
+
         TmpNodeIP = self.getK8sNodeIP()
         TmpNodePort = self.getServiceNodePort()
 
@@ -260,6 +240,8 @@ class ServiceStateCheckTool(object):
                                           body={'endpoints': [targetaddress]}, url='/checkservice',
                                           header={'Content-Type': "application/json"}
                                           )
+
+        self.close()
 
         print (TmpHttpResponse['result'])
         return TmpHttpResponse['result']
@@ -273,8 +255,7 @@ class ServiceStateCheckTool(object):
 
 
 if __name__ == "__main__":
-    tmp = ServiceStateCheckTool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.74', port=1022, username='root', password='!QAZ2wsx1234',
-                         basepath='/TRS/DATA'))
+    tmp = ServiceStateCheckTool(namespace='sly2')
     tmp.start()
     tmp.checkServicePortState(targetaddress='mariadb-svc:3306')
 

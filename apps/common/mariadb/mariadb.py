@@ -3,7 +3,7 @@
 
 import sys, os
 sys.path.append('../../..')
-from apps.common import nfs, nfsprovisioner
+from apps.common import nfs, nfsprovisioner, servicestatecheck
 from tools import k8s_tools
 from metadata import AppInfo
 from copy import deepcopy
@@ -16,6 +16,8 @@ from time import sleep
 from tools import k8s_tools
 from pprint import pprint
 from codecs import open as open
+
+
 
 class MariaDBTool(object):
     def __init__(self, namespace='default', mariadbdatapath='mariadb-pv-data', nfsinfo={},
@@ -163,13 +165,13 @@ class MariaDBTool(object):
             TmpResponse = self.k8sObj.getNamespacedDeployment(name='mariadb-deploy',
                                                                    namespace=self.AppInfo['Namespace'])['result'].to_dict()
 
-            if (TmpResponse['status']['replicas'] != TmpResponse['status']['ready_replicas']) and \
-                   (TmpResponse['status']['replicas'] is not None):
+            if (TmpResponse['status']['replicas'] != TmpResponse['status']['ready_replicas']) or \
+                   (TmpResponse['status']['replicas'] is  None):
                 print ('Waitting for Deployment  %s to be ready,replicas: %s, available replicas: %s')%(
                     TmpResponse['metadata']['name'], str(TmpResponse['status']['replicas']),
                     str(TmpResponse['status']['ready_replicas'])
                 )
-                sleep (20)
+                sleep (5)
                 continue
             print ('Deployment: %s is available;replicas: %s')%(TmpResponse['metadata']['name'],
                                                               str(TmpResponse['status']['replicas']))
@@ -183,7 +185,12 @@ class MariaDBTool(object):
                 'result': 'Failed to apply Deployment: %s'%(TmpResponse['metadata']['name'],)
             }
         print ('Waitting MariaDB for running....')
-        sleep(120)
+        ####sleep(120)
+
+        TmpServiceCheckObj = servicestatecheck.ServiceStateCheckTool(namespace=self.AppInfo['Namespace'], harbor=self.AppInfo['HarborAddr'])
+        TmpCheckResult = TmpServiceCheckObj.checkServicePortState(targetaddress='mariadb-svc:3306')
+        print ('mariadb-svc:3306 is listening....')
+
 
         return {
             'ret_code': 0,
