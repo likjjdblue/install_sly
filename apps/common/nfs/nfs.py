@@ -108,4 +108,7 @@ class NFSTool(object):
             'result': 'NFS create subfolder %s successfully'%(subpath,)
         }
 
+    def close(self):
+        self.SSHClient.closeConnection()
+
 

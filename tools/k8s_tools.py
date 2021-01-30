@@ -676,6 +676,19 @@ class K8SClient(object):
         }
 
 
+    def getNodes(self):
+        try:
+            TmpResponse = self.K8SCoreV1Client.list_node()
+            return {
+                "ret_code": 0,
+                'result': TmpResponse
+            }
+        except Exception as e:
+            print (str(e))
+            return {
+                "ret_code":1,
+                'result': 'can not list nodes'
+            }
 
 
 
@@ -727,9 +740,7 @@ class K8SClient(object):
 #print (TmpObj.deleteNamespacedStateFulSet('nacos', 'wakaka'))
 
 if __name__ == '__main__':
-    TmpObj.createNamespace('wakaka')
-    for a,b,c in os.walk('tmp'):
-        for file in c:
-            print (TmpObj.deleteResourceFromYaml(filepath=os.path.join('tmp/', file), namespace='wakaka'))
-            print ('+'*20)
-            sleep (5)
+    TmpObj = K8SClient()
+    tmp = TmpObj.getNodes()['result'].to_dict()
+    for item in tmp['items']:
+        print (item['status']['addresses'])
