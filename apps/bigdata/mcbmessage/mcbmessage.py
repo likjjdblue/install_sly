@@ -191,7 +191,7 @@ class MCBMessageTool(object):
 
             TmpServiceCheckObj = servicestatecheck.ServiceStateCheckTool(namespace=self.AppInfo['Namespace'],
                                                                          harbor=self.AppInfo['HarborAddr'])
-            TmpCheckResult = TmpServiceCheckObj.checkServicePortState(targetaddress='mcb-message-svc:8082')
+            TmpCheckResult = TmpServiceCheckObj.checkServicePortState(targetaddress='nginx-svc:80')
             print ('mcb-message-svc:8082 is listening....')
 
 
