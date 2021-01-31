@@ -204,8 +204,6 @@ class DicttoolTool(object):
                 'ret_code': 1,
                 'result': 'Failed to apply Deployment: %s'%(TmpResponse['metadata']['name'],)
             }
-        print ('Waitting Dicttool for running....')
-        sleep(120)
 
         return {
             'ret_code': 0,

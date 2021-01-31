@@ -191,7 +191,7 @@ class DataGatherTool(object):
 
             TmpServiceCheckObj = servicestatecheck.ServiceStateCheckTool(namespace=self.AppInfo['Namespace'],
                                                                          harbor=self.AppInfo['HarborAddr'])
-            TmpCheckResult = TmpServiceCheckObj.checkServicePortState(targetaddress='gather-consumer-svc:8788')
+            TmpCheckResult = TmpServiceCheckObj.checkServicePortState(targetaddress='nginx-svc:80')
             print ('gather-consumer-svc:8788 is listening....')
 
 
@@ -206,8 +206,7 @@ class DataGatherTool(object):
                 'ret_code': 1,
                 'result': 'Failed to apply Deployment: %s'%(TmpResponse['metadata']['name'],)
             }
-        print ('Waitting DataGather for running....')
-        sleep(120)
+
 
         return {
             'ret_code': 0,
@@ -385,7 +384,8 @@ class DataGatherTool(object):
 
 
     def close(self):
-        self.close()
+        self.NFSObj.close()
+        self.SSHClient.close()
 
 
 

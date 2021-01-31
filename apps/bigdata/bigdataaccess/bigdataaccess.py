@@ -189,7 +189,7 @@ class BigdataAccessTool(object):
 
             TmpServiceCheckObj = servicestatecheck.ServiceStateCheckTool(namespace=self.AppInfo['Namespace'],
                                                                          harbor=self.AppInfo['HarborAddr'])
-            TmpCheckResult = TmpServiceCheckObj.checkServicePortState(targetaddress='bigdata-access-svc:9016')
+            TmpCheckResult = TmpServiceCheckObj.checkServicePortState(targetaddress='nginx-svc:80')
             print ('bigdata-access-svc:9016 is listening....')
 
             print ('Deployment: %s is available;replicas: %s')%(TmpResponse['metadata']['name'],
