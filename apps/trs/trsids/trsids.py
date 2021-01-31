@@ -197,8 +197,6 @@ class TRSIDSTool(object):
                 'ret_code': 1,
                 'result': 'Failed to apply Deployment: %s'%(TmpResponse['metadata']['name'],)
             }
-        print ('Waitting TRS IDS for running....')
-        sleep(180)
 
         return {
             'ret_code': 0,
