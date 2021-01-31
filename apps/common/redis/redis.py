@@ -3,7 +3,7 @@
 
 import sys, os
 sys.path.append('../../..')
-from apps.common import nfs, nfsprovisioner
+from apps.common import nfs, nfsprovisioner, servicestatecheck
 from tools import k8s_tools
 from metadata import AppInfo
 from copy import deepcopy
@@ -19,7 +19,7 @@ from codecs import open as open
 
 class RedisTool(object):
     def __init__(self, namespace='default', redisdatapath='redis-pv-data',
-                 nfsinfo={},harbor=None, retrytimes=10):
+                 nfsinfo={},harbor=None, retrytimes=60):
 
         namespace = namespace.strip()
         self.RetryTimes = int(retrytimes)
@@ -169,14 +169,20 @@ class RedisTool(object):
             TmpResponse = self.k8sObj.getNamespacedDeployment(name='redis-deploy',
                                                                    namespace=self.AppInfo['Namespace'])['result'].to_dict()
 
-            if (TmpResponse['status']['replicas'] != TmpResponse['status']['ready_replicas']) and \
-                   (TmpResponse['status']['replicas'] is not None):
+            if not self.k8sObj.checkNamespacedResourceHealth(name='redis-deploy', namespace=self.AppInfo['Namespace'],
+                                                         kind='Deployment'):
                 print ('Waitting for Deployment  %s to be ready,replicas: %s, available replicas: %s')%(
                     TmpResponse['metadata']['name'], str(TmpResponse['status']['replicas']),
                     str(TmpResponse['status']['ready_replicas'])
                 )
-                sleep (20)
+                sleep (5)
                 continue
+
+            TmpServiceCheckObj = servicestatecheck.ServiceStateCheckTool(namespace=self.AppInfo['Namespace'],
+                                                                         harbor=self.AppInfo['HarborAddr'])
+            TmpCheckResult = TmpServiceCheckObj.checkServicePortState(targetaddress='redis-svc:6379')
+            print ('redis-svc:6379 is listening....')
+
             print ('Deployment: %s is available;replicas: %s')%(TmpResponse['metadata']['name'],
                                                               str(TmpResponse['status']['replicas']))
             isRunning = True
@@ -205,6 +211,7 @@ class RedisTool(object):
         self.renderTemplate()
 
         TmpResponse = self.applyYAML()
+        self.close()
         return TmpResponse
 
 
@@ -220,6 +227,11 @@ class RedisTool(object):
             with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='rb') as f:
                 TmpValuse = yaml.safe_load(f)
         return TmpValuse
+
+
+    def close(self):
+        self.SSHObj.close()
+        self.NFSObj.close()
 
 
 

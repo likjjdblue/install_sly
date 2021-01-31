@@ -161,7 +161,7 @@ class ServiceStateCheckTool(object):
                     TmpResponse['metadata']['name'], str(TmpResponse['status']['replicas']),
                     str(TmpResponse['status']['ready_replicas'])
                 )
-                sleep (5)
+                sleep (2)
                 continue
             print ('Deployment: %s is available;replicas: %s')%(TmpResponse['metadata']['name'],
                                                               str(TmpResponse['status']['replicas']))
@@ -175,7 +175,7 @@ class ServiceStateCheckTool(object):
                 'result': 'Failed to apply Deployment: %s'%(TmpResponse['metadata']['name'],)
             }
         print ('Waitting ServiceStateCheck for running....')
-        sleep(3)
+        sleep(2)
 
         return {
             'ret_code': 0,
