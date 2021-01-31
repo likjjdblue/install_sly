@@ -21,7 +21,7 @@ from codecs import open as open
 
 class MariaDBTool(object):
     def __init__(self, namespace='default', mariadbdatapath='mariadb-pv-data', nfsinfo={},
-                 harbor=None, retrytimes=10):
+                 harbor=None, retrytimes=60):
 
         namespace = namespace.strip()
         self.RetryTimes = int(retrytimes)
@@ -165,8 +165,8 @@ class MariaDBTool(object):
             TmpResponse = self.k8sObj.getNamespacedDeployment(name='mariadb-deploy',
                                                                    namespace=self.AppInfo['Namespace'])['result'].to_dict()
 
-            if (TmpResponse['status']['replicas'] != TmpResponse['status']['ready_replicas']) or \
-                   (TmpResponse['status']['replicas'] is  None):
+            if not self.k8sObj.checkNamespacedResourceHealth(name='mariadb-deploy', namespace=self.AppInfo['Namespace'],
+                                                         kind='Deployment'):
                 print ('Waitting for Deployment  %s to be ready,replicas: %s, available replicas: %s')%(
                     TmpResponse['metadata']['name'], str(TmpResponse['status']['replicas']),
                     str(TmpResponse['status']['ready_replicas'])
@@ -207,6 +207,7 @@ class MariaDBTool(object):
         self.renderTemplate()
 
         TmpResponse = self.applyYAML()
+        self.close()
         return TmpResponse
 
 
@@ -222,6 +223,10 @@ class MariaDBTool(object):
             with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='rb') as f:
                 TmpValuse = yaml.safe_load(f)
         return TmpValuse
+
+
+    def close(self):
+        self.NFSObj.close()
 
 
 

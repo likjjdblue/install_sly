@@ -9,4 +9,4 @@ nfsinfo = {
     'basepath': '/TRS/DATA',
 }
 
-namespace = 'sly2'
+namespace = 'sly3'
