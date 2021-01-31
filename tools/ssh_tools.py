@@ -43,6 +43,10 @@ class SSHTool(object):
         self.SSHObj.close()
         self.GoodConnection = False
 
+    def close(self):
+        self.closeConnection()
+
+
     def ExecCmd(self,command, get_pty=True, *args, **kwargs):
         TmpCheckResult = self.checkConnection()
         if TmpCheckResult['ret_code'] != 0:

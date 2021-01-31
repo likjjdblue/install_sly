@@ -109,6 +109,6 @@ class NFSTool(object):
         }
 
     def close(self):
-        self.SSHClient.closeConnection()
+        self.SSHClient.close()
 
 
