@@ -17,7 +17,7 @@ from tools import k8s_tools
 from pprint import pprint
 
 class NFSProvisionerTool(object):
-    def __init__(self, namespace='default', nfsinfo={},nfsdatapath='nfs-provisioner',harbor=None, retrytimes=10):
+    def __init__(self, namespace='default', nfsinfo={},nfsdatapath='nfs-provisioner',harbor=None, retrytimes=60):
 
         namespace = namespace.strip()
         self.RetryTimes = int(retrytimes)
@@ -146,7 +146,7 @@ class NFSProvisionerTool(object):
                     TmpResponse['metadata']['name'], str(TmpResponse['status']['replicas']),
                     str(TmpResponse['status']['ready_replicas'])
                 )
-                sleep(20)
+                sleep(5)
                 continue
             print ('Deployment: %s is available;replicas: %s') % (TmpResponse['metadata']['name'],
                                                                   str(TmpResponse['status']['replicas']))

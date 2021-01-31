@@ -3,7 +3,7 @@
 
 import sys, os
 sys.path.append('../../..')
-from apps.common import nfs, nfsprovisioner
+from apps.common import nfs, nfsprovisioner, servicestatecheck
 from tools import k8s_tools
 from metadata import AppInfo
 from copy import deepcopy
@@ -18,7 +18,7 @@ from pprint import pprint
 from codecs import open as open
 
 class KafkaTool(object):
-    def __init__(self, namespace='default', nfsinfo={},kafkadatapath='nfs-provisioner',harbor=None, retrytimes=10):
+    def __init__(self, namespace='default', nfsinfo={},kafkadatapath='nfs-provisioner',harbor=None, retrytimes=60):
 
         namespace = namespace.strip()
         self.RetryTimes = int(retrytimes)
@@ -168,14 +168,22 @@ class KafkaTool(object):
                                                                    namespace=self.AppInfo['Namespace'])['result'].to_dict()
 
 
-            if TmpResponse['status']['replicas'] != TmpResponse['status']['ready_replicas']:
+            if not self.k8sObj.checkNamespacedResourceHealth(name='kafka', namespace=self.AppInfo['Namespace'],
+                                                         kind='StatefulSet'):
                 print ('Waitting for Stateful Set %s to be ready,replicas: %s, available replicas: %s')%(
                     TmpResponse['metadata']['name'], str(TmpResponse['status']['replicas']),
                     str(TmpResponse['status']['ready_replicas'])
                 )
-                sleep (20)
+                sleep (5)
                 continue
-            sleep (20)
+
+            ##sleep (20)
+            TmpServiceCheckObj = servicestatecheck.ServiceStateCheckTool(namespace=self.AppInfo['Namespace'],
+                                                                         harbor=self.AppInfo['HarborAddr'])
+            TmpCheckResult = TmpServiceCheckObj.checkServicePortState(targetaddress='kafka-svc:9092')
+            print ('kafka-svc:9092 is listening....')
+
+
             print ('Stateful Set: %s is available;replicas: %s')%(TmpResponse['metadata']['name'],
                                                               str(TmpResponse['status']['replicas']))
             isRunning = True
@@ -202,6 +210,7 @@ class KafkaTool(object):
         self.renderTemplate()
 
         TmpResponse = self.applyYAML()
+        self.close()
         return TmpResponse
 
 
@@ -218,6 +227,11 @@ class KafkaTool(object):
             with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='rb') as f:
                 TmpValuse = yaml.safe_load(f)
         return TmpValuse
+
+
+    def close(self):
+        self.NFSObj.close()
+
 
 
 
