@@ -194,8 +194,6 @@ class RedisTool(object):
                 'ret_code': 1,
                 'result': 'Failed to apply Deployment: %s'%(TmpResponse['metadata']['name'],)
             }
-        print ('Waitting Redis for running....')
-        sleep(30)
 
         return {
             'ret_code': 0,
