@@ -3,7 +3,7 @@
 
 import sys, os
 sys.path.append('../../..')
-from apps.common import nfs, nfsprovisioner, sqltool
+from apps.common import nfs, nfsprovisioner, sqltool, servicestatecheck
 from tools import k8s_tools, ssh_tools
 from metadata import AppInfo
 from copy import deepcopy
@@ -20,7 +20,7 @@ import importlib
 
 class DshareTool(object):
     def __init__(self, namespace='default', downimglogdata='dshare-pv-log' ,
-                 nfsinfo={}, harbor=None, retrytimes=10, *args, **kwargs):
+                 nfsinfo={}, harbor=None, retrytimes=60, *args, **kwargs):
 
         namespace = namespace.strip()
         kwargs['namespace'] = namespace
@@ -177,14 +177,20 @@ class DshareTool(object):
             TmpResponse = self.k8sObj.getNamespacedDeployment(name='dshare-deploy',
                                                                    namespace=self.AppInfo['Namespace'])['result'].to_dict()
 
-            if (TmpResponse['status']['replicas'] != TmpResponse['status']['ready_replicas']) and \
-                   (TmpResponse['status']['replicas'] is not None):
+            if not self.k8sObj.checkNamespacedResourceHealth(name='dshare-deploy', namespace=self.AppInfo['Namespace'],
+                                                         kind='Deployment'):
                 print ('Waitting for Deployment  %s to be ready,replicas: %s, available replicas: %s')%(
                     TmpResponse['metadata']['name'], str(TmpResponse['status']['replicas']),
                     str(TmpResponse['status']['ready_replicas'])
                 )
-                sleep (20)
+                sleep (5)
                 continue
+
+            TmpServiceCheckObj = servicestatecheck.ServiceStateCheckTool(namespace=self.AppInfo['Namespace'],
+                                                                         harbor=self.AppInfo['HarborAddr'])
+            TmpCheckResult = TmpServiceCheckObj.checkServicePortState(targetaddress='dshare-svc:9014')
+            print ('dshare-svc:9014 is listening....')
+
             print ('Deployment: %s is available;replicas: %s')%(TmpResponse['metadata']['name'],
                                                               str(TmpResponse['status']['replicas']))
             isRunning = True
@@ -196,8 +202,7 @@ class DshareTool(object):
                 'ret_code': 1,
                 'result': 'Failed to apply Deployment: %s'%(TmpResponse['metadata']['name'],)
             }
-        print ('Waitting TRS Dshare for running....')
-        sleep(120)
+
 
         return {
             'ret_code': 0,
@@ -229,6 +234,7 @@ class DshareTool(object):
         print ('install %s successsfully')%(self.AppInfo['AppName'], )
         print ('configging Nginx for %s')%(self.AppInfo['AppName'])
         self.postInstall()
+        self.close()
 
         return {
             'ret_code': 0,
@@ -369,6 +375,11 @@ class DshareTool(object):
             with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='rb') as f:
                 TmpValuse = yaml.safe_load(f)
         return TmpValuse
+
+
+    def close(self):
+        self.NFSObj.close()
+        self.SSHClient.close()
 
 
 
