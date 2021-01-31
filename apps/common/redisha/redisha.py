@@ -3,7 +3,7 @@
 
 import sys, os
 sys.path.append('../../..')
-from apps.common import nfs, nfsprovisioner
+from apps.common import nfs, nfsprovisioner, servicestatecheck
 from tools import k8s_tools
 from metadata import AppInfo
 from copy import deepcopy
@@ -18,7 +18,7 @@ from pprint import pprint
 from codecs import open as open
 
 class RedisHATool(object):
-    def __init__(self, namespace='default', nfsinfo={},redisdatapath='nfs-provisioner',harbor=None, retrytimes=10):
+    def __init__(self, namespace='default', nfsinfo={},redisdatapath='nfs-provisioner',harbor=None, retrytimes=60):
 
         namespace = namespace.strip()
         self.RetryTimes = int(retrytimes)
@@ -147,70 +147,6 @@ class RedisHATool(object):
         print ('setup NFS provisioner for  %s successfully '%(self.AppInfo['AppName'],))
 
 
-
-        '''print ('Apply  RBAC...')
-        TmpTargetNamespaceDIR = os.path.join(self.AppInfo['TargetNamespaceDIR'], self.AppInfo['Namespace'],
-                                             self.AppInfo['AppName'])
-        TmpTargetNamespaceDIR = os.path.normpath(os.path.realpath(TmpTargetNamespaceDIR))
-
-        TmpResponse = self.k8sObj.createResourceFromYaml(
-            filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'rbac.yaml'),
-            namespace=self.AppInfo['Namespace'])
-        if TmpResponse['ret_code'] != 0:
-            print (TmpResponse)
-            return TmpResponse
-
-        print ('Create ServiceAccount and deploy NFS-Client Provisioner....')
-        if not self.k8sObj.checkNamespacedResourceHealth(name='nfs-client-provisioner', kind='Deployment',
-                                                         namespace=self.AppInfo['Namespace']):
-            try:
-                self.k8sObj.deleteNamespacedDeployment(name='nfs-client-provisioner',
-                                                       namespace=self.AppInfo['Namespace'])
-            except:
-                pass
-
-            TmpResponse = self.k8sObj.createResourceFromYaml(
-                filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'deployment.yaml'),
-                namespace=self.AppInfo['Namespace'])
-            if TmpResponse['ret_code'] != 0:
-                print (TmpResponse)
-                return TmpResponse
-
-        isRunning = False
-        for itime in range(self.RetryTimes):
-            TmpResponse = self.k8sObj.getNamespacedDeployment(name='nfs-client-provisioner',
-                                                              namespace=self.AppInfo['Namespace'])['result'].to_dict()
-
-            if TmpResponse['status']['replicas'] != TmpResponse['status']['ready_replicas']:
-                print ('Waitting for Deployment %s to be ready,replicas: %s, available replicas: %s') % (
-                    TmpResponse['metadata']['name'], str(TmpResponse['status']['replicas']),
-                    str(TmpResponse['status']['ready_replicas'])
-                )
-                sleep(20)
-                continue
-            print ('Deployment: %s is available;replicas: %s') % (TmpResponse['metadata']['name'],
-                                                                  str(TmpResponse['status']['replicas']))
-            isRunning = True
-            break
-
-        if not isRunning:
-            print ('Failed to apply Deployment: %s') % (TmpResponse['metadata']['name'],)
-            return {
-                'ret_code': 1,
-                'result': 'Failed to apply Deployment: %s' % (TmpResponse['metadata']['name'],)
-            }
-
-        print ('Apply StorageClass.....')
-        TmpResponse = self.k8sObj.createResourceFromYaml(
-            filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'class.yaml'),
-            namespace=self.AppInfo['Namespace'])
-        if TmpResponse['ret_code'] != 0:
-            print (TmpResponse)
-            return {
-                'ret_code': 1,
-                'result': TmpResponse
-            }'''
-
         print ('Apply Redis HA YAML ...')
         TmpTargetNamespaceDIR = os.path.join(self.AppInfo['TargetNamespaceDIR'], self.AppInfo['Namespace'],
                                              self.AppInfo['AppName'])
@@ -237,14 +173,21 @@ class RedisHATool(object):
                                                                    namespace=self.AppInfo['Namespace'])['result'].to_dict()
 
 
-            if TmpResponse['status']['replicas'] != TmpResponse['status']['ready_replicas']:
+            if not self.k8sObj.checkNamespacedResourceHealth(name='redis-ha-server', namespace=self.AppInfo['Namespace'],
+                                                         kind='StatefulSet'):
                 print ('Waitting for Stateful Set %s to be ready,replicas: %s, available replicas: %s')%(
                     TmpResponse['metadata']['name'], str(TmpResponse['status']['replicas']),
                     str(TmpResponse['status']['ready_replicas'])
                 )
-                sleep (20)
+                sleep (5)
                 continue
-            sleep (20)
+            #sleep (20)
+            TmpServiceCheckObj = servicestatecheck.ServiceStateCheckTool(namespace=self.AppInfo['Namespace'],
+                                                                         harbor=self.AppInfo['HarborAddr'])
+            TmpCheckResult = TmpServiceCheckObj.checkServicePortState(targetaddress='redis-ha:6379')
+            print ('redis-ha:6379 is listening....')
+
+
             print ('Stateful Set: %s is available;replicas: %s')%(TmpResponse['metadata']['name'],
                                                               str(TmpResponse['status']['replicas']))
             isRunning = True
@@ -271,6 +214,7 @@ class RedisHATool(object):
         self.renderTemplate()
 
         TmpResponse = self.applyYAML()
+        self.close()
 
         return TmpResponse
 
@@ -288,6 +232,11 @@ class RedisHATool(object):
             with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='rb') as f:
                 TmpValuse = yaml.safe_load(f)
         return TmpValuse
+
+
+
+    def close(self):
+        self.NFSObj.close()
 
 
 

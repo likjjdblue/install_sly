@@ -3,7 +3,7 @@
 
 import sys, os
 sys.path.append('../../..')
-from apps.common import nfs, nfsprovisioner, sqltool
+from apps.common import nfs, nfsprovisioner, sqltool, servicestatecheck
 from tools import k8s_tools, ssh_tools
 from metadata import AppInfo
 from copy import deepcopy
@@ -20,7 +20,7 @@ import importlib
 
 class TRSIDSTool(object):
     def __init__(self, namespace='default', trsidsdatapath='trsids-pv-data', nfsinfo={},
-                 harbor=None, retrytimes=10, *args, **kwargs):
+                 harbor=None, retrytimes=60, *args, **kwargs):
 
         namespace = namespace.strip()
         kwargs['namespace'] = namespace
@@ -172,14 +172,20 @@ class TRSIDSTool(object):
             TmpResponse = self.k8sObj.getNamespacedDeployment(name='ids-deploy',
                                                                    namespace=self.AppInfo['Namespace'])['result'].to_dict()
 
-            if (TmpResponse['status']['replicas'] != TmpResponse['status']['ready_replicas']) and \
-                   (TmpResponse['status']['replicas'] is not None):
+            if not self.k8sObj.checkNamespacedResourceHealth(name='ids-deploy', namespace=self.AppInfo['Namespace'],
+                                                         kind='Deployment'):
                 print ('Waitting for Deployment  %s to be ready,replicas: %s, available replicas: %s')%(
                     TmpResponse['metadata']['name'], str(TmpResponse['status']['replicas']),
                     str(TmpResponse['status']['ready_replicas'])
                 )
-                sleep (20)
+                sleep (5)
                 continue
+
+            TmpServiceCheckObj = servicestatecheck.ServiceStateCheckTool(namespace=self.AppInfo['Namespace'],
+                                                                         harbor=self.AppInfo['HarborAddr'])
+            TmpCheckResult = TmpServiceCheckObj.checkServicePortState(targetaddress='trsids-svc:8300')
+            print ('trsids-svc:8300 is listening....')
+
             print ('Deployment: %s is available;replicas: %s')%(TmpResponse['metadata']['name'],
                                                               str(TmpResponse['status']['replicas']))
             isRunning = True
