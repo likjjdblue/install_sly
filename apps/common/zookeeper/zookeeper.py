@@ -220,7 +220,9 @@ class ZookeeperTool(object):
 
         TmpResponse = self.applyYAML()
         self.close()
-        ZookeeperTool.CachedResult = TmpResponse
+
+        if TmpResponse['ret_code'] == 0:
+            ZookeeperTool.CachedResult = TmpResponse
 
         return TmpResponse
 

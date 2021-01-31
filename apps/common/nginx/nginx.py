@@ -222,7 +222,9 @@ class NginxTool(object):
 
         TmpResponse = self.applyYAML()
         self.close()
-        NginxTool.CachedResult = TmpResponse
+
+        if TmpResponse['ret_code'] == 0:
+            NginxTool.CachedResult = TmpResponse
         return TmpResponse
 
 

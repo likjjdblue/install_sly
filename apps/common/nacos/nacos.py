@@ -274,7 +274,9 @@ class NacosTool(object):
 
         TmpResponse = self.applyYAML()
         self.close()
-        NacosTool.CachedResult = TmpResponse
+
+        if TmpResponse['ret_code'] == 0:
+            NacosTool.CachedResult = TmpResponse
 
         return TmpResponse
 

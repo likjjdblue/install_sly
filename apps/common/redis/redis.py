@@ -217,7 +217,8 @@ class RedisTool(object):
         TmpResponse = self.applyYAML()
         self.close()
 
-        RedisTool.CachedResult = TmpResponse
+        if TmpResponse['ret_code'] == 0:
+            RedisTool.CachedResult = TmpResponse
         return TmpResponse
 
 

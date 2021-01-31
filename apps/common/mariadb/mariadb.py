@@ -214,7 +214,9 @@ class MariaDBTool(object):
 
         TmpResponse = self.applyYAML()
         self.close()
-        MariaDBTool.CachedResult = TmpResponse
+
+        if TmpResponse['ret_code'] == 0:
+            MariaDBTool.CachedResult = TmpResponse
 
         return TmpResponse
 

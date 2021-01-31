@@ -217,7 +217,9 @@ class KafkaTool(object):
 
         TmpResponse = self.applyYAML()
         self.close()
-        KafkaTool.CachedResult = TmpResponse
+
+        if TmpResponse['ret_code'] == 0:
+            KafkaTool.CachedResult = TmpResponse
 
         return TmpResponse
 

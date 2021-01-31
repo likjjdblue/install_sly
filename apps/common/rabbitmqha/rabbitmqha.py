@@ -270,7 +270,9 @@ class RabbitmqHATool(object):
 
         TmpResponse = self.applyYAML()
         self.close()
-        RabbitmqHATool.CachedResult = TmpResponse
+
+        if TmpResponse['ret_code'] == 0:
+            RabbitmqHATool.CachedResult = TmpResponse
 
         if TmpResponse['ret_code'] == 0:
             TmpResponse = self.createVhosts()

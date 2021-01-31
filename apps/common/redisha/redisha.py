@@ -221,7 +221,9 @@ class RedisHATool(object):
 
         TmpResponse = self.applyYAML()
         self.close()
-        RedisHATool.CachedResult = TmpResponse
+
+        if TmpResponse['ret_code'] == 0:
+            RedisHATool.CachedResult = TmpResponse
 
         return TmpResponse
 

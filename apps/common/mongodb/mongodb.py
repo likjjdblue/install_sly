@@ -217,7 +217,9 @@ class MongodbTool(object):
 
         TmpResponse = self.applyYAML()
         self.close()
-        MongodbTool.CachedResult = TmpResponse
+
+        if TmpResponse['ret_code'] == 0:
+            MongodbTool.CachedResult = TmpResponse
 
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
