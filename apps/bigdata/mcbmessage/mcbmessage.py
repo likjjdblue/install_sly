@@ -267,7 +267,7 @@ class MCBMessageTool(object):
             elif TmpClsName == 'RedisTool':
                 self.AppInfo['TRSRedisPassword'] = TmpInfo['RedisStandAlonePassword']
             elif TmpClsName == 'RabbitmqHATool':
-                self.AppInfo['TRSMQPassword'] = crypto_tools.DecodeBase64(TmpInfo['RabbitmqPassword'])
+                self.AppInfo['MCBMessageMQPassword'] = crypto_tools.DecodeBase64(TmpInfo['RabbitmqPassword'])
             elif  TmpClsName == 'TRSWCMTool':
                 self.AppInfo['MCBMessageSecondDBPassword'] = TmpInfo['TRSWCMDBPassword']
 
