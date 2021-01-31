@@ -20,6 +20,8 @@ from codecs import open as open
 
 
 class MariaDBTool(object):
+    CachedResult = None
+
     def __init__(self, namespace='default', mariadbdatapath='mariadb-pv-data', nfsinfo={},
                  harbor=None, retrytimes=60):
 
@@ -200,6 +202,10 @@ class MariaDBTool(object):
 
 
     def start(self):
+        if MariaDBTool.CachedResult:
+            print ('Using cached result')
+            return MariaDBTool.CachedResult
+
         TmpResponse = self.setupNFS()
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
@@ -208,6 +214,8 @@ class MariaDBTool(object):
 
         TmpResponse = self.applyYAML()
         self.close()
+        MariaDBTool.CachedResult = TmpResponse
+
         return TmpResponse
 
 

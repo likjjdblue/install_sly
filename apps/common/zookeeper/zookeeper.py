@@ -18,6 +18,8 @@ from pprint import pprint
 from codecs import open as open
 
 class ZookeeperTool(object):
+    CachedResult = None
+
     def __init__(self, namespace='default', nfsinfo={},zookeeperdatapath='nfs-provisioner',harbor=None, retrytimes=60):
 
         namespace = namespace.strip()
@@ -206,6 +208,10 @@ class ZookeeperTool(object):
         }
 
     def start(self):
+        if ZookeeperTool.CachedResult:
+            print ('Using cached result')
+            return ZookeeperTool.CachedResult
+
         TmpResponse = self.setupNFS()
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
@@ -214,6 +220,8 @@ class ZookeeperTool(object):
 
         TmpResponse = self.applyYAML()
         self.close()
+        ZookeeperTool.CachedResult = TmpResponse
+
         return TmpResponse
 
 

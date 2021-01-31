@@ -18,6 +18,8 @@ from pprint import pprint
 from codecs import open as open
 
 class MongodbTool(object):
+    CachedResult = None
+
     def __init__(self, namespace='default', nfsinfo={}, mongodbdatapath='nfs-provisioner', harbor=None, retrytimes=60):
 
         namespace = namespace.strip()
@@ -203,6 +205,10 @@ class MongodbTool(object):
         }
 
     def start(self):
+        if MongodbTool.CachedResult:
+            print ('Using cached result')
+            return MongodbTool.CachedResult
+
         TmpResponse = self.setupNFS()
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
@@ -211,6 +217,7 @@ class MongodbTool(object):
 
         TmpResponse = self.applyYAML()
         self.close()
+        MongodbTool.CachedResult = TmpResponse
 
         if TmpResponse['ret_code'] != 0:
             return TmpResponse

@@ -18,6 +18,8 @@ from pprint import pprint
 from codecs import open as open
 
 class NginxTool(object):
+    CachedResult = None
+
     def __init__(self, namespace='default', nginxdatapath='nginx-pv-web', nginxlogpath='nginx-pv-log',
                  nginxconfigpath='nginx-pv-config', nfsinfo={},harbor=None, retrytimes=60):
 
@@ -208,6 +210,10 @@ class NginxTool(object):
         }
 
     def start(self):
+        if NginxTool.CachedResult:
+            print ('Using cached result')
+            return NginxTool.CachedResult
+
         TmpResponse = self.setupNFS()
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
@@ -216,6 +222,7 @@ class NginxTool(object):
 
         TmpResponse = self.applyYAML()
         self.close()
+        NginxTool.CachedResult = TmpResponse
         return TmpResponse
 
 

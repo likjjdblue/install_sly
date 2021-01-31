@@ -18,6 +18,8 @@ from pprint import pprint
 from codecs import open as open
 
 class RedisHATool(object):
+    CachedResult = None
+
     def __init__(self, namespace='default', nfsinfo={},redisdatapath='nfs-provisioner',harbor=None, retrytimes=60):
 
         namespace = namespace.strip()
@@ -207,6 +209,10 @@ class RedisHATool(object):
         }
 
     def start(self):
+        if RedisHATool.CachedResult:
+            print ('Using cached result')
+            return RedisHATool.CachedResult
+
         TmpResponse = self.setupNFS()
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
@@ -215,6 +221,7 @@ class RedisHATool(object):
 
         TmpResponse = self.applyYAML()
         self.close()
+        RedisHATool.CachedResult = TmpResponse
 
         return TmpResponse
 

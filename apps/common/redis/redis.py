@@ -18,6 +18,8 @@ from pprint import pprint
 from codecs import open as open
 
 class RedisTool(object):
+    CachedResult = None
+
     def __init__(self, namespace='default', redisdatapath='redis-pv-data',
                  nfsinfo={},harbor=None, retrytimes=60):
 
@@ -202,6 +204,10 @@ class RedisTool(object):
         }
 
     def start(self):
+        if RedisTool.CachedResult:
+            print ('Using cached result')
+            return RedisTool.CachedResult
+
         TmpResponse = self.setupNFS()
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
@@ -210,6 +216,8 @@ class RedisTool(object):
 
         TmpResponse = self.applyYAML()
         self.close()
+
+        RedisTool.CachedResult = TmpResponse
         return TmpResponse
 
 

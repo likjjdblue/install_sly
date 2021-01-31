@@ -18,6 +18,8 @@ from pprint import pprint
 from codecs import open as open
 
 class NacosTool(object):
+    CachedResult = None
+
     def __init__(self, namespace='default', mysqldatapath='nacos_mysql', nacosdatapath='nfs-provisioner', nfsinfo={},
                  harbor=None, retrytimes=60):
 
@@ -260,6 +262,10 @@ class NacosTool(object):
         }
 
     def start(self):
+        if NacosTool.CachedResult:
+            print ('Using cached result')
+            return NacosTool.CachedResult
+
         TmpResponse = self.setupNFS()
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
@@ -267,6 +273,9 @@ class NacosTool(object):
         self.renderTemplate()
 
         TmpResponse = self.applyYAML()
+        self.close()
+        NacosTool.CachedResult = TmpResponse
+
         return TmpResponse
 
 
@@ -283,6 +292,11 @@ class NacosTool(object):
             with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='rb') as f:
                 TmpValuse = yaml.safe_load(f)
         return TmpValuse
+
+
+    def close(self):
+        self.NFSObj.close()
+
 
 
 

@@ -18,6 +18,8 @@ from pprint import pprint
 from codecs import open as open
 
 class RabbitmqHATool(object):
+    CachedResult = None
+
     def __init__(self, namespace='default', nfsinfo={},rabbitmqdatapath='nfs-provisioner',harbor=None, retrytimes=60):
 
         namespace = namespace.strip()
@@ -256,6 +258,10 @@ class RabbitmqHATool(object):
 
 
     def start(self):
+        if RabbitmqHATool.CachedResult:
+            print ('Using cached result')
+            return RabbitmqHATool.CachedResult
+
         TmpResponse = self.setupNFS()
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
@@ -264,6 +270,7 @@ class RabbitmqHATool(object):
 
         TmpResponse = self.applyYAML()
         self.close()
+        RabbitmqHATool.CachedResult = TmpResponse
 
         if TmpResponse['ret_code'] == 0:
             TmpResponse = self.createVhosts()

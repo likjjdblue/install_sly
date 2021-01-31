@@ -18,6 +18,8 @@ from pprint import pprint
 from codecs import open as open
 
 class KafkaTool(object):
+    CachedResult = None
+
     def __init__(self, namespace='default', nfsinfo={},kafkadatapath='nfs-provisioner',harbor=None, retrytimes=60):
 
         namespace = namespace.strip()
@@ -203,6 +205,10 @@ class KafkaTool(object):
         }
 
     def start(self):
+        if KafkaTool.CachedResult:
+            print ('Using cached result')
+            return KafkaTool.CachedResult
+
         TmpResponse = self.setupNFS()
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
@@ -211,6 +217,8 @@ class KafkaTool(object):
 
         TmpResponse = self.applyYAML()
         self.close()
+        KafkaTool.CachedResult = TmpResponse
+
         return TmpResponse
 
 
