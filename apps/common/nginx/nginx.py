@@ -3,7 +3,7 @@
 
 import sys, os
 sys.path.append('../../..')
-from apps.common import nfs, nfsprovisioner
+from apps.common import nfs, nfsprovisioner, servicestatecheck
 from tools import k8s_tools
 from metadata import AppInfo
 from copy import deepcopy
@@ -19,7 +19,7 @@ from codecs import open as open
 
 class NginxTool(object):
     def __init__(self, namespace='default', nginxdatapath='nginx-pv-web', nginxlogpath='nginx-pv-log',
-                 nginxconfigpath='nginx-pv-config', nfsinfo={},harbor=None, retrytimes=10):
+                 nginxconfigpath='nginx-pv-config', nfsinfo={},harbor=None, retrytimes=60):
 
         namespace = namespace.strip()
         self.RetryTimes = int(retrytimes)
@@ -174,14 +174,20 @@ class NginxTool(object):
             TmpResponse = self.k8sObj.getNamespacedDeployment(name='nginx-deploy',
                                                                    namespace=self.AppInfo['Namespace'])['result'].to_dict()
 
-            if (TmpResponse['status']['replicas'] != TmpResponse['status']['ready_replicas']) and \
-                   (TmpResponse['status']['replicas'] is not None):
+            if not self.k8sObj.checkNamespacedResourceHealth(name='nginx-deploy', namespace=self.AppInfo['Namespace'],
+                                                         kind='Deployment'):
                 print ('Waitting for Deployment  %s to be ready,replicas: %s, available replicas: %s')%(
                     TmpResponse['metadata']['name'], str(TmpResponse['status']['replicas']),
                     str(TmpResponse['status']['ready_replicas'])
                 )
-                sleep (20)
+                sleep (5)
                 continue
+
+            TmpServiceCheckObj = servicestatecheck.ServiceStateCheckTool(namespace=self.AppInfo['Namespace'],
+                                                                         harbor=self.AppInfo['HarborAddr'])
+            TmpCheckResult = TmpServiceCheckObj.checkServicePortState(targetaddress='nginx-svc:80')
+            print ('nginx-svc:80 is listening....')
+
             print ('Deployment: %s is available;replicas: %s')%(TmpResponse['metadata']['name'],
                                                               str(TmpResponse['status']['replicas']))
             isRunning = True
@@ -194,7 +200,6 @@ class NginxTool(object):
                 'result': 'Failed to apply Deployment: %s'%(TmpResponse['metadata']['name'],)
             }
         print ('Waitting Nginx for running....')
-        sleep(30)
 
         return {
             'ret_code': 0,
@@ -210,6 +215,7 @@ class NginxTool(object):
         self.renderTemplate()
 
         TmpResponse = self.applyYAML()
+        self.close()
         return TmpResponse
 
 
@@ -225,6 +231,11 @@ class NginxTool(object):
             with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='rb') as f:
                 TmpValuse = yaml.safe_load(f)
         return TmpValuse
+
+
+    def close(self):
+        self.SSHObj.close()
+        self.NFSObj.close()
 
 
 
