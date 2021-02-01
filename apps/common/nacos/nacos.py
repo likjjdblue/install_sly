@@ -177,7 +177,10 @@ class NacosTool(object):
             except:
                 pass
 
-
+            TmpResponse = self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mysql-pv.yaml'),
+                                                         namespace=self.AppInfo['Namespace'])
+            TmpResponse = self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mysql-pvc.yaml'),
+                                                         namespace=self.AppInfo['Namespace'])
 
             TmpResponse = self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mysql-nfs.yaml'),
                                                          namespace=self.AppInfo['Namespace'])
