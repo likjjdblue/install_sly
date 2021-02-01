@@ -56,7 +56,7 @@ spec:
       serviceAccountName: nfs-client-provisioner
       initContainers:
         - name: peer-finder-plugin-install
-          image: {{ NacosPeerFinderImage }}
+          image: nacos/nacos-peer-finder-plugin:1.0
           imagePullPolicy: Always
           volumeMounts:
             - mountPath: "/home/nacos/plugins/peer-finder"

@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mariadb-pvc-data
+  name: nacos-mysql-pvc-data
 spec:
   accessModes:
      - ReadWriteOnce
   volumeMode: Filesystem
-  storageClassName: mariadb-pv-data-class
+  storageClassName: nacos-mysql-pv-data-class
   resources:
      requests:
        storage: 20Gi

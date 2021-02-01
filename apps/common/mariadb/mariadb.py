@@ -59,7 +59,9 @@ class MariaDBTool(object):
 
         print ('create MariaDB NFS successfully')
 
+        '''
         self.NFSObj.createSubFolder(self.AppInfo['MariaDBDataPath'])
+        '''
 
         print ('setup MariaDB NFS successfully')
 
@@ -73,6 +75,14 @@ class MariaDBTool(object):
         self.AppInfo['NFSProvisionerImage'] =replaceDockerRepo(self.AppInfo['NFSProvisionerImage'],
                                                                self.AppInfo['HarborAddr'])
         self.AppInfo['MariaDBPassword'] = crypto_tools.generateRandomAlphaNumericString(lenght=10)
+
+        if not self.AppInfo['MariaDBHostIP']:
+            TmpIP = raw_input('input IP  Address for MariaDB:')
+            self.AppInfo['MariaDBHostIP'] = TmpIP.strip()
+
+            print ('Please make sure MariaDB data folder %s@%s  exists!!!'%(self.AppInfo['MariaDBDataPath'], self.AppInfo['MariaDBHostIP']))
+            TmpChoice = raw_input('press any key to continue:')
+
 
 
     def renderTemplate(self):

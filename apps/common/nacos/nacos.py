@@ -72,9 +72,19 @@ class NacosTool(object):
     def generateValues(self):
         self.AppInfo['NacosImage'] = replaceDockerRepo(self.AppInfo['NacosImage'], self.AppInfo['HarborAddr'])
         self.AppInfo['MysqlImage'] = replaceDockerRepo(self.AppInfo['MysqlImage'], self.AppInfo['HarborAddr'])
+        self.AppInfo['NacosPeerFinderImage'] = replaceDockerRepo(self.AppInfo['NacosPeerFinderImage'], self.AppInfo['HarborAddr'])
         self.AppInfo['NFSProvisionerImage'] =replaceDockerRepo(self.AppInfo['NFSProvisionerImage'],
                                                                self.AppInfo['HarborAddr'])
         self.AppInfo['MysqlPassword'] = crypto_tools.generateRandomAlphaNumericString(lenght=10)
+
+
+        if not self.AppInfo['MysqlHostIP']:
+            TmpIP = raw_input('input IP  Address for Nacos Mysql:')
+            self.AppInfo['MysqlHostIP'] = TmpIP.strip()
+
+            print ('Please make sure Naocs Mysql data folder %s@%s  exists!!!'%(self.AppInfo['MysqlDataPath'], self.AppInfo['MysqlHostIP']))
+            TmpChoice = raw_input('press any key to continue:')
+
 
 
     def renderTemplate(self):

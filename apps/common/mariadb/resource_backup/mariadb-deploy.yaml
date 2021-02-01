@@ -22,7 +22,6 @@ spec:
         configMap:
           name: mariadb-configmap
       containers:
-#      - image: registry.cn-hangzhou.aliyuncs.com/trsrd/mariadb:4.12 
       - image: {{ MariaDBImage }}
 #      - image: registry.cn-hangzhou.aliyuncs.com/trsrd/mysql:utf8mb4-5.7.27
         imagePullPolicy: IfNotPresent
@@ -38,5 +37,4 @@ spec:
         - mountPath: "/etc/mysql/conf.d/mysql.cnf"
           name: mariadb-conf
       restartPolicy: Always
-      nodeSelector:
-         kubernetes.io/hostname: "{{ MariaDBHostIP }}"
+

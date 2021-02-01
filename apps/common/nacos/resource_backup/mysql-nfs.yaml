@@ -19,7 +19,7 @@ spec:
         ports:
         - containerPort: 3306
         volumeMounts:
-        - name: nacos-mysql-data
+        - name: mysql-data
           mountPath: /var/lib/mysql
         env:
         - name: MYSQL_ROOT_PASSWORD
@@ -31,10 +31,10 @@ spec:
         - name: MYSQL_PASSWORD
           value: "{{ MysqlPassword }}"
       volumes:
-      - name: nacos-mysql-data
-        persistentVolumeClaim:
-          claimName: nacos-mysql-pvc-data
-
+      - name: mysql-data
+        nfs:
+          server: {{ NFSAddr }}
+          path: {{ MysqlDataPath }}
 ---
 apiVersion: v1
 kind: Service
