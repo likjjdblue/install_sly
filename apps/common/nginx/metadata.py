@@ -13,4 +13,7 @@ AppInfo = {
     'HarborAddr': None,
     'NginxImage': 'nginx',
     "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
+    'NginxWCMDataPath': None,
+    'NginxWCMPublishDataPath': None,
+    'NginxMCNDataPath': None,
 }

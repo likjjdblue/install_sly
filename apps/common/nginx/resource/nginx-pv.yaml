@@ -46,3 +46,52 @@ spec:
   nfs:
     path: {{ NginxConfigDataPath }}
     server: {{ NFSAddr }}
+### 20210202   ###
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nginx-pv-mcndata
+spec:
+  capacity:
+    storage: 40Gi
+  volumeMode: Filesystem
+  storageClassName: nginx-pv-mcndata-class
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: {{ NginxMCNDataPath }}
+    server: {{ NFSAddr }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nginx-pv-wcmdata
+spec:
+  capacity:
+    storage: 40Gi
+  volumeMode: Filesystem
+  storageClassName: nginx-pv-wcmdata-class
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: {{ NginxWCMDataPath }}
+    server: {{ NFSAddr }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nginx-pv-wcmpublishdata
+spec:
+  capacity:
+    storage: 40Gi
+  volumeMode: Filesystem
+  storageClassName: nginx-pv-wcmpublishdata-class
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: {{ NginxWCMPublishDataPath }}
+    server: {{ NFSAddr }}

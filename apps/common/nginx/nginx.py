@@ -21,7 +21,9 @@ class NginxTool(object):
     CachedResult = None
 
     def __init__(self, namespace='default', nginxdatapath='nginx-pv-web', nginxlogpath='nginx-pv-log',
-                 nginxconfigpath='nginx-pv-config', nfsinfo={},harbor=None, retrytimes=60):
+                 nginxconfigpath='nginx-pv-config', nginxwcmdatapath='trswcm-pv-data/WCMData',
+                 nginxwcmpublishdatapath='trswcm-pv-data/WCMPubData', nginxmcndatapath='mcn-pv-data/MCNData',
+                 nfsinfo={},harbor=None, retrytimes=60):
 
         namespace = namespace.strip()
         self.RetryTimes = int(retrytimes)
@@ -38,8 +40,27 @@ class NginxTool(object):
         self.AppInfo['NginxLogDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, nginxlogpath]))
         self.AppInfo['NginxConfigDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, nginxconfigpath]))
 
-
         self.AppInfo['Namespace'] = namespace
+
+
+        #### 20210202 ###
+        TmpList = nginxwcmdatapath.split('/')
+        self.AppInfo['NginxWCMDataPath'] = os.path.join(self.AppInfo['NFSBasePath'],
+                                          '-'.join([self.AppInfo['Namespace'], TmpList[0]]), *TmpList[1:])
+
+        TmpList = nginxwcmpublishdatapath.split('/')
+        self.AppInfo['NginxWCMPublishDataPath'] = os.path.join(self.AppInfo['NFSBasePath'],
+                                          '-'.join([self.AppInfo['Namespace'], TmpList[0]]), *TmpList[1:])
+
+
+        TmpList = nginxmcndatapath.split('/')
+        self.AppInfo['NginxMCNDataPath'] = os.path.join(self.AppInfo['NFSBasePath'],
+                                          '-'.join([self.AppInfo['Namespace'], TmpList[0]]), *TmpList[1:])
+
+        #### END ####
+
+
+
 
         self.AppInfo['HarborAddr'] = harbor
         self.k8sObj = k8s_tools.K8SClient()
@@ -67,6 +88,14 @@ class NginxTool(object):
         self.NFSObj.createSubFolder(self.AppInfo['NginxDataPath'])
         self.NFSObj.createSubFolder(self.AppInfo['NginxLogDataPath'])
         self.NFSObj.createSubFolder(self.AppInfo['NginxConfigDataPath'])
+
+        #### 20210202 ####
+        self.NFSObj.createSubFolder(self.AppInfo['NginxWCMDataPath'])
+        self.NFSObj.createSubFolder(self.AppInfo['NginxWCMPublishDataPath'])
+        self.NFSObj.createSubFolder(self.AppInfo['NginxMCNDataPath'])
+
+        #### END #####
+
 
 
 

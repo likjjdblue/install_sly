@@ -36,5 +36,44 @@ spec:
   storageClassName: nginx-pv-config-class
   resources:
      requests:
-       storage: 40Gi       
-
+       storage: 40Gi
+#### 20210202 ####
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nginx-pvc-mcndata
+spec:
+  accessModes:
+     - ReadWriteOnce
+  volumeMode: Filesystem
+  storageClassName: nginx-pv-mcndata-class
+  resources:
+     requests:
+       storage: 40Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nginx-pvc-wcmdata
+spec:
+  accessModes:
+     - ReadWriteOnce
+  volumeMode: Filesystem
+  storageClassName: nginx-pv-wcmdata-class
+  resources:
+     requests:
+       storage: 40Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nginx-pvc-wcmpublishdata
+spec:
+  accessModes:
+     - ReadWriteOnce
+  volumeMode: Filesystem
+  storageClassName: nginx-pv-wcmpublishdata-class
+  resources:
+     requests:
+       storage: 40Gi

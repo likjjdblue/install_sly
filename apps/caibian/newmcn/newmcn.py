@@ -69,6 +69,23 @@ class MCNTool(object):
         self.NFSObj.createSubFolder(self.AppInfo['MCNDataPath'])
         self.NFSObj.createSubFolder(self.AppInfo['MCNLogPath'])
 
+        #### 20210202 ####
+        TmpSubFolders = ['mcn-pv-data/MCNData/upload', 'mcn-pv-data/MCNData/mcndata/mcnpic',
+                        'mcn-pv-data/MCNData/mcndata/mcnvideo', 'mcn-pv-data/MCNData/mcndata/mcnaudio',
+                        ]
+
+        for TmpSubFolder in TmpSubFolders:
+            TmpSubFolder = TmpSubFolder.split()
+            TmpList = TmpSubFolder.split('/')
+
+            TmpTargeFolder = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([self.AppInfo['Namespace'], TmpList[0]]), *TmpList[1:])
+            self.NFSObj.createSubFolder(TmpTargeFolder)
+
+     #### END #####
+
+
+
+
         print ('setup MCN NFS successfully')
 
         return {
@@ -202,8 +219,8 @@ class MCNTool(object):
 
             TmpServiceCheckObj = servicestatecheck.ServiceStateCheckTool(namespace=self.AppInfo['Namespace'],
                                                                          harbor=self.AppInfo['HarborAddr'])
-            TmpCheckResult = TmpServiceCheckObj.checkServicePortState(targetaddress='nginx-svc:80')
-            print ('mcn-svc:9018 is listening....')
+            TmpCheckResult = TmpServiceCheckObj.checkServicePortState(targetaddress='mcn-svc:9000')
+            print ('mcn-svc:9000 is listening....')
 
             print ('Deployment: %s is available;replicas: %s')%(TmpResponse['metadata']['name'],
                                                               str(TmpResponse['status']['replicas']))
@@ -360,9 +377,9 @@ class MCNTool(object):
         print (TmpNginxConfigPath)
         self.SSHClient.ExecCmd('mkdir -p %s' % (TmpNginxConfigPath, ))
 
-        '''self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'tmyimgcenter.conf'),
-                                  remotepath=os.path.join(TmpNginxConfigPath, 'tmyimgcenter.conf')
-                                  )'''
+        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'mcn.conf'),
+                                  remotepath=os.path.join(TmpNginxConfigPath, 'mcn.conf')
+                                  )
 
 
         TmpNginxPods = self.k8sObj.filterNamespacedPod(namespace=self.AppInfo['Namespace'], filters={

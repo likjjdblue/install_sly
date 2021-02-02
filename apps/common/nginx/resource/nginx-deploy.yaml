@@ -24,6 +24,17 @@ spec:
       - name: nginx-data-log
         persistentVolumeClaim:
           claimName: nginx-pvc-log
+#### 20210202  ###
+      - name: nginx-mcn-data
+        persistentVolumeClaim:
+          claimName: nginx-pvc-mcndata
+      - name: nginx-wcm-data
+        persistentVolumeClaim:
+          claimName: nginx-pvc-wcmdata
+      - name: nginx-wcmpublish-data
+        persistentVolumeClaim:
+          claimName: nginx-pvc-wcmpublishdata
+#### END ###
       - name: nginx-config-data
         persistentVolumeClaim:
            claimName: nginx-pvc-config
@@ -48,4 +59,13 @@ spec:
         - mountPath: "/etc/nginx/nginx.conf"
           name: nginx-config
           subPath: nginx.conf
+#### 20210202   ###
+        - mountPath: "/TRS/DATA/WCMData"
+          name: nginx-wcm-data
+        - mountPath: "/TRS/DATA/WCMPubData"
+          name: nginx-wcmpublish-data
+        - mountPath: "/TRS/DATA/MCNData"
+          name: nginx-mcn-data
+
+#### END   ####
       restartPolicy: Always

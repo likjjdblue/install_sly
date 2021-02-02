@@ -21,6 +21,10 @@ spec:
       - name: newmediaplatform-pvc-data
         persistentVolumeClaim:
           claimName: newmediaplatform-pvc-data
+     # hostAliases:
+     # - ip: "10.6.42.1"
+     #   hostnames:
+     #   - "sly.trscd.com.cn"
       containers:
         - name: newmediaplatform
           image: {{ NewMediaPlatformImage }}
