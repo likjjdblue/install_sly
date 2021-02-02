@@ -316,13 +316,25 @@ class TRSWCMTool(object):
         self.SSHClient.ExecCmd('rm -f -r %s/*'%(TmpSQLToolSQLPath,))
 
         print (os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'))
-        print (os.path.join(self.BaseDIRPath, 'downloads', 'mty_wcm.sql'))
+
+        ##### 20210202   ###
+        with open(os.path.join(self.BaseDIRPath, 'downloads', 'mty_wcm.sql'), mode='rb', encoding='utf-8') as f:
+            TmpContent = f.read()
+        TmpContent = jinja2.Template(TmpContent).render(self.AppInfo)
+
+        with open(os.path.join(self.BaseDIRPath, 'tmp', 'mty_wcm.sql'), mode='wb', encoding='utf-8') as f:
+            f.write(TmpContent)
+
+        #####  END   ###
+
+
+        print (os.path.join(self.BaseDIRPath, 'tmp', 'mty_wcm.sql'))
 
         self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'),
                                   remotepath=os.path.join(TmpSQLToolAccountPath, 'account.txt')
                                   )
 
-        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'mty_wcm.sql'),
+        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'tmp', 'mty_wcm.sql'),
                                   remotepath=os.path.join(TmpSQLToolSQLPath, 'mty_wcm.sql')
                                   )
 
