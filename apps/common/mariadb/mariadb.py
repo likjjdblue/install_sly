@@ -77,7 +77,7 @@ class MariaDBTool(object):
         self.AppInfo['MariaDBPassword'] = crypto_tools.generateRandomAlphaNumericString(lenght=10)
 
         if not self.AppInfo['MariaDBHostIP']:
-            TmpIP = raw_input('input IP  Address for MariaDB:')
+            TmpIP = raw_input('input k8s node IP  Address for MariaDB:')
             self.AppInfo['MariaDBHostIP'] = TmpIP.strip()
 
             print ('Please make sure MariaDB data folder %s@%s  exists!!!'%(self.AppInfo['MariaDBDataPath'], self.AppInfo['MariaDBHostIP']))

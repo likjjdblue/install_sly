@@ -79,7 +79,7 @@ class NacosTool(object):
 
 
         if not self.AppInfo['MysqlHostIP']:
-            TmpIP = raw_input('input IP  Address for Nacos Mysql:')
+            TmpIP = raw_input('input k8s node IP  Address for Nacos Mysql:')
             self.AppInfo['MysqlHostIP'] = TmpIP.strip()
 
             print ('Please make sure Naocs Mysql data folder %s@%s  exists!!!'%(self.AppInfo['MysqlDataPath'], self.AppInfo['MysqlHostIP']))

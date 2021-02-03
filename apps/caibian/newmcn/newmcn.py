@@ -75,7 +75,7 @@ class MCNTool(object):
                         ]
 
         for TmpSubFolder in TmpSubFolders:
-            TmpSubFolder = TmpSubFolder.split()
+            TmpSubFolder = TmpSubFolder.strip()
             TmpList = TmpSubFolder.split('/')
 
             TmpTargeFolder = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([self.AppInfo['Namespace'], TmpList[0]]), *TmpList[1:])
