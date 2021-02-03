@@ -237,6 +237,10 @@ class RabbitmqHATool(object):
                                       cmd='rabbitmqctl set_user_tags admin administrator'
                                       )
 
+
+        print ('rabbitmqctl add_user admin %s'%(TmpAdminPassword,))
+        print ('rabbitmqctl set_user_tags admin administrator')
+
         for vhost in self.AppInfo['VHosts']:
             print ('creating Rabbitmq Vhost: '+str(vhost))
             self.k8sObj.execNamespacedPod(namespace=self.AppInfo['Namespace'], name=TmpPod['metadata']['name'],
@@ -244,7 +248,7 @@ class RabbitmqHATool(object):
                                            )
             print ('rabbitmqctl set_permissions -p "%s" "admin" ".*" ".*" ".*"'%(vhost.strip(),))
             tmp=self.k8sObj.execNamespacedPod(namespace=self.AppInfo['Namespace'], name=TmpPod['metadata']['name'],
-                                           cmd="rabbitmqctl set_permissions -p %s admin '.*' '.*' '.*'"%(vhost.strip(),)
+                                           cmd="rabbitmqctl set_permissions -p %s admin  .*  .*  .*"%(vhost.strip(),)
                                            )
             print (tmp['result'])
 
