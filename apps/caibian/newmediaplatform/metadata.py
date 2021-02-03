@@ -10,7 +10,7 @@ AppInfo = {
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
-    'NewMediaPlatformImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/newmediaplatform:v1',
+    'NewMediaPlatformImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/newmediaplatform-deploy:xjzmy-devops-v5.20.1',
     "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
     'NewMediaPlatformDBHost': 'mariadb-svc',
     'NewMediaPlatformDBName': 'new_media_platform',

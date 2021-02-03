@@ -9,7 +9,7 @@ AppInfo = {
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
-    'TransferResourceAIImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/transfer_resource_ai:v1',
+    'TransferResourceAIImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/transfer-resource-ai-deploy:zmy-devops-v1.0.0.4',
     "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
 
     'TransferResourceAIPrimaryDBHost': 'mariadb-svc',
