@@ -344,9 +344,9 @@ class DDCTool(object):
         print (TmpNginxConfigPath)
         self.SSHClient.ExecCmd('mkdir -p %s' % (TmpNginxConfigPath, ))
 
-        '''self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'trswcm.conf'),
-                                  remotepath=os.path.join(TmpNginxConfigPath, 'trswcm.conf')
-                                  )'''
+        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'ddc.conf'),
+                                  remotepath=os.path.join(TmpNginxConfigPath, 'ddc.conf')
+                                  )
 
 
         TmpNginxPods = self.k8sObj.filterNamespacedPod(namespace=self.AppInfo['Namespace'], filters={
