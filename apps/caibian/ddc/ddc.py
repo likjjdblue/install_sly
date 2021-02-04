@@ -183,8 +183,8 @@ class DDCTool(object):
 
             TmpServiceCheckObj = servicestatecheck.ServiceStateCheckTool(namespace=self.AppInfo['Namespace'],
                                                                          harbor=self.AppInfo['HarborAddr'])
-            TmpCheckResult = TmpServiceCheckObj.checkServicePortState(targetaddress='ddc-svc:9998')
-            print ('ddc-svc:9998 is listening....')
+            TmpCheckResult = TmpServiceCheckObj.checkServicePortState(targetaddress='ddc-svc:9016')
+            print ('ddc-svc:9016 is listening....')
 
             print ('Deployment: %s is available;replicas: %s')%(TmpResponse['metadata']['name'],
                                                               str(TmpResponse['status']['replicas']))
