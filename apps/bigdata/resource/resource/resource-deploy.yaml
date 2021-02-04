@@ -58,12 +58,12 @@ spec:
         livenessProbe:
           tcpSocket:
             port: http
-          initialDelaySeconds: 360
+          initialDelaySeconds: 200
           periodSeconds: 10
         readinessProbe:
           tcpSocket:
             port: http
-          initialDelaySeconds: 360
+          initialDelaySeconds: 200
           periodSeconds: 10
         resources:
           limits:
