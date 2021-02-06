@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: callback-deploy
+  labels:
+    app: callback
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: callback
+  template:
+    metadata:
+      labels:
+        app: callback
+    spec:
+     # volumes:
+     # - name: pvc-callbacklog-slytest
+     #   persistentVolumeClaim:
+     #     claimName: callback-pvc-log
+      containers:
+        - name: callback
+          image: {{ CallbackImage }}
+          envFrom:
+             - configMapRef:
+                 name: callback-configmap
+          imagePullPolicy: IfNotPresent
+          #volumeMounts:
+          #- mountPath: /TRS/LOGS/callback
+          #  name: pvc-callbacklog-slytest
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 128Mi

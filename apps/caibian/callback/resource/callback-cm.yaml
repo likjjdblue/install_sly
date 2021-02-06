@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: callback-configmap
+data:
+  # 类属性键；每一个键都映射到一个简单的值
+# 大数据应用公有变量
+  server.port: "8080"
+  spring.redis.masterName: "" 
+  spring.redis.nodes: "redis-svc:6379"
+  spring.redis.pwd: "{{ RedisPassword }}"
+  forwarding.wechat.ticket: "https://sly.trscd.com.cn/NewMediaPlatform/wechat/event"
+  forwarding.wechat.callback: "https://sly.trscd.com.cn/NewMediaPlatform/wechat/{appId}/callback"

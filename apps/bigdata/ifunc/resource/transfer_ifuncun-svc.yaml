@@ -1,0 +1,17 @@
+---
+# Source: transfer-ifuncun/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: transfer-ifuncun-svc
+  labels:
+    app: transfer-ifuncun
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8881
+    targetPort: 8881
+    protocol: TCP
+    name: http
+  selector:
+    app: transfer-ifuncun
