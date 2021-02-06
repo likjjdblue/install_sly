@@ -11,7 +11,7 @@ TmpNFS = nfsinfo
 TmpNamespace = namespace
 
 APPMap = {
-    '1': 'apps.common.kafka/KafkaTool',
+    '1': 'apps.common.zookeeper/ZookeeperTool',
     '2': 'apps.common.mariadb/MariaDBTool',
     '3': 'apps.common.mongodb/MongodbTool',
     '4': 'apps.common.nacos/NacosTool',
@@ -19,7 +19,7 @@ APPMap = {
     '6': 'apps.common.rabbitmqha/RabbitmqHATool',
     '7': 'apps.common.redis/RedisTool',
     '8': 'apps.common.redisha/RedisHATool',
-    '9': 'apps.common.zookeeper/ZookeeperTool',
+    '9': 'apps.common.kafka/KafkaTool',
     '10': 'apps.trs.trsids/TRSIDSTool',
     '11': 'apps.trs.ckm/CKMTool',
     '12':  'apps.caibian.ddc/DDCTool',
@@ -53,11 +53,13 @@ APPMap = {
     '40':  'apps.caibian.newmediaplatform/NewMediaPlatformTool',
     '41': 'apps.bigdata.screendataaccess/ScreenDataAccessTool',
     '42': 'apps.bigdata.wcmbigscreenserver/WCMBigScreenServerTool',
+    '43': 'apps.caibian.callback/CallbackTool',
+    '44': 'apps.bigdata.ifunc/iFuncTool',
 }
 
 
 def showMenu():
-    for i in range(1,43):
+    for i in range(1,len(APPMap)+1):
         TmpAppName = APPMap[str(i)].split('/')[1].replace('Tool', '')
         print ('%s : install %s')%(str(i),TmpAppName )
     print ('0 : quit')
