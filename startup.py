@@ -56,6 +56,8 @@ APPMap = {
     '42': 'apps.bigdata.wcmbigscreenserver/WCMBigScreenServerTool',
     '43': 'apps.caibian.callback/CallbackTool',
     '44': 'apps.bigdata.ifunc/iFuncTool',
+    '45': 'apps.trs.hybase/TRSHyBaseTool',
+    '46': 'apps.trs.ckm6/TRSCKM6Tool',
 }
 
 

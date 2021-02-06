@@ -1,0 +1,11 @@
+#将k8s集群外的服务纳入k8s集群中
+apiVersion: v1
+kind: Endpoints
+metadata:
+  name: ckm6-svc
+subsets:
+  - addresses:
+    - ip: {{ Ckm6IP }}
+    ports:
+    - port: 8001
+      protocol: TCP

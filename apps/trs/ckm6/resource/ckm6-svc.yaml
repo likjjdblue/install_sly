@@ -1,0 +1,10 @@
+#注册服务，不带选择器，所以手动创建一个和改service同名的Endpoint，用户指向后端访问地址
+apiVersion: v1
+kind: Service
+metadata:
+  name: ckm6-svc
+spec:
+  ports:
+  - port: 8001
+    targetPort: 8001
+    protocol: TCP

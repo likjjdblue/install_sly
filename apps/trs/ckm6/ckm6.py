@@ -18,7 +18,7 @@ from pprint import pprint
 from codecs import open as open
 import importlib
 
-class TRSHyBaseTool(object):
+class TRSCKM6Tool(object):
     def __init__(self, namespace='default', nfsinfo={},
                  harbor=None, retrytimes=10, *args, **kwargs):
 
@@ -73,8 +73,8 @@ class TRSHyBaseTool(object):
         self.AppInfo['NFSProvisionerImage'] =replaceDockerRepo(self.AppInfo['NFSProvisionerImage'],
                                                                self.AppInfo['HarborAddr'])
 
-        if not self.AppInfo['HyBaseIP']:
-            self.AppInfo['HyBaseIP'] = raw_input('input hybase IP Address(e.g 192.168.200.17): ')
+        if not self.AppInfo['Ckm6IP']:
+            self.AppInfo['Ckm6IP'] = raw_input('input CKM6 IP Address(e.g 192.168.200.17): ')
 
 
 
@@ -139,10 +139,10 @@ class TRSHyBaseTool(object):
 
 
 
-        self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'hybase-endpoint.yaml'),
+        self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'ckm6-endpoint.yaml'),
                                                namespace=self.AppInfo['Namespace']
                                                )
-        self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'hybase-svc.yaml'),
+        self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'ckm6-svc.yaml'),
                                                namespace=self.AppInfo['Namespace']
                                                )
 
@@ -278,7 +278,7 @@ class TRSHyBaseTool(object):
 
 
 if __name__ == "__main__":
-    tmp = TRSHyBaseTool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.168', port=1022, username='root', password='!QAZ2wsx1234',
+    tmp = TRSCKM6Tool(namespace='sly2', nfsinfo=dict(hostname='192.168.200.168', port=1022, username='root', password='!QAZ2wsx1234',
                          basepath='/TRS/DATA'))
 
     print (tmp.start())
