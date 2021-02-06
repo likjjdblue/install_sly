@@ -2,6 +2,7 @@
 # -*- encoding: utf-8 -*-
 import sys, os
 import importlib
+import re
 sys.path.append('.')
 
 import apps
@@ -75,25 +76,84 @@ def installApps(TmpRawStr):
     print (TmpResponse)
     return TmpResponse
 
+
+
+def parseChoice(choice):
+    AutoQuit = False
+    choice = choice.strip()
+    TmpTargeList = []
+    TmpList = choice.split(',')
+
+    for tmp in TmpList:
+        tmp = tmp.strip()
+        if tmp in APPMap:
+            TmpTargeList.append(tmp)
+        elif '-' in tmp:
+            TmpReObj = re.search(r'^(\d+)\s*-\s*(\d+)$', tmp)
+            if not TmpReObj:
+                print ('invalid choice %s'%(tmp, ))
+                continue
+
+            MinInt = TmpReObj.group(1)
+            MaxInt = TmpReObj.group(2)
+
+            if MinInt == '0':
+                AutoQuit = True
+
+            MinInt = max(1, int(MinInt))
+            MaxInt = min(len(APPMap) + 1, int(MaxInt))
+
+            if int(MinInt) > int(MaxInt):
+                print ('invalid choice %s'%(tmp, ))
+                continue
+
+            TmpTargeList += [str(_) for _ in range(int(MinInt), int(MaxInt) + 1)]
+
+        elif tmp =='0':
+            AutoQuit = True
+        else:
+            print ('invalid choice %s' % (tmp,))
+
+    TmpTargeList = list(set(TmpTargeList))
+    TmpTargeList = [int(x) for x in TmpTargeList]
+    TmpTargeList.sort()
+    TmpTargeList = [str(x) for x in TmpTargeList ]
+
+    if AutoQuit:
+        TmpTargeList.append('0')
+
+    print ('Final choice: '+str(TmpTargeList))
+    return TmpTargeList
+
+
+
+def applyChoice(choice):
+    choice = choice.strip()
+
+    if choice == '0':
+        exit(0)
+
+    TmpResponse = installApps(APPMap[choice])
+    if TmpResponse['ret_code'] != 0:
+        print ('failed to install %s' % (APPMap[choice],))
+        exit (1)
+
+
+
 def runMenu():
     while True:
         showMenu()
-        choice = raw_input('input number: ')
-        choice = choice.strip()
-        if choice not in  APPMap and choice != '0':
-            print ('invalid number,retry....')
-            continue
+        TmpChoice = raw_input('input number: ')
+        TmpChoiceList = parseChoice(TmpChoice)
 
-        if choice == '0':
-             break
-
-        TmpResponse = installApps(APPMap[choice])
-        if TmpResponse['ret_code'] != 0:
-            print ('failed to install %s'%(APPMap[choice], ))
-            break
+        for choice in TmpChoiceList:
+            print ('current choice: %s\n\n'%(choice))
+            applyChoice(choice)
 
 
-runMenu()
+if __name__ == '__main__':
+    runMenu()
+
 
 
 
