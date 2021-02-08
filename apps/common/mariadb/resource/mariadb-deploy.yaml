@@ -35,7 +35,7 @@ spec:
         volumeMounts:
         - mountPath: "/var/lib/mysql"
           name: mariadb-data
-        - mountPath: "/etc/mysql/conf.d/mysql.cnf"
+        - mountPath: "/etc/mysql/conf.d"
           name: mariadb-conf
       restartPolicy: Always
       nodeSelector:

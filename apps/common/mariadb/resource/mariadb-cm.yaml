@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: mariadb-configmap
 data:
-  my.conf: |-
+  my.cnf: |-
     [mysqld]
     slow-query-log = on   #打开慢查询
     slow-query-log-file = /var/lib/mysql/mysql-slow.log
