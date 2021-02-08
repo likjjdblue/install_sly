@@ -9,7 +9,7 @@ AppInfo = {
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
-    'MariaDBImage': 'registry.cn-hangzhou.aliyuncs.com/trsrd/mariadb:10.4.12-utf8mb4-general_ci',
+    'MariaDBImage': 'registry.cn-hangzhou.aliyuncs.com/trsrd/mariadb:10.4.17',
     "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
     "MariaDBPassword": None,
     "MariaDBHostIP": None,

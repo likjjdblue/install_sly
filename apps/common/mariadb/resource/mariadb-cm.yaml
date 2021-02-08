@@ -13,12 +13,13 @@ data:
     wait_timeout=28800000
     max_allowed_packet=500M
     max_connections=1000 #最大连接数
-    #binlog_format=row
-    #expire_logs_days = 7
+    binlog_format=row
+    expire_logs_days = 7
     skip-name-resolve  #跳过域名解析
-    #innodb_buffer_pool_size = 2G
-    #innodb_log_file_size = 256M
-    ibdata1:12M:autoextend
+    innodb_buffer_pool_size = 2G
+    innodb_log_file_size = 256M
+    character-set-server=utf8mb4
+    #ibdata1:12M:autoextend
     #zabbix
     #innodb_log_buffer_size = 256M
     #innodb_file_per_table = 1
