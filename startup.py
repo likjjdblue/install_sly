@@ -58,6 +58,7 @@ APPMap = {
     '44': 'apps.bigdata.ifunc/iFuncTool',
     '45': 'apps.trs.hybase/TRSHyBaseTool',
     '46': 'apps.trs.ckm6/TRSCKM6Tool',
+    '47': 'apps.common.elasticsearchha/ElasticsearchHATool',
 }
 
 
