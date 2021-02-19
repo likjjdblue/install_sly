@@ -3,7 +3,8 @@ kind: ConfigMap
 metadata:
   name: mlfsearch-configmap
 data:
-  es.dataSource.url: "http://elasticsearch-elasticsearch-coordinating-only:9200"
+  server.port: "9009"
+  es.dataSource.url: "http://elasticsearch-svc:9200"
   es.search.showSearchQuery: "true"
   es.index: "trs_mlf_log"
   es.index.type: "_doc"

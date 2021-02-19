@@ -292,12 +292,15 @@ class ElasticsearchHATool(object):
 
         #TmpServiceNodePort = int(TmpResponse['spec']['ports'][0]['node_port'])
         TmpServiceNodePortList = TmpResponse['spec']['ports']
+        print (TmpServiceNodePortList)
 
         TmpServiceNodePort = None
         for _ in TmpServiceNodePortList:
             if _['port'] == 9200:
                 TmpServiceNodePort = _['node_port']
                 break
+            else:
+                print (_)
 
         return int(TmpServiceNodePort)
 

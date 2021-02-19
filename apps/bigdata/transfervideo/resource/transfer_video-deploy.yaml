@@ -37,7 +37,7 @@ spec:
             name: transfer-video-configmap
         imagePullPolicy: IfNotPresent
         volumeMounts:
-        - mountPath: /TRS/DATA/transfer-video/logs
+        - mountPath: /TRS/DATA/
           name: transfer-video-pvc-log
        # ports:
        #   - name: http

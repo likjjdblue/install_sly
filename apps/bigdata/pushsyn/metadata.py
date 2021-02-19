@@ -10,7 +10,7 @@ AppInfo = {
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
 
-    'PushSynImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/push-syn:v1',
+    'PushSynImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/push-syn-deploy:zmy-devops-v2.21.1',
     "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
 
     'PushSynPrimaryDBHost': 'mariadb-svc',

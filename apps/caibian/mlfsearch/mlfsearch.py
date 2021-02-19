@@ -340,9 +340,9 @@ class MLFSearchTool(object):
         print (TmpNginxConfigPath)
         self.SSHClient.ExecCmd('mkdir -p %s' % (TmpNginxConfigPath, ))
 
-        '''self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'tmyimgcenter.conf'),
-                                  remotepath=os.path.join(TmpNginxConfigPath, 'tmyimgcenter.conf')
-                                  )'''
+        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'mlfsearch.conf'),
+                                  remotepath=os.path.join(TmpNginxConfigPath, 'mlfsearch.conf')
+                                  )
 
 
         TmpNginxPods = self.k8sObj.filterNamespacedPod(namespace=self.AppInfo['Namespace'], filters={

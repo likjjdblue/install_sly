@@ -10,7 +10,7 @@ AppInfo = {
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
 
-    'PropagationServerImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/propagation-server:v2',
+    'PropagationServerImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/propagation-server-deploy:zmy-devops-v2.21.1',
     "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
 
     'PropagationServerPrimaryDBHost': 'mariadb-svc',

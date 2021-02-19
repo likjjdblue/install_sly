@@ -37,7 +37,7 @@ spec:
             name: transfer-resource-ai-configmap
         imagePullPolicy: IfNotPresent
         volumeMounts:
-        - mountPath: /TRS/DATA/transfer-resource-ai/logs
+        - mountPath: /TRS/DATA/
           name: transfer-resource-ai-pvc-log
        # ports:
        #   - name: http

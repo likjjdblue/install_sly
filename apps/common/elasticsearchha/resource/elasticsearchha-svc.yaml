@@ -17,4 +17,4 @@ spec:
   selector:
     app: elasticsearch-master
     release: elasticsearch
-  type: ClusterIP
+  type: NodePort

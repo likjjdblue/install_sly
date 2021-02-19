@@ -11,5 +11,5 @@ AppInfo = {
     'HarborAddr': None,
     'MLFSearchImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/mlfsearch:v1',
     "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
-    'dependences': ['apps.common.nginx/NginxTool', ]
+    'dependences': ['apps.common.nginx/NginxTool', 'apps.common.elasticsearchha/ElasticsearchHATool']
 }
