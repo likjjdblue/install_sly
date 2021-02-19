@@ -1,0 +1,52 @@
+---
+# Source: interaction-task/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: interaction-task-svc
+  labels:
+    app: interaction-task
+    chart: "interaction-task-1.0.0"
+    release: "interaction-task"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9999 
+      targetPort: 9999
+      protocol: TCP
+      name: http9999
+    - port: 2050
+      targetPort: 2050
+      protocol: TCP
+      name: http2050
+    - port: 7778
+      targetPort: 7778
+      protocol: TCP
+      name: http7778
+    - port: 7781
+      targetPort: 7781
+      protocol: TCP
+      name: http7781
+    - port: 7782
+      targetPort: 7782
+      protocol: TCP
+      name: http7782
+    - port: 7783
+      targetPort: 7783
+      protocol: TCP
+      name: http7783
+    - port: 7780
+      targetPort: 7780
+      protocol: TCP
+      name: http7780
+    - port: 7779
+      targetPort: 7779
+      protocol: TCP
+      name: http7779
+    - port: 7777
+      targetPort: 7777
+      protocol: TCP
+      name: http7777
+  selector:
+    app: interaction-task
+    release: "interaction-task"

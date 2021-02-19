@@ -59,6 +59,8 @@ APPMap = {
     '45': 'apps.trs.hybase/TRSHyBaseTool',
     '46': 'apps.trs.ckm6/TRSCKM6Tool',
     '47': 'apps.common.elasticsearchha/ElasticsearchHATool',
+    '48': 'apps.bigdata.interactiontask/InteractionTaskTool',
+    '49': 'apps.bigdata.interactionservicecenter/InteractionServiceCenterTool',
 }
 
 

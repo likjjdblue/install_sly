@@ -1,0 +1,62 @@
+# Source: interaction-task/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: interaction-task-deploy
+  labels:
+    app: interaction-task
+    chart: "interaction-task-1.0.0"
+    release: "interaction-task"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: interaction-task
+      release: "interaction-task"
+  template:
+    metadata:
+      labels:
+        app: interaction-task
+        release: "interaction-task"
+    spec:
+     # nodeSelector:
+     #   kubernetes.io/hostname: 192.168.200.94
+      volumes:
+      - name: interaction-task-pvc-log
+        persistentVolumeClaim:
+          claimName: interaction-task-pvc-log
+     # hostAliases:
+     # - ip: "10.6.42.1"
+     #   hostnames:
+     #   - "nginx.nyrb-test.com"
+      containers:
+      - name: interaction-task
+        image: {{ InteractionTaskImage }}
+        envFrom:
+        - configMapRef:
+            name: interaction-task-configmap
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - mountPath: /TRS/DATA/interaction-task/logs
+          name: interaction-task-pvc-log
+       # ports:
+       #   - name: http
+       #     containerPort: 8090
+       #     protocol: TCP
+       # livenessProbe:
+       #   tcpSocket:
+       #     port: http
+       #   initialDelaySeconds: 60
+       #   periodSeconds: 10
+       # readinessProbe:
+       #   tcpSocket:
+       #     port: http
+       #   initialDelaySeconds: 60
+       #   periodSeconds: 10
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+          requests:
+            cpu: 100m
+            memory: 256Mi

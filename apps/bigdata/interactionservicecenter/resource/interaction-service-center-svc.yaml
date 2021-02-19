@@ -1,0 +1,52 @@
+---
+# Source: interaction-service-center/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: interaction-service-center-svc
+  labels:
+    app: interaction-service-center
+    chart: "interaction-service-center-1.0.0"
+    release: "interaction-service-center"
+spec:
+  type: ClusterIP
+  ports:
+    - port: 9998
+      targetPort: 9998
+      protocol: TCP
+      name: http9998
+#    - port: 2050
+#      targetPort: 2050
+#      protocol: TCP
+#      name: http2050
+#    - port: 7778
+#      targetPort: 7778
+#      protocol: TCP
+#      name: http7778
+#    - port: 7781
+#      targetPort: 7781
+#      protocol: TCP
+#      name: http7781
+#    - port: 7782
+#      targetPort: 7782
+#      protocol: TCP
+#      name: http7782
+#    - port: 7783
+#      targetPort: 7783
+#      protocol: TCP
+#      name: http7783
+#    - port: 7780
+#      targetPort: 7780
+#      protocol: TCP
+#      name: http7780
+#    - port: 7779
+#      targetPort: 7779
+#      protocol: TCP
+#      name: http7779
+#    - port: 7777
+#      targetPort: 7777
+#      protocol: TCP
+#      name: http7777
+  selector:
+    app: interaction-service-center
+    release: "interaction-service-center"
