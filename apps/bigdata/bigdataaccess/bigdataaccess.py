@@ -78,8 +78,11 @@ class BigdataAccessTool(object):
         self.AppInfo['BigdataAccessImage'] = replaceDockerRepo(self.AppInfo['BigdataAccessImage'], self.AppInfo['HarborAddr'])
         self.AppInfo['NFSProvisionerImage'] =replaceDockerRepo(self.AppInfo['NFSProvisionerImage'],
                                                                self.AppInfo['HarborAddr'])
+
+        '''
         if not self.AppInfo['BigdataAccessDBPassword']:
             self.AppInfo['BigdataAccessDBPassword'] = crypto_tools.generateRandomAlphaNumericString(lenght=10)
+        '''
 
 
     def renderTemplate(self):
@@ -266,6 +269,8 @@ class BigdataAccessTool(object):
                 self.AppInfo['TRSRedisPassword'] = TmpInfo['RedisStandAlonePassword']
             elif TmpClsName == 'RabbitmqHATool':
                 self.AppInfo['TRSMQPassword'] = crypto_tools.DecodeBase64(TmpInfo['RabbitmqPassword'])
+            elif TmpClsName == 'TmyDecisionCenterTool':
+                self.AppInfo['BigdataAccessDBPassword'] = TmpInfo['TmyDecisionCenterPrimaryDBPassword']
 
         return {
             'ret_code': 0,
