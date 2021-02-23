@@ -63,7 +63,8 @@ class NFSTool(object):
 
         print ('Setup NFS .....')
         self.SSHClient.ExecCmd('mkdir -p %s'%(basedir,))
-        self.SSHClient.ExecCmd('chown nfsnobody:nfsnobody  %s'%(basedir,))
+        #self.SSHClient.ExecCmd('chown nfsnobody:nfsnobody  %s'%(basedir,))
+        self.SSHClient.ExecCmd('chmod -R 777  %s'%(basedir,))
         self.SSHClient.ExecCmd('touch /etc/exports')
 
         try:
@@ -80,7 +81,7 @@ class NFSTool(object):
                     break
 
             if not TmpMatched:
-                TmpFileContent += '\n' + '%s     %s\n'%(basedir, '*(rw,sync,no_root_squash,no_subtree_check)')
+                TmpFileContent += '\n' + '%s     %s\n'%(basedir, '*(rw,no_root_squash,sync)')
                 self.SSHClient.writeRemoteFile(filename='/etc/exports', data=TmpFileContent)
 
             print ('Restart NFS server...')
