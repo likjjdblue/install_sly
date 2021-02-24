@@ -5,7 +5,7 @@ metadata:
 data:
   # 类属性键；每一个键都映射到一个简单的值
 # 大数据应用公有变量
-  spring.datasource.url: "jdbc:mysql://mariadb-svc:3306/tmy_decision_center"
+  spring.datasource.url: "jdbc:mysql://mariadb-svc:3306/tmy_decision_center?useSSL=false&serverTimezone=GMT%2B8&useUnicode=true&characterEncoding=UTF-8"
   spring.datasource.username: "decisioncenter"
   spring.datasource.password: "{{ TmyDecisionCenterPrimaryDBPassword }}"
   spring.cloud.nacos.config.namespace: "8953ca45-4cfb-469a-bc55-7e3bce569994"
