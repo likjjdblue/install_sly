@@ -19,6 +19,7 @@ data:
     innodb_buffer_pool_size = 2G
     innodb_log_file_size = 256M
     character-set-server=utf8mb4
+    collation-server=utf8mb4_general_ci
     #ibdata1:12M:autoextend
     #zabbix
     #innodb_log_buffer_size = 256M
@@ -27,7 +28,6 @@ data:
     #innodb_file_format = Barracuda
     #innodb_strict_mode = 0
     [client]
-    default-character-set=utf8
+    default-character-set=utf8mb4
     [mysql]
-    default-character-set=utf8
-
+    default-character-set=utf8mb4
