@@ -33,7 +33,7 @@ spec:
         ports:
         - containerPort: 3306
         volumeMounts:
-        - mountPath: "/var/lib/mysql"
+        - mountPath: "/TRS/DBData/MariaDB"
           name: mariadb-data
         - mountPath: "/etc/mysql/conf.d"
           name: mariadb-conf
