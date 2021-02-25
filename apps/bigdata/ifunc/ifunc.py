@@ -351,12 +351,12 @@ class iFuncTool(object):
         print (TmpNginxConfigPath)
         self.SSHClient.ExecCmd('mkdir -p %s' % (TmpNginxConfigPath, ))
 
-        '''
-        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'metasearch.conf'),
-                                  remotepath=os.path.join(TmpNginxConfigPath, 'metasearch.conf')
+
+        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'ifunc.conf'),
+                                  remotepath=os.path.join(TmpNginxConfigPath, 'ifunc.conf')
                                   )
 
-        '''
+
 
         TmpNginxPods = self.k8sObj.filterNamespacedPod(namespace=self.AppInfo['Namespace'], filters={
             "run": "nginx"
