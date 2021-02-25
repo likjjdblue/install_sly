@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'nacos',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'MysqlDataPath': None,
     'NacosDataPath': None,
     'Namespace': None,
