@@ -30,11 +30,11 @@ spec:
             - name: PROVISIONER_NAME
               value: fuseim.pri/ifs
             - name: NFS_SERVER
-              value: {{ NFSAddr }}
+              value: {{ DataStorageAddr }}
             - name: NFS_PATH
               value: {{ NFSDataPath }}
       volumes:
         - name: nfs-client-root
           nfs:
-            server: {{ NFSAddr }}
+            server: {{ DataStorageAddr }}
             path: {{ NFSDataPath }}

@@ -3,7 +3,7 @@
 
 import sys, os
 sys.path.append('../../..')
-from apps.common import nfs, nfsprovisioner, servicestatecheck
+from apps.common import nfsprovisioner, servicestatecheck
 from tools import k8s_tools
 from metadata import AppInfo
 from copy import deepcopy
@@ -17,6 +17,9 @@ from tools import k8s_tools
 from pprint import pprint
 from codecs import open as open
 from ESScript import  ESMetaData
+from storagenode import datastoragenode, logstoragenode
+from apps.storage import getClsObj
+
 
 def sendHttpRequest(host='127.0.0.1', port=9200, url='/', method='GET', body={}, header={}):
     #### 调用特定的 web API,并获取结果 ###
@@ -42,27 +45,28 @@ def sendHttpRequest(host='127.0.0.1', port=9200, url='/', method='GET', body={},
 class ElasticsearchHATool(object):
     CachedResult = None
 
-    def __init__(self, namespace='default', nfsinfo={},elasticsearchdatapath='nfs-provisioner',harbor=None, retrytimes=60):
+    def __init__(self, namespace='default', elasticsearchdatapath='nfs-provisioner',harbor=None, retrytimes=60):
 
         namespace = namespace.strip()
         self.RetryTimes = int(retrytimes)
-        self.NFSAddr = nfsinfo['hostname']
-        self.NFSPort = nfsinfo['port']
-        self.NFSUsername = nfsinfo['username']
-        self.NFSPassword = nfsinfo['password']
-        self.NFSBasePath = nfsinfo['basepath']
         self.AppInfo = deepcopy(AppInfo)
 
-        self.AppInfo['NFSAddr'] = self.NFSAddr
-        self.AppInfo['NFSBasePath'] = self.NFSBasePath
+        self.AppInfo['DataStorageAddr'] = datastoragenode['hostname']
+        self.AppInfo['DataStorageBasePath'] = datastoragenode['basepath']
+        self.AppInfo['LogStorageAddr'] = logstoragenode['hostname']
+        self.AppInfo['LogStorageBasePath'] = logstoragenode['basepath']
+
+
+
         self.AppInfo['Namespace'] = namespace
-        self.AppInfo['ElasticsearchDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, elasticsearchdatapath]))
+        self.AppInfo['ElasticsearchDataPath'] = os.path.join(self.AppInfo['DataStorageBasePath'], '-'.join([namespace, elasticsearchdatapath]))
         self.AppInfo['ProvisionerPath'] = elasticsearchdatapath
 
         self.AppInfo['HarborAddr'] = harbor
         self.k8sObj = k8s_tools.K8SClient()
 
-        self.NFSObj = nfs.NFSTool(**nfsinfo)
+        self.DataStorageObj = getClsObj(datastoragenode['type'])(**datastoragenode)
+        self.LogStorageObj = getClsObj(logstoragenode['type'])(**logstoragenode)
 
         TmpCWDPath = os.path.abspath(__file__)
         TmpCWDPath = os.path.dirname(TmpCWDPath)
@@ -72,14 +76,14 @@ class ElasticsearchHATool(object):
             print ('load from file....')
             self.AppInfo = deepcopy(self.getValues())
 
-    def setupNFS(self):
-        TmpResponse = self.NFSObj.installNFS(basedir=self.AppInfo['NFSBasePath'])
+    def setupStorage(self):
+        TmpResponse = self.DataStorageObj.installStorage(basedir=self.AppInfo['DataStorageBasePath'])
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
 
-        print ('create Elasticsearch HA NFS successfully')
-        self.NFSObj.createSubFolder(self.AppInfo['ElasticsearchDataPath'])
+        print ('create Elasticsearch HA Storage successfully')
+        self.DataStorageObj.createSubFolder(self.AppInfo['ElasticsearchDataPath'])
 
 
         return {
@@ -147,15 +151,8 @@ class ElasticsearchHATool(object):
             return TmpResponse
 
         print ('setup  NFS provisioner for %s'%(self.AppInfo['AppName'], ))
-        TmpNFSInfo={
-            'hostname': self.NFSAddr,
-            'port': self.NFSPort,
-            'username': self.NFSUsername,
-            'password': self.NFSPassword,
-            'basepath': self.NFSBasePath,
-        }
 
-        TmpNFSProvisionser = nfsprovisioner.NFSProvisionerTool(nfsinfo=TmpNFSInfo, namespace=self.AppInfo['Namespace'],
+        TmpNFSProvisionser = nfsprovisioner.NFSProvisionerTool(namespace=self.AppInfo['Namespace'],
                                                                nfsdatapath=self.AppInfo['ProvisionerPath'],
                                                                harbor=self.AppInfo['HarborAddr']
                                                                )
@@ -239,7 +236,7 @@ class ElasticsearchHATool(object):
             print ('Using cached result')
             return ElasticsearchHATool.CachedResult
 
-        TmpResponse = self.setupNFS()
+        TmpResponse = self.setupStorage()
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
@@ -273,7 +270,8 @@ class ElasticsearchHATool(object):
 
 
     def close(self):
-        self.NFSObj.close()
+        self.DataStorageObj.close()
+        self.LogStorageObj.close()
 
 
 
