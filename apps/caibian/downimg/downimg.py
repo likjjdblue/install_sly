@@ -3,7 +3,7 @@
 
 import sys, os
 sys.path.append('../../..')
-from apps.common import nfs, nfsprovisioner, sqltool, servicestatecheck
+from apps.common import nfsprovisioner, sqltool, servicestatecheck
 from tools import k8s_tools, ssh_tools
 from metadata import AppInfo
 from copy import deepcopy
@@ -17,38 +17,41 @@ from tools import k8s_tools
 from pprint import pprint
 from codecs import open as open
 import importlib
+from storagenode import datastoragenode, logstoragenode
+from apps.storage import getClsObj
+
 
 class DownImgTool(object):
     def __init__(self, namespace='default', downimgdatapath='trswcm-pv-data/WCMData/webpic', downimglogdata='tmyimgcenter-pv-log' ,
-                 nfsinfo={}, harbor=None, retrytimes=60, *args, **kwargs):
+                 harbor=None, retrytimes=60, *args, **kwargs):
 
         namespace = namespace.strip()
         kwargs['namespace'] = namespace
-        kwargs['nfsinfo'] = nfsinfo
         kwargs['harbor'] = harbor
         self.kwargs = kwargs
 
         self.RetryTimes = int(retrytimes)
-        self.NFSAddr = nfsinfo['hostname']
-        self.NFSPort = nfsinfo['port']
-        self.NFSUsername = nfsinfo['username']
-        self.NFSPassword = nfsinfo['password']
-        self.NFSBasePath = nfsinfo['basepath']
         self.AppInfo = deepcopy(AppInfo)
 
-        self.AppInfo['NFSAddr'] = self.NFSAddr
-        self.AppInfo['NFSBasePath'] = self.NFSBasePath
+        self.AppInfo['DataStorageAddr'] = datastoragenode['hostname']
+        self.AppInfo['DataStorageBasePath'] = datastoragenode['basepath']
+        self.AppInfo['LogStorageAddr'] = logstoragenode['hostname']
+        self.AppInfo['LogStorageBasePath'] = logstoragenode['basepath']
+
+
 
         TmpdownimgdatapathList = downimgdatapath.split('/')
-        self.AppInfo['DownImgDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, TmpdownimgdatapathList[0]]), *TmpdownimgdatapathList[1])
-        self.AppInfo['DownImgLogPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, downimglogdata]))
+        self.AppInfo['DownImgDataPath'] = os.path.join(self.AppInfo['DataStorageBasePath'], '-'.join([namespace, TmpdownimgdatapathList[0]]), *(TmpdownimgdatapathList[1:]))
+        self.AppInfo['DownImgLogPath'] = os.path.join(self.AppInfo['LogStorageBasePath'], '-'.join([namespace, downimglogdata]))
         self.AppInfo['Namespace'] = namespace
 
         self.AppInfo['HarborAddr'] = harbor
         self.k8sObj = k8s_tools.K8SClient()
 
-        self.NFSObj = nfs.NFSTool(**nfsinfo)
-        self.SSHClient = ssh_tools.SSHTool(**nfsinfo)
+
+        self.DataStorageObj = getClsObj(datastoragenode['type'])(**datastoragenode)
+        self.LogStorageObj = getClsObj(logstoragenode['type'])(**logstoragenode)
+
 
         self.DependencyDict ={}
         TmpCWDPath = os.path.abspath(__file__)
@@ -59,17 +62,22 @@ class DownImgTool(object):
             print ('load from file....')
             self.AppInfo = deepcopy(self.getValues())
 
-    def setupNFS(self):
-        TmpResponse = self.NFSObj.installNFS(basedir=self.AppInfo['NFSBasePath'])
+    def setupStorage(self):
+        TmpResponse = self.DataStorageObj.installStorage(basedir=self.AppInfo['DataStorageBasePath'])
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
-        print ('create Down Img NFS successfully')
 
-        self.NFSObj.createSubFolder(self.AppInfo['DownImgDataPath'])
-        self.NFSObj.createSubFolder(self.AppInfo['DownImgLogPath'])
+        TmpResponse = self.LogStorageObj.installStorage(basedir=self.AppInfo['LogStorageBasePath'])
+        if TmpResponse['ret_code'] != 0:
+            return TmpResponse
 
-        print ('setup Down Img NFS successfully')
+        print ('create Down Img Storage successfully')
+
+        self.DataStorageObj.createSubFolder(self.AppInfo['DownImgDataPath'])
+        self.LogStorageObj.createSubFolder(self.AppInfo['DownImgLogPath'])
+
+        print ('setup Down Img Storage successfully')
 
         return {
             'ret_code': 0,
@@ -213,7 +221,7 @@ class DownImgTool(object):
         }
 
     def start(self):
-        TmpResponse = self.setupNFS()
+        TmpResponse = self.setupStorage()
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
@@ -295,29 +303,29 @@ class DownImgTool(object):
             f.write('%s %s %s'%(self.AppInfo['DownImgDBName'], self.AppInfo['DownImgDBUser'], self.AppInfo['DownImgDBPassword'])+'\n')
 
         TmpSQLToolAccountPath = '-'.join([self.AppInfo['Namespace'], 'sqltool-pv-account'])
-        TmpSQLToolAccountPath = os.path.realpath(os.path.join(self.AppInfo['NFSBasePath'], TmpSQLToolAccountPath))
+        TmpSQLToolAccountPath = os.path.realpath(os.path.join(self.AppInfo['DataStorageBasePath'], TmpSQLToolAccountPath))
         TmpSQLToolSQLPath = '-'.join([self.AppInfo['Namespace'], 'sqltool-pv-sql'])
-        TmpSQLToolSQLPath = os.path.realpath(os.path.join(self.AppInfo['NFSBasePath'], TmpSQLToolSQLPath))
+        TmpSQLToolSQLPath = os.path.realpath(os.path.join(self.AppInfo['DataStorageBasePath'], TmpSQLToolSQLPath))
 
         print (TmpSQLToolAccountPath)
         print (TmpSQLToolSQLPath)
 
-        self.SSHClient.ExecCmd('mkdir -p %s'%(TmpSQLToolSQLPath, ))
-        self.SSHClient.ExecCmd('mkdir -p %s'%(TmpSQLToolAccountPath, ))
+        self.DataStorageObj.ExecCmd('mkdir -p %s'%(TmpSQLToolSQLPath, ))
+        self.DataStorageObj.ExecCmd('mkdir -p %s'%(TmpSQLToolAccountPath, ))
 
 
 
-        self.SSHClient.ExecCmd('rm -f -r %s/*'%(TmpSQLToolAccountPath, ))
-        self.SSHClient.ExecCmd('rm -f -r %s/*'%(TmpSQLToolSQLPath,))
+        self.DataStorageObj.ExecCmd('rm -f -r %s/*'%(TmpSQLToolAccountPath, ))
+        self.DataStorageObj.ExecCmd('rm -f -r %s/*'%(TmpSQLToolSQLPath,))
 
         '''print (os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'))
         print (os.path.join(self.BaseDIRPath, 'downloads', 'mty_wcm.sql'))'''
 
-        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'),
+        self.DataStorageObj.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'),
                                   remotepath=os.path.join(TmpSQLToolAccountPath, 'account.txt')
                                   )
 
-        '''self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'mty_wcm.sql'),
+        '''self.DataStorageObj.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'mty_wcm.sql'),
                                   remotepath=os.path.join(TmpSQLToolSQLPath, 'mty_wcm.sql')
                                   )'''
 
@@ -339,12 +347,12 @@ class DownImgTool(object):
 
     def postInstall(self):
         TmpNginxConfigPath = '-'.join([self.AppInfo['Namespace'], 'nginx-pv-config'])
-        TmpNginxConfigPath = os.path.realpath(os.path.join(self.AppInfo['NFSBasePath'], TmpNginxConfigPath))
+        TmpNginxConfigPath = os.path.realpath(os.path.join(self.AppInfo['DataStorageBasePath'], TmpNginxConfigPath))
 
         print (TmpNginxConfigPath)
-        self.SSHClient.ExecCmd('mkdir -p %s' % (TmpNginxConfigPath, ))
+        self.DataStorageObj.ExecCmd('mkdir -p %s' % (TmpNginxConfigPath, ))
 
-        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'tmyimgcenter.conf'),
+        self.DataStorageObj.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'tmyimgcenter.conf'),
                                   remotepath=os.path.join(TmpNginxConfigPath, 'tmyimgcenter.conf')
                                   )
 
@@ -380,8 +388,8 @@ class DownImgTool(object):
 
 
     def close(self):
-        self.NFSObj.close()
-        self.SSHClient.close()
+        self.DataStorageObj.close()
+        self.LogStorageObj.close()
 
 
 
