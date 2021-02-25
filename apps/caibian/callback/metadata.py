@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'callback',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'CallbackLogPath': None,
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
