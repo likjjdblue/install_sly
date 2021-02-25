@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'redis',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'RedisDataPath': None,
     'RedisStandAlonePassword': None,
     'Namespace': None,
