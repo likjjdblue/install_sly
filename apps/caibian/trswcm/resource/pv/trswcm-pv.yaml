@@ -13,7 +13,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   nfs:
     path: {{ TRSWCMDataPath }}
-    server: {{ NFSAddr }}
+    server: {{ DataStorageAddr }}
 
 ---
 apiVersion: v1
@@ -30,4 +30,4 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   nfs:
     path: {{ TRSWCMLogPath }}
-    server: {{ NFSAddr }}
+    server: {{ LogStorageAddr }}

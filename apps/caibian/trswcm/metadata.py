@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'trswcm',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'TRSWCMDataPath': None,
     'TRSWCMLogPath': None,
     'Namespace': None,
