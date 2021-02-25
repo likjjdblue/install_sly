@@ -117,3 +117,7 @@ class NFSTool(object):
         self.SSHClient.ExecCmd(command)
 
 
+    def uploadFile(self, localpath, remotepath, *args, **kwargs):
+        self.SSHClient.uploadFile(localpath=localpath, remotepath=remotepath)
+
+

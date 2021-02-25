@@ -3,7 +3,7 @@
 
 import sys, os
 sys.path.append('../../..')
-from apps.common import nfs, nfsprovisioner
+from apps.common import  nfsprovisioner
 from tools import k8s_tools
 from metadata import AppInfo
 from copy import deepcopy

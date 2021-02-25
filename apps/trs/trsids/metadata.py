@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'trsids',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'TRSIDSDataPath': None,
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',

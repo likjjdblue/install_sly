@@ -3,7 +3,7 @@
 
 import sys, os
 sys.path.append('../../..')
-from apps.common import nfs, nfsprovisioner, servicestatecheck
+from apps.common import nfsprovisioner, servicestatecheck
 from tools import k8s_tools
 from metadata import AppInfo
 from copy import deepcopy
@@ -16,33 +16,31 @@ from time import sleep
 from tools import k8s_tools
 from pprint import pprint
 from codecs import open as open
+from storagenode import datastoragenode, logstoragenode
+from apps.storage import getClsObj
 
 
 
 class MariaDBTool(object):
     CachedResult = None
 
-    def __init__(self, namespace='default', mariadbdatapath='mariadb-pv-data', nfsinfo={},
+    def __init__(self, namespace='default', mariadbdatapath='mariadb-pv-data',
                  harbor=None, retrytimes=60):
 
         namespace = namespace.strip()
         self.RetryTimes = int(retrytimes)
-        self.NFSAddr = nfsinfo['hostname']
-        self.NFSPort = nfsinfo['port']
-        self.NFSUsername = nfsinfo['username']
-        self.NFSPassword = nfsinfo['password']
-        self.NFSBasePath = nfsinfo['basepath']
         self.AppInfo = deepcopy(AppInfo)
 
-        self.AppInfo['NFSAddr'] = self.NFSAddr
-        self.AppInfo['NFSBasePath'] = self.NFSBasePath
-        self.AppInfo['MariaDBDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, mariadbdatapath]))
+        self.AppInfo['DataStorageAddr'] = datastoragenode['hostname']
+        self.AppInfo['DataStorageBasePath'] = datastoragenode['basepath']
+        self.AppInfo['LogStorageAddr'] = logstoragenode['hostname']
+        self.AppInfo['LogStorageBasePath'] = logstoragenode['basepath']
+
+        self.AppInfo['MariaDBDataPath'] = os.path.join(self.AppInfo['DataStorageBasePath'], '-'.join([namespace, mariadbdatapath]))
         self.AppInfo['Namespace'] = namespace
 
         self.AppInfo['HarborAddr'] = harbor
         self.k8sObj = k8s_tools.K8SClient()
-
-        self.NFSObj = nfs.NFSTool(**nfsinfo)
 
         TmpCWDPath = os.path.abspath(__file__)
         TmpCWDPath = os.path.dirname(TmpCWDPath)
@@ -52,12 +50,8 @@ class MariaDBTool(object):
             print ('load from file....')
             self.AppInfo = deepcopy(self.getValues())
 
-    def setupNFS(self):
-        TmpResponse = self.NFSObj.installNFS(basedir=self.AppInfo['NFSBasePath'])
-        if TmpResponse['ret_code'] != 0:
-            return TmpResponse
-
-        print ('create MariaDB NFS successfully')
+    def setupStorage(self):
+        print ('create MariaDB Storage successfully')
 
         '''
         self.NFSObj.createSubFolder(self.AppInfo['MariaDBDataPath'])
@@ -216,7 +210,7 @@ class MariaDBTool(object):
             print ('Using cached result')
             return MariaDBTool.CachedResult
 
-        TmpResponse = self.setupNFS()
+        TmpResponse = self.setupStorage()
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
@@ -246,7 +240,7 @@ class MariaDBTool(object):
 
 
     def close(self):
-        self.NFSObj.close()
+        pass
 
 
 
