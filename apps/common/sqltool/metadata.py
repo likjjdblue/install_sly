@@ -5,6 +5,12 @@ AppInfo = {
     'AppName': 'sqltool',
     'NFSAddr': None,
     'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'SQLFilePath': None,
     'SQLAccountPath': None,
     'Namespace': None,

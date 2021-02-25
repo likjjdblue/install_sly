@@ -16,24 +16,26 @@ from time import sleep
 from tools import k8s_tools
 from pprint import pprint
 from codecs import open as open
+from storagenode import datastoragenode, logstoragenode
+from apps.storage import getClsObj
+
 
 class SQLTool(object):
     def __init__(self, namespace='default', sqlfilepath='sqltool-pv-sql', sqlaccountpath='sqltool-pv-account',
-                 nfsinfo={},harbor=None, retrytimes=600):
+                 harbor=None, retrytimes=600, *args, **kwargs):
 
         namespace = namespace.strip()
         self.RetryTimes = int(retrytimes)
-        self.NFSAddr = nfsinfo['hostname']
-        self.NFSPort = nfsinfo['port']
-        self.NFSUsername = nfsinfo['username']
-        self.NFSPassword = nfsinfo['password']
-        self.NFSBasePath = nfsinfo['basepath']
         self.AppInfo = deepcopy(AppInfo)
 
-        self.AppInfo['NFSAddr'] = self.NFSAddr
-        self.AppInfo['NFSBasePath'] = self.NFSBasePath
-        self.AppInfo['SQLFilePath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, sqlfilepath]))
-        self.AppInfo['SQLAccountPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, sqlaccountpath]))
+        self.AppInfo['DataStorageAddr'] = datastoragenode['hostname']
+        self.AppInfo['DataStorageBasePath'] = datastoragenode['basepath']
+        self.AppInfo['LogStorageAddr'] = logstoragenode['hostname']
+        self.AppInfo['LogStorageBasePath'] = logstoragenode['basepath']
+
+
+        self.AppInfo['SQLFilePath'] = os.path.join(self.AppInfo['DataStorageBasePath'], '-'.join([namespace, sqlfilepath]))
+        self.AppInfo['SQLAccountPath'] = os.path.join(self.AppInfo['DataStorageBasePath'], '-'.join([namespace, sqlaccountpath]))
 
 
         self.AppInfo['Namespace'] = namespace
@@ -41,24 +43,30 @@ class SQLTool(object):
         self.AppInfo['HarborAddr'] = harbor
         self.k8sObj = k8s_tools.K8SClient()
 
-        self.NFSObj = nfs.NFSTool(**nfsinfo)
-        self.SSHObj = ssh_tools.SSHTool(hostname=nfsinfo['hostname'], port=nfsinfo['port'], username=nfsinfo['username'],
-                                password=nfsinfo['password'])
 
-    def setupNFS(self):
-        TmpResponse = self.NFSObj.installNFS(basedir=self.AppInfo['NFSBasePath'])
+
+        self.DataStorageObj = getClsObj(datastoragenode['type'])(**datastoragenode)
+        self.LogStorageObj = getClsObj(logstoragenode['type'])(**logstoragenode)
+
+    def setupStorage(self):
+        TmpResponse = self.DataStorageObj.installStorage(basedir=self.AppInfo['DataStorageBasePath'])
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
-        print ('create SQLTool NFS successfully')
-
-        self.NFSObj.createSubFolder(self.AppInfo['SQLFilePath'])
-        self.NFSObj.createSubFolder(self.AppInfo['SQLAccountPath'])
-
+        TmpResponse = self.DataStorageObj.installStorage(basedir=self.AppInfo['LogStorageBasePath'])
+        if TmpResponse['ret_code'] != 0:
+            return TmpResponse
 
 
+        print ('create SQLTool Storage successfully')
 
-        print ('setup SQLTool NFS successfully')
+        self.DataStorageObj.createSubFolder(self.AppInfo['SQLFilePath'])
+        self.DataStorageObj.createSubFolder(self.AppInfo['SQLAccountPath'])
+
+
+
+
+        print ('setup SQLTool Storage successfully')
 
         return {
             'ret_code': 0,
@@ -187,7 +195,7 @@ class SQLTool(object):
 
 
     def start(self):
-        TmpResponse = self.setupNFS()
+        TmpResponse = self.setupStorage()
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 

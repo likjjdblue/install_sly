@@ -16,6 +16,10 @@ from time import sleep
 from tools import k8s_tools
 from pprint import pprint
 from codecs import open as open
+from storagenode import datastoragenode, logstoragenode
+from apps.storage import getClsObj
+
+
 
 class NginxTool(object):
     CachedResult = None
@@ -23,38 +27,37 @@ class NginxTool(object):
     def __init__(self, namespace='default', nginxdatapath='nginx-pv-web', nginxlogpath='nginx-pv-log',
                  nginxconfigpath='nginx-pv-config', nginxwcmdatapath='trswcm-pv-data/WCMData',
                  nginxwcmpublishdatapath='trswcm-pv-data/WCMPubData', nginxmcndatapath='mcn-pv-data/MCNData',
-                 nfsinfo={},harbor=None, retrytimes=60):
+                 harbor=None, retrytimes=60, *args, **kwargs):
 
         namespace = namespace.strip()
         self.RetryTimes = int(retrytimes)
-        self.NFSAddr = nfsinfo['hostname']
-        self.NFSPort = nfsinfo['port']
-        self.NFSUsername = nfsinfo['username']
-        self.NFSPassword = nfsinfo['password']
-        self.NFSBasePath = nfsinfo['basepath']
         self.AppInfo = deepcopy(AppInfo)
 
-        self.AppInfo['NFSAddr'] = self.NFSAddr
-        self.AppInfo['NFSBasePath'] = self.NFSBasePath
-        self.AppInfo['NginxDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, nginxdatapath]))
-        self.AppInfo['NginxLogDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, nginxlogpath]))
-        self.AppInfo['NginxConfigDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, nginxconfigpath]))
+        self.AppInfo['DataStorageAddr'] = datastoragenode['hostname']
+        self.AppInfo['DataStorageBasePath'] = datastoragenode['basepath']
+        self.AppInfo['LogStorageAddr'] = logstoragenode['hostname']
+        self.AppInfo['LogStorageBasePath'] = logstoragenode['basepath']
+
+
+        self.AppInfo['NginxDataPath'] = os.path.join(self.AppInfo['DataStorageBasePath'], '-'.join([namespace, nginxdatapath]))
+        self.AppInfo['NginxLogDataPath'] = os.path.join(self.AppInfo['LogStorageBasePath'], '-'.join([namespace, nginxlogpath]))
+        self.AppInfo['NginxConfigDataPath'] = os.path.join(self.AppInfo['DataStorageBasePath'], '-'.join([namespace, nginxconfigpath]))
 
         self.AppInfo['Namespace'] = namespace
 
 
         #### 20210202 ###
         TmpList = nginxwcmdatapath.split('/')
-        self.AppInfo['NginxWCMDataPath'] = os.path.join(self.AppInfo['NFSBasePath'],
+        self.AppInfo['NginxWCMDataPath'] = os.path.join(self.AppInfo['DataStorageBasePath'],
                                           '-'.join([self.AppInfo['Namespace'], TmpList[0]]), *TmpList[1:])
 
         TmpList = nginxwcmpublishdatapath.split('/')
-        self.AppInfo['NginxWCMPublishDataPath'] = os.path.join(self.AppInfo['NFSBasePath'],
+        self.AppInfo['NginxWCMPublishDataPath'] = os.path.join(self.AppInfo['DataStorageBasePath'],
                                           '-'.join([self.AppInfo['Namespace'], TmpList[0]]), *TmpList[1:])
 
 
         TmpList = nginxmcndatapath.split('/')
-        self.AppInfo['NginxMCNDataPath'] = os.path.join(self.AppInfo['NFSBasePath'],
+        self.AppInfo['NginxMCNDataPath'] = os.path.join(self.AppInfo['DataStorageBasePath'],
                                           '-'.join([self.AppInfo['Namespace'], TmpList[0]]), *TmpList[1:])
 
         #### END ####
@@ -65,9 +68,8 @@ class NginxTool(object):
         self.AppInfo['HarborAddr'] = harbor
         self.k8sObj = k8s_tools.K8SClient()
 
-        self.NFSObj = nfs.NFSTool(**nfsinfo)
-        self.SSHObj = ssh_tools.SSHTool(hostname=nfsinfo['hostname'], port=nfsinfo['port'], username=nfsinfo['username'],
-                                password=nfsinfo['password'])
+        self.DataStorageObj = getClsObj(datastoragenode['type'])(**datastoragenode)
+        self.LogStorageObj = getClsObj(logstoragenode['type'])(**logstoragenode)
 
 
         TmpCWDPath = os.path.abspath(__file__)
@@ -78,28 +80,33 @@ class NginxTool(object):
             print ('load from file....')
             self.AppInfo = deepcopy(self.getValues())
 
-    def setupNFS(self):
-        TmpResponse = self.NFSObj.installNFS(basedir=self.AppInfo['NFSBasePath'])
+    def setupStorage(self):
+        TmpResponse = self.DataStorageObj.installStorage(basedir=self.AppInfo['DataStorageBasePath'])
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
-        print ('create Nginx NFS successfully')
+        TmpResponse = self.DataStorageObj.installStorage(basedir=self.AppInfo['LogStorageBasePath'])
+        if TmpResponse['ret_code'] != 0:
+            return TmpResponse
 
-        self.NFSObj.createSubFolder(self.AppInfo['NginxDataPath'])
-        self.NFSObj.createSubFolder(self.AppInfo['NginxLogDataPath'])
-        self.NFSObj.createSubFolder(self.AppInfo['NginxConfigDataPath'])
+
+        print ('create SQLTool Storage successfully')
+
+        self.DataStorageObj.createSubFolder(self.AppInfo['NginxDataPath'])
+        self.DataStorageObj.createSubFolder(self.AppInfo['NginxLogDataPath'])
+        self.DataStorageObj.createSubFolder(self.AppInfo['NginxConfigDataPath'])
 
         #### 20210202 ####
-        self.NFSObj.createSubFolder(self.AppInfo['NginxWCMDataPath'])
-        self.NFSObj.createSubFolder(self.AppInfo['NginxWCMPublishDataPath'])
-        self.NFSObj.createSubFolder(self.AppInfo['NginxMCNDataPath'])
+        self.DataStorageObj.createSubFolder(self.AppInfo['NginxWCMDataPath'])
+        self.DataStorageObj.createSubFolder(self.AppInfo['NginxWCMPublishDataPath'])
+        self.DataStorageObj.createSubFolder(self.AppInfo['NginxMCNDataPath'])
 
         #### END #####
 
 
 
 
-        print ('setup Nginx NFS successfully')
+        print ('setup Nginx Storage successfully')
 
         return {
             'ret_code': 0,
@@ -243,7 +250,7 @@ class NginxTool(object):
             print ('Using cached result')
             return NginxTool.CachedResult
 
-        TmpResponse = self.setupNFS()
+        TmpResponse = self.setupStorage()
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
@@ -272,8 +279,8 @@ class NginxTool(object):
 
 
     def close(self):
-        self.SSHObj.close()
-        self.NFSObj.close()
+        self.DataStorageObj.close()
+        self.LogStorageObj.close()
 
 
 

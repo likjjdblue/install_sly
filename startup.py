@@ -6,9 +6,9 @@ import re
 sys.path.append('.')
 
 import apps
-from nfsnode import nfsinfo, namespace
+from storagenode import namespace
 
-TmpNFS = nfsinfo
+
 TmpNamespace = namespace
 
 APPMap = {
@@ -76,7 +76,7 @@ def installApps(TmpRawStr):
     print (TmpList)
     TmpModuleName, TmpClsName = (TmpList[0], TmpList[1])
     TmpModule = importlib.import_module(TmpModuleName)
-    TmpInstance = getattr(TmpModule, TmpClsName)(namespace=TmpNamespace, nfsinfo=TmpNFS)
+    TmpInstance = getattr(TmpModule, TmpClsName)(namespace=TmpNamespace)
     TmpResponse = TmpInstance.start()
     print (TmpResponse)
     return TmpResponse

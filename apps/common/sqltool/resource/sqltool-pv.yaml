@@ -12,7 +12,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   nfs:
     path: {{ SQLAccountPath }}
-    server: {{ NFSAddr }}
+    server: {{ DataStorageAddr }}
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -28,5 +28,5 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   nfs:
     path: {{ SQLFilePath }}
-    server: {{ NFSAddr }}
+    server: {{ DataStorageAddr }}
 
