@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'rabbitmq_ha',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,

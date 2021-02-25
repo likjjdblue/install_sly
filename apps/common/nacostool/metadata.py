@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'nacostool',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'NacosDataPath': None,
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
