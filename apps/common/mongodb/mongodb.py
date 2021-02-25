@@ -3,7 +3,7 @@
 
 import sys, os
 sys.path.append('../../..')
-from apps.common import nfs, nfsprovisioner, servicestatecheck
+from apps.common import nfsprovisioner, servicestatecheck
 from tools import k8s_tools
 from metadata import AppInfo
 from copy import deepcopy
@@ -16,32 +16,37 @@ from time import sleep
 from tools import k8s_tools
 from pprint import pprint
 from codecs import open as open
+from storagenode import datastoragenode, logstoragenode
+from apps.storage import getClsObj
+
+
 
 class MongodbTool(object):
     CachedResult = None
 
-    def __init__(self, namespace='default', nfsinfo={}, mongodbdatapath='nfs-provisioner', harbor=None, retrytimes=60):
+    def __init__(self, namespace='default', mongodbdatapath='nfs-provisioner', harbor=None, retrytimes=60):
 
         namespace = namespace.strip()
         self.RetryTimes = int(retrytimes)
-        self.NFSAddr = nfsinfo['hostname']
-        self.NFSPort = nfsinfo['port']
-        self.NFSUsername = nfsinfo['username']
-        self.NFSPassword = nfsinfo['password']
-        self.NFSBasePath = nfsinfo['basepath']
         self.AppInfo = deepcopy(AppInfo)
 
-        self.AppInfo['NFSAddr'] = self.NFSAddr
-        self.AppInfo['NFSBasePath'] = self.NFSBasePath
+
+        self.AppInfo['DataStorageAddr'] = datastoragenode['hostname']
+        self.AppInfo['DataStorageBasePath'] = datastoragenode['basepath']
+        self.AppInfo['LogStorageAddr'] = logstoragenode['hostname']
+        self.AppInfo['LogStorageBasePath'] = logstoragenode['basepath']
+
+
         self.AppInfo['Namespace'] = namespace
-        self.AppInfo['MongodbDataPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, mongodbdatapath]))
+        self.AppInfo['MongodbDataPath'] = os.path.join(self.AppInfo['DataStorageBasePath'], '-'.join([namespace, mongodbdatapath]))
         self.AppInfo['ProvisionerPath'] = mongodbdatapath
 
 
         self.AppInfo['HarborAddr'] = harbor
         self.k8sObj = k8s_tools.K8SClient()
 
-        self.NFSObj = nfs.NFSTool(**nfsinfo)
+        self.DataStorageObj = getClsObj(datastoragenode['type'])(**datastoragenode)
+        self.LogStorageObj = getClsObj(logstoragenode['type'])(**logstoragenode)
 
         TmpCWDPath = os.path.abspath(__file__)
         TmpCWDPath = os.path.dirname(TmpCWDPath)
@@ -51,13 +56,13 @@ class MongodbTool(object):
             print ('load from file....')
             self.AppInfo = deepcopy(self.getValues())
 
-    def setupNFS(self):
-        TmpResponse = self.NFSObj.installNFS(basedir=self.AppInfo['NFSBasePath'])
+    def setupStorage(self):
+        TmpResponse = self.DataStorageObj.installStorage(basedir=self.AppInfo['DataStorageBasePath'])
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
-        print ('create MongoDB NFS successfully')
-        self.NFSObj.createSubFolder(self.AppInfo['MongodbDataPath'])
+        print ('create MongoDB Storage successfully')
+        self.DataStorageObj.createSubFolder(self.AppInfo['MongodbDataPath'])
 
 
         return {
@@ -126,15 +131,9 @@ class MongodbTool(object):
             return TmpResponse
 
         print ('setup  NFS provisioner for %s'%(self.AppInfo['AppName'], ))
-        TmpNFSInfo={
-            'hostname': self.NFSAddr,
-            'port': self.NFSPort,
-            'username': self.NFSUsername,
-            'password': self.NFSPassword,
-            'basepath': self.NFSBasePath,
-        }
 
-        TmpNFSProvisionser = nfsprovisioner.NFSProvisionerTool(nfsinfo=TmpNFSInfo, namespace=self.AppInfo['Namespace'],
+
+        TmpNFSProvisionser = nfsprovisioner.NFSProvisionerTool(namespace=self.AppInfo['Namespace'],
                                                                nfsdatapath=self.AppInfo['ProvisionerPath'],
                                                                harbor=self.AppInfo['HarborAddr']
                                                                )
@@ -209,7 +208,7 @@ class MongodbTool(object):
             print ('Using cached result')
             return MongodbTool.CachedResult
 
-        TmpResponse = self.setupNFS()
+        TmpResponse = self.setupStorage()
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
@@ -242,7 +241,7 @@ class MongodbTool(object):
 
 
     def close(self):
-        self.NFSObj.close()
+        self.DataStorageObj.close()
 
 
 
