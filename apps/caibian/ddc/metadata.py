@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'ddc',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'DDCLogPath': None,
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
