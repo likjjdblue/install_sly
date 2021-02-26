@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'tenantcenter',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'TenantCenterLogPath': None,
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
