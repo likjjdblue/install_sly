@@ -3,7 +3,7 @@
 
 import sys, os
 sys.path.append('../../..')
-from apps.common import nfs, nfsprovisioner, nacostool, sqltool, servicestatecheck
+from apps.common import nfsprovisioner, nacostool, sqltool, servicestatecheck
 from tools import k8s_tools, ssh_tools
 from metadata import AppInfo
 from copy import deepcopy
@@ -17,51 +17,58 @@ from tools import k8s_tools
 from pprint import pprint
 from codecs import open as open
 import importlib
+from storagenode import datastoragenode, logstoragenode
+from apps.storage import getClsObj
+
 
 class TenantCenterTool(object):
-    def __init__(self, namespace='default', tenantcenterlogdata='tenantcenter-pv-log' ,nfsinfo={},
+    def __init__(self, namespace='default', tenantcenterlogdata='tenantcenter-pv-log',
                  harbor=None, retrytimes=60, *args, **kwargs):
 
         namespace = namespace.strip()
         kwargs['namespace'] = namespace
-        kwargs['nfsinfo'] = nfsinfo
         kwargs['harbor'] = harbor
         self.kwargs = kwargs
 
         self.RetryTimes = int(retrytimes)
-        self.NFSAddr = nfsinfo['hostname']
-        self.NFSPort = nfsinfo['port']
-        self.NFSUsername = nfsinfo['username']
-        self.NFSPassword = nfsinfo['password']
-        self.NFSBasePath = nfsinfo['basepath']
         self.AppInfo = deepcopy(AppInfo)
 
-        self.AppInfo['NFSAddr'] = self.NFSAddr
-        self.AppInfo['NFSBasePath'] = self.NFSBasePath
-        self.AppInfo['TenantCenterLogPath'] = os.path.join(self.AppInfo['NFSBasePath'], '-'.join([namespace, tenantcenterlogdata]))
+        self.AppInfo['DataStorageAddr'] = datastoragenode['hostname']
+        self.AppInfo['DataStorageBasePath'] = datastoragenode['basepath']
+        self.AppInfo['LogStorageAddr'] = logstoragenode['hostname']
+        self.AppInfo['LogStorageBasePath'] = logstoragenode['basepath']
+
+
+        self.AppInfo['TenantCenterLogPath'] = os.path.join(self.AppInfo['LogStorageBasePath'], '-'.join([namespace, tenantcenterlogdata]))
         self.AppInfo['Namespace'] = namespace
 
         self.AppInfo['HarborAddr'] = harbor
         self.k8sObj = k8s_tools.K8SClient()
 
-        self.NFSObj = nfs.NFSTool(**nfsinfo)
-        self.SSHClient = ssh_tools.SSHTool(**nfsinfo)
+
+        self.DataStorageObj = getClsObj(datastoragenode['type'])(**datastoragenode)
+        self.LogStorageObj = getClsObj(logstoragenode['type'])(**logstoragenode)
 
         self.DependencyDict ={}
         TmpCWDPath = os.path.abspath(__file__)
         TmpCWDPath = os.path.dirname(TmpCWDPath)
         self.BaseDIRPath= os.path.realpath(os.path.join(TmpCWDPath, '../../..'))
 
-    def setupNFS(self):
-        TmpResponse = self.NFSObj.installNFS(basedir=self.AppInfo['NFSBasePath'])
+    def setupStorage(self):
+        TmpResponse = self.DataStorageObj.installStorage(basedir=self.AppInfo['DataStorageBasePath'])
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
-        print ('create TenantCenter NFS successfully')
 
-        self.NFSObj.createSubFolder(self.AppInfo['TenantCenterLogPath'])
+        TmpResponse = self.LogStorageObj.installStorage(basedir=self.AppInfo['LogStorageBasePath'])
+        if TmpResponse['ret_code'] != 0:
+            return TmpResponse
 
-        print ('setup TenantCenter NFS successfully')
+        print ('create TenantCenter Storage successfully')
+
+        self.LogStorageObj.createSubFolder(self.AppInfo['TenantCenterLogPath'])
+
+        print ('setup TenantCenter Storage successfully')
 
         return {
             'ret_code': 0,
@@ -206,7 +213,7 @@ class TenantCenterTool(object):
         }
 
     def start(self):
-        TmpResponse = self.setupNFS()
+        TmpResponse = self.setupStorage()
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
@@ -294,30 +301,30 @@ class TenantCenterTool(object):
             f.write('%s %s %s'%(self.AppInfo['PaperReviewDBName'], self.AppInfo['PaperReviewDBUser'], self.AppInfo['PaperReviewDBPassword'])+'\n')
 
         TmpSQLToolAccountPath = '-'.join([self.AppInfo['Namespace'], 'sqltool-pv-account'])
-        TmpSQLToolAccountPath = os.path.realpath(os.path.join(self.AppInfo['NFSBasePath'], TmpSQLToolAccountPath))
+        TmpSQLToolAccountPath = os.path.realpath(os.path.join(self.AppInfo['DataStorageBasePath'], TmpSQLToolAccountPath))
         TmpSQLToolSQLPath = '-'.join([self.AppInfo['Namespace'], 'sqltool-pv-sql'])
-        TmpSQLToolSQLPath = os.path.realpath(os.path.join(self.AppInfo['NFSBasePath'], TmpSQLToolSQLPath))
+        TmpSQLToolSQLPath = os.path.realpath(os.path.join(self.AppInfo['DataStorageBasePath'], TmpSQLToolSQLPath))
 
         print (TmpSQLToolAccountPath)
         print (TmpSQLToolSQLPath)
 
-        self.SSHClient.ExecCmd('mkdir -p %s'%(TmpSQLToolSQLPath, ))
-        self.SSHClient.ExecCmd('mkdir -p %s'%(TmpSQLToolAccountPath, ))
+        self.DataStorageObj.ExecCmd('mkdir -p %s'%(TmpSQLToolSQLPath, ))
+        self.DataStorageObj.ExecCmd('mkdir -p %s'%(TmpSQLToolAccountPath, ))
 
 
 
-        self.SSHClient.ExecCmd('rm -f -r %s/*'%(TmpSQLToolAccountPath, ))
-        self.SSHClient.ExecCmd('rm -f -r %s/*'%(TmpSQLToolSQLPath,))
+        self.DataStorageObj.ExecCmd('rm -f -r %s/*'%(TmpSQLToolAccountPath, ))
+        self.DataStorageObj.ExecCmd('rm -f -r %s/*'%(TmpSQLToolSQLPath,))
 
         print (os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'))
         #print (os.path.join(self.BaseDIRPath, 'downloads', 'mty_wcm.sql'))
 
-        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'),
+        self.DataStorageObj.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'),
                                   remotepath=os.path.join(TmpSQLToolAccountPath, 'account.txt')
                                   )
 
         
-        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'mty_wcm.sql'),
+        self.DataStorageObj.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'mty_wcm.sql'),
                                   remotepath=os.path.join(TmpSQLToolSQLPath, 'mty_wcm.sql')
                                   )
 
@@ -340,30 +347,30 @@ class TenantCenterTool(object):
             f.write('bigdata %s'%(self.AppInfo['PaperReviewNacosID'], )+'\n')
 
         TmpNacosToolDataPath = '-'.join([self.AppInfo['Namespace'], 'nacostool'])
-        TmpNacosToolDataPath = os.path.realpath(os.path.join(self.AppInfo['NFSBasePath'], TmpNacosToolDataPath))
+        TmpNacosToolDataPath = os.path.realpath(os.path.join(self.AppInfo['DataStorageBasePath'], TmpNacosToolDataPath))
 
 
         print (TmpNacosToolDataPath)
 
-        self.SSHClient.ExecCmd('mkdir -p %s'%(TmpNacosToolDataPath, ))
+        self.DataStorageObj.ExecCmd('mkdir -p %s'%(TmpNacosToolDataPath, ))
 
 
 
-        self.SSHClient.ExecCmd('rm -f -r %s/*'%(TmpNacosToolDataPath, ))
+        self.DataStorageObj.ExecCmd('rm -f -r %s/*'%(TmpNacosToolDataPath, ))
 
 
         print (os.path.join(self.BaseDIRPath, 'tmp', 'namespace.txt'))
         #print (os.path.join(self.BaseDIRPath, 'downloads', 'mty_wcm.sql'))
 
-        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'tmp', 'namespace.txt'),
+        self.DataStorageObj.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'tmp', 'namespace.txt'),
                                   remotepath=os.path.join(TmpNacosToolDataPath, 'namespace.txt')
                                   )
 
-        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'nacos.tar.gz'),
+        self.DataStorageObj.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'nacos.tar.gz'),
                                   remotepath=os.path.join(TmpNacosToolDataPath, 'nacos.tar.gz')
                                   )
 
-        self.SSHClient.ExecCmd('cd %s;tar -xvzf nacos.tar.gz'%(TmpNacosToolDataPath, ))
+        self.DataStorageObj.ExecCmd('cd %s;tar -xvzf nacos.tar.gz'%(TmpNacosToolDataPath, ))
 
         TmpNacosToolObj = nacostool.NacosTool(**self.kwargs)
         TmpResponse = TmpNacosToolObj.start()
@@ -384,12 +391,12 @@ class TenantCenterTool(object):
 
     def postInstall(self):
         TmpNginxConfigPath = '-'.join([self.AppInfo['Namespace'], 'nginx-pv-config'])
-        TmpNginxConfigPath = os.path.realpath(os.path.join(self.AppInfo['NFSBasePath'], TmpNginxConfigPath))
+        TmpNginxConfigPath = os.path.realpath(os.path.join(self.AppInfo['DataStorageBasePath'], TmpNginxConfigPath))
 
         print (TmpNginxConfigPath)
-        self.SSHClient.ExecCmd('mkdir -p %s' % (TmpNginxConfigPath, ))
+        self.DataStorageObj.ExecCmd('mkdir -p %s' % (TmpNginxConfigPath, ))
 
-        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'tenantcenter.conf'),
+        self.DataStorageObj.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'tenantcenter.conf'),
                                   remotepath=os.path.join(TmpNginxConfigPath, 'tenantcenter.conf')
                                   )
 
@@ -425,8 +432,8 @@ class TenantCenterTool(object):
 
 
     def close(self):
-        self.NFSObj.close()
-        self.SSHClient.close()
+        self.DataStorageObj.close()
+        self.LogStorageObj.close()
 
 
 
