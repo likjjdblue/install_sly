@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'mlfsearch',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'MLFSearchLogPath': None,
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
