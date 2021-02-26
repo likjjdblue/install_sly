@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'interactiontask',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'InteractionTaskLogPath': None,
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',

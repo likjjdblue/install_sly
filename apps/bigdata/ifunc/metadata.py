@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'ifunc',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'iFuncLogPath': None,
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
