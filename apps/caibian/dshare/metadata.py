@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'dshare',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'DshareLogPath': None,
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
