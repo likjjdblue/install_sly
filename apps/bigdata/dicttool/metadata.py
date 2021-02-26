@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'dicttool',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'DicttoolLogPath': None,
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
