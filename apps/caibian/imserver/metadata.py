@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'imserver',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'IMServerLogPath': None,
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
