@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'datagather',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'DataGatherLogPath': None,
     'DataGatherDataPath': None,
     'Namespace': None,
