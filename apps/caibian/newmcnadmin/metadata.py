@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'newmcnadmin',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'MCNAdminDataPath': None,
     'MCNAdminLogPath': None,
     'Namespace': None,
