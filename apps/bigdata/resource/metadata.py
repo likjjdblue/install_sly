@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'resource',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'ResourceLogPath': None,
     'ResourceDataPath': None,
     'ResourceMediaDataPath': None,

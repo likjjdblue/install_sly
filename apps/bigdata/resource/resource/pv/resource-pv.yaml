@@ -13,7 +13,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   nfs:
     path: {{ ResourceLogPath }}
-    server: {{ NFSAddr }}
+    server: {{ LogStorageAddr }}
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -29,7 +29,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   nfs:
     path: {{ ResourceDataPath }}
-    server: {{ NFSAddr }}
+    server: {{ DataStorageAddr }}
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -45,4 +45,4 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   nfs:
     path: {{ ResourceMediaDataPath }}
-    server: {{ NFSAddr }}
+    server: {{ DataStorageAddr }}
