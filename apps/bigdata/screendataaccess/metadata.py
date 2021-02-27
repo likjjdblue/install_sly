@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'screendataaccess',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'ScreenDataAccessDataPath': None,
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
