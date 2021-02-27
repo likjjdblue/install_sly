@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'mcbsdmschedule',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'MCBSDMScheduleLogPath': None,
     'MCBSDMScheduleDataPath': None,
     'Namespace': None,

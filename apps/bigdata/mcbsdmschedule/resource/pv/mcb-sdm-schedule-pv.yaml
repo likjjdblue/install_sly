@@ -13,7 +13,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   nfs:
     path: {{ MCBSDMScheduleLogPath }}
-    server: {{ NFSAddr }}
+    server: {{ LogStorageAddr }}
 
 ---
 apiVersion: v1
@@ -30,5 +30,5 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   nfs:
     path: {{ MCBSDMScheduleDataPath }}
-    server: {{ NFSAddr }}
+    server: {{ DataStorageAddr }}
 
