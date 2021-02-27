@@ -9,7 +9,7 @@ spec:
     storage: 10Gi
   nfs:
     path: {{ CKMDataPath }}
-    server: {{ NFSAddr }}
+    server: {{ DataStorageAddr }}
   persistentVolumeReclaimPolicy: Retain
   volumeMode: Filesystem
 

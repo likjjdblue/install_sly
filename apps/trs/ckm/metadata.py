@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'ckm',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'CKMDataPath': None,
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
