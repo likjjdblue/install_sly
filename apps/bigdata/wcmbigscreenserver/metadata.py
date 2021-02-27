@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'wcmbigscreenserver',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'WCMBigScreenServerDataPath': None,
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',

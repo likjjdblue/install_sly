@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'transfervideo',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'TransferVideoLogPath': None,
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',

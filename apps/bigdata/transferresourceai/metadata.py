@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'transferresourceai',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'TransferResourceAILogPath': None,
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
