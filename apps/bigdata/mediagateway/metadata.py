@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'mediagateway',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'MediaGatewayLogPath': None,
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
