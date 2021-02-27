@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'metasearch',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'MetaSearchLogPath': None,
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',

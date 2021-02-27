@@ -12,4 +12,4 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   nfs:
     path: {{ MetaSearchLogPath }}
-    server: {{ NFSAddr }}
+    server: {{ LogStorageAddr }}
