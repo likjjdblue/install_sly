@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'mcbpm',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'MCBPMLogPath': None,
     'MCBPMDataPath': None,
     'Namespace': None,
