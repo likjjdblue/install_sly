@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'picturecenter',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'PictureCenterLogPath': None,
     'PictureCenterDataPath': None,
     'Namespace': None,
