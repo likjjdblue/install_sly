@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'timingscheduler',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'TimingSchedulerLogPath': None,
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
