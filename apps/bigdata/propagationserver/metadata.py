@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'propagationserver',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'PropagationServerLogPath': None,
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
