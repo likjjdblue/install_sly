@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'pushsyn',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'PushSynLogPath': None,
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
