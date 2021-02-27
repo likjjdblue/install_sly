@@ -13,7 +13,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   nfs:
     path: {{ MCBMessageLogPath }}
-    server: {{ NFSAddr }}
+    server: {{ LogStorageAddr }}
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -29,4 +29,4 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   nfs:
     path: {{ MCBMessageDataPath }}
-    server: {{ NFSAddr }}
+    server: {{ DataStorageAddr }}

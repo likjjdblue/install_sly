@@ -3,8 +3,12 @@
 
 AppInfo = {
     'AppName': 'mcbmessage',
-    'NFSAddr': None,
-    'NFSBasePath': None,
+
+    'DataStorageAddr': None,
+    'DataStorageBasePath': None,
+    'LogStorageAddr': None,
+    'LogStorageBasePath': None,
+
     'MCBMessageLogPath': None,
     'MCBMessageDataPath': None,
     'Namespace': None,
