@@ -16,6 +16,7 @@ from tools import k8s_tools
 from pprint import pprint
 from storagenode import datastoragenode, logstoragenode
 from apps.storage import getClsObj
+from apps import mergeTwoDicts
 
 
 
@@ -46,6 +47,9 @@ class NFSProvisionerTool(object):
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
+
+        self.TmpStoragePathDict = dict()
+        self.TmpStoragePathDict['NFSDataPath'] = self.DataStorageObj.generateRealPath(self.AppInfo['NFSDataPath'])
 
         print ('create  NFS successfully')
         self.DataStorageObj.createSubFolder(self.AppInfo['NFSDataPath'])
@@ -82,8 +86,11 @@ class NFSProvisionerTool(object):
 
         if not os.path.isfile(os.path.join(TmpTargetNamespaceDIR, 'values.yaml')):
             self.generateValues()
+
+            TmpAppInfo = mergeTwoDicts(self.AppInfo, self.TmpStoragePathDict)
+
             with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='wb') as f:
-                yaml.safe_dump(self.AppInfo, f)
+                yaml.safe_dump(TmpAppInfo, f)
 
             TmpCWDPath = os.path.abspath(__file__)
             TmpCWDPath = os.path.dirname(TmpCWDPath)
@@ -97,7 +104,7 @@ class NFSProvisionerTool(object):
                     TmpContent = ''
                     with open(os.path.join(basepath, file), mode='rb') as f:
                         TmpContent = f.read()
-                    TmpContent = jinja2.Template(TmpContent).render(self.AppInfo)
+                    TmpContent = jinja2.Template(TmpContent).render(TmpAppInfo)
 
                     with open(os.path.join(basepath, file), mode='wb') as f:
                         f.write(TmpContent)
