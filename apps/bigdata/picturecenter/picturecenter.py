@@ -79,7 +79,7 @@ class PictureCenterTool(object):
 
         self.TmpStoragePathDict = dict()
         self.TmpStoragePathDict['PictureCenterDataPath'] = self.DataStorageObj.generateRealPath(self.AppInfo['PictureCenterDataPath'])
-        self.TmpStoragePathDict['PictureCenterLogPath'] = self.LogStorageObj.generateRealPath(self.AppInfo['TRSWCPictureCenterLogPathMLogPath'])
+        self.TmpStoragePathDict['PictureCenterLogPath'] = self.LogStorageObj.generateRealPath(self.AppInfo['PictureCenterLogPath'])
 
         print ('setup PictureCenter Storage successfully')
 
