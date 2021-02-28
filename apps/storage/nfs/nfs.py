@@ -107,6 +107,7 @@ class NFSTool(object):
             subpath = subpath.strip('/')
 
         TmpPath = os.path.join(self.BaseDir, subpath)
+        print ('create subfolder: '+str(TmpPath))
         TmpResponse = self.SSHClient.ExecCmd('mkdir -p %s'%(TmpPath,))
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
@@ -125,6 +126,16 @@ class NFSTool(object):
 
 
     def uploadFile(self, localpath, remotepath, *args, **kwargs):
+        print ('NFS uploading.....')
+        remotepath = remotepath.strip()
+
+        if (remotepath != '/')  and (remotepath.startswith('/')):
+            remotepath = remotepath.strip('/')
+
+        print ('remote path: '+str(remotepath))
+        print ('local path: '+str(localpath))
+        remotepath = os.path.join(self.BaseDir, remotepath)
+
         self.SSHClient.uploadFile(localpath=localpath, remotepath=remotepath)
 
 

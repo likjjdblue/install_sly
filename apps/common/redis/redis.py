@@ -114,7 +114,7 @@ class RedisTool(object):
             TmpAppInfo = mergeTwoDicts(self.AppInfo, self.TmpStoragePathDict)
 
             with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='wb') as f:
-                yaml.safe_dump(TmpAppInfo, f)
+                yaml.safe_dump(self.AppInfo, f)
 
             TmpCWDPath = os.path.abspath(__file__)
             TmpCWDPath = os.path.dirname(TmpCWDPath)

@@ -53,20 +53,20 @@ class SQLTool(object):
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
-        TmpResponse = self.DataStorageObj.installStorage(basedir=self.AppInfo['LogStorageBasePath'])
+        TmpResponse = self.LogStorageObj.installStorage(basedir=self.AppInfo['LogStorageBasePath'])
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
-
-        self.TmpStoragePathDict = dict()
-        self.TmpStoragePathDict['SQLFilePath'] = self.DataStorageObj.generateRealPath(self.AppInfo['SQLFilePath'])
-        self.TmpStoragePathDict['SQLAccountPath'] = self.DataStorageObj.generateRealPath(self.AppInfo['SQLAccountPath'])
 
 
         print ('create SQLTool Storage successfully')
 
         self.DataStorageObj.createSubFolder(self.AppInfo['SQLFilePath'])
         self.DataStorageObj.createSubFolder(self.AppInfo['SQLAccountPath'])
+
+        self.TmpStoragePathDict = dict()
+        self.TmpStoragePathDict['SQLFilePath'] = self.DataStorageObj.generateRealPath(self.AppInfo['SQLFilePath'])
+        self.TmpStoragePathDict['SQLAccountPath'] = self.DataStorageObj.generateRealPath(self.AppInfo['SQLAccountPath'])
 
 
 
@@ -111,7 +111,7 @@ class SQLTool(object):
             TmpAppInfo = mergeTwoDicts(self.AppInfo, self.TmpStoragePathDict)
 
             with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='wb') as f:
-                yaml.safe_dump(TmpAppInfo, f)
+                yaml.safe_dump(self.AppInfo, f)
 
             TmpCWDPath = os.path.abspath(__file__)
             TmpCWDPath = os.path.dirname(TmpCWDPath)

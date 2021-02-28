@@ -129,6 +129,10 @@ class SSHTool(object):
             TmpFTPClient = self.SSHObj.open_sftp()
             kwargs['remotepath'] = remotepath
             kwargs['localpath'] = localpath
+
+            print ('SSH client local path: '+ kwargs['localpath'])
+            print ('SSH client remote path: ' + kwargs['remotepath'])
+
             TmpFTPClient.put(*args, **kwargs)
 
             return {

@@ -19,6 +19,8 @@ from codecs import open as open
 import importlib
 from storagenode import datastoragenode, logstoragenode
 from apps.storage import getClsObj
+from apps import mergeTwoDicts
+
 
 class TRSIDSTool(object):
     def __init__(self, namespace='default', trsidsdatapath='trsids-pv-data',
@@ -293,13 +295,13 @@ class TRSIDSTool(object):
         print (TmpSQLToolAccountPath)
         print (TmpSQLToolSQLPath)
 
-        self.DataStorageObj.ExecCmd('mkdir -p %s'%(TmpSQLToolSQLPath, ))
-        self.DataStorageObj.ExecCmd('mkdir -p %s'%(TmpSQLToolAccountPath, ))
+        self.DataStorageObj.createSubFolder(TmpSQLToolSQLPath)
+        self.DataStorageObj.createSubFolder(TmpSQLToolAccountPath)
 
 
 
-        self.DataStorageObj.ExecCmd('rm -f -r %s/*'%(TmpSQLToolAccountPath, ))
-        self.DataStorageObj.ExecCmd('rm -f -r %s/*'%(TmpSQLToolSQLPath,))
+        self.DataStorageObj.cleanSubFolder(TmpSQLToolAccountPath)
+        self.DataStorageObj.cleanSubFolder(TmpSQLToolSQLPath)
 
         print (os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'))
         print (os.path.join(self.BaseDIRPath, 'downloads', 'mty_ids.sql'))
