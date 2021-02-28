@@ -18,7 +18,7 @@ from pprint import pprint
 from codecs import open as open
 from storagenode import datastoragenode, logstoragenode
 from apps.storage import getClsObj
-
+from apps import mergeTwoDicts
 
 class SQLTool(object):
     def __init__(self, namespace='default', sqlfilepath='sqltool-pv-sql', sqlaccountpath='sqltool-pv-account',
@@ -56,6 +56,11 @@ class SQLTool(object):
         TmpResponse = self.DataStorageObj.installStorage(basedir=self.AppInfo['LogStorageBasePath'])
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
+
+
+        self.TmpStoragePathDict = dict()
+        self.TmpStoragePathDict['SQLFilePath'] = self.DataStorageObj.generateRealPath(self.AppInfo['SQLFilePath'])
+        self.TmpStoragePathDict['SQLAccountPath'] = self.DataStorageObj.generateRealPath(self.AppInfo['SQLAccountPath'])
 
 
         print ('create SQLTool Storage successfully')
@@ -102,8 +107,11 @@ class SQLTool(object):
 
         if not os.path.isfile(os.path.join(TmpTargetNamespaceDIR, 'values.yaml')):
             self.generateValues()
+
+            TmpAppInfo = mergeTwoDicts(self.AppInfo, self.TmpStoragePathDict)
+
             with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='wb') as f:
-                yaml.safe_dump(self.AppInfo, f)
+                yaml.safe_dump(TmpAppInfo, f)
 
             TmpCWDPath = os.path.abspath(__file__)
             TmpCWDPath = os.path.dirname(TmpCWDPath)
@@ -117,7 +125,7 @@ class SQLTool(object):
                     TmpContent = ''
                     with open(os.path.join(basepath, file), mode='rb', encoding='utf-8') as f:
                         TmpContent = f.read()
-                    TmpContent = jinja2.Template(TmpContent).render(self.AppInfo)
+                    TmpContent = jinja2.Template(TmpContent).render(TmpAppInfo)
 
                     with open(os.path.join(basepath, file), mode='wb', encoding='utf-8') as f:
                         f.write(TmpContent)
