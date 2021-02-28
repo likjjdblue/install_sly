@@ -19,6 +19,7 @@ from codecs import open as open
 import importlib
 from storagenode import datastoragenode, logstoragenode
 from apps.storage import getClsObj
+from apps import mergeTwoDicts
 
 
 
@@ -69,6 +70,10 @@ class PaperReviewTool(object):
 
         self.LogStorageObj.createSubFolder(self.AppInfo['PaperReviewLogPath'])
 
+
+        self.TmpStoragePathDict = dict()
+        self.TmpStoragePathDict['PaperReviewLogPath'] = self.LogStorageObj.generateRealPath(self.AppInfo['PaperReviewLogPath'])
+
         print ('setup PaperReview Storage successfully')
 
         return {
@@ -106,6 +111,9 @@ class PaperReviewTool(object):
 
         if not os.path.isfile(os.path.join(TmpTargetNamespaceDIR, 'values.yaml')):
             self.generateValues()
+
+            TmpAppInfo = mergeTwoDicts(self.AppInfo, self.TmpStoragePathDict)
+
             with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='wb') as f:
                 yaml.safe_dump(self.AppInfo, f)
 
@@ -121,7 +129,7 @@ class PaperReviewTool(object):
                     TmpContent = ''
                     with open(os.path.join(basepath, file), mode='rb', encoding='utf-8') as f:
                         TmpContent = f.read()
-                    TmpContent = jinja2.Template(TmpContent).render(self.AppInfo)
+                    TmpContent = jinja2.Template(TmpContent).render(TmpAppInfo)
 
                     with open(os.path.join(basepath, file), mode='wb', encoding='utf-8') as f:
                         f.write(TmpContent)
@@ -308,13 +316,13 @@ class PaperReviewTool(object):
         print (TmpSQLToolAccountPath)
         print (TmpSQLToolSQLPath)
 
-        self.DataStorageObj.ExecCmd('mkdir -p %s'%(TmpSQLToolSQLPath, ))
-        self.DataStorageObj.ExecCmd('mkdir -p %s'%(TmpSQLToolAccountPath, ))
+        self.DataStorageObj.createSubFolder(TmpSQLToolSQLPath)
+        self.DataStorageObj.createSubFolder(TmpSQLToolAccountPath)
 
 
 
-        self.DataStorageObj.ExecCmd('rm -f -r %s/*'%(TmpSQLToolAccountPath, ))
-        self.DataStorageObj.ExecCmd('rm -f -r %s/*'%(TmpSQLToolSQLPath,))
+        self.DataStorageObj.cleanSubFolder(TmpSQLToolAccountPath)
+        self.DataStorageObj.cleanSubFolder(TmpSQLToolSQLPath)
 
         print (os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'))
         #print (os.path.join(self.BaseDIRPath, 'downloads', 'mty_wcm.sql'))
@@ -351,7 +359,7 @@ class PaperReviewTool(object):
 
         print (TmpNacosToolDataPath)
 
-        self.DataStorageObj.ExecCmd('mkdir -p %s'%(TmpNacosToolDataPath, ))
+        self.DataStorageObj.createSubFolder(TmpNacosToolDataPath)
 
 
 
