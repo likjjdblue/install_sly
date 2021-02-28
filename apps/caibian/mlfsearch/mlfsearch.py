@@ -19,6 +19,7 @@ from codecs import open as open
 import importlib
 from storagenode import datastoragenode, logstoragenode
 from apps.storage import getClsObj
+from apps import mergeTwoDicts
 
 
 
@@ -74,6 +75,10 @@ class MLFSearchTool(object):
 
         self.LogStorageObj.createSubFolder(self.AppInfo['MLFSearchLogPath'])
 
+
+        self.TmpStoragePathDict = dict()
+        self.TmpStoragePathDict['MLFSearchLogPath'] = self.LogStorageObj.generateRealPath(self.AppInfo['MLFSearchLogPath'])
+
         print ('setup MLFSearch Storage successfully')
 
         return {
@@ -109,6 +114,9 @@ class MLFSearchTool(object):
 
         if not os.path.isfile(os.path.join(TmpTargetNamespaceDIR, 'values.yaml')):
             self.generateValues()
+
+            TmpAppInfo = mergeTwoDicts(self.AppInfo, self.TmpStoragePathDict)
+
             with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='wb') as f:
                 yaml.safe_dump(self.AppInfo, f)
 
@@ -124,7 +132,7 @@ class MLFSearchTool(object):
                     TmpContent = ''
                     with open(os.path.join(basepath, file), mode='rb', encoding='utf-8') as f:
                         TmpContent = f.read()
-                    TmpContent = jinja2.Template(TmpContent).render(self.AppInfo)
+                    TmpContent = jinja2.Template(TmpContent).render(TmpAppInfo)
 
                     with open(os.path.join(basepath, file), mode='wb', encoding='utf-8') as f:
                         f.write(TmpContent)
@@ -346,7 +354,7 @@ class MLFSearchTool(object):
         TmpNginxConfigPath = os.path.realpath(os.path.join(self.AppInfo['DataStorageBasePath'], TmpNginxConfigPath))
 
         print (TmpNginxConfigPath)
-        self.DataStorageObj.ExecCmd('mkdir -p %s' % (TmpNginxConfigPath, ))
+        self.DataStorageObj.createSubFolder(TmpNginxConfigPath)
 
         self.DataStorageObj.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'mlfsearch.conf'),
                                   remotepath=os.path.join(TmpNginxConfigPath, 'mlfsearch.conf')
