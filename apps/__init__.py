@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 # -*- coding: utf-8 -*-
 import socket
+from copy import deepcopy
 __all__ = ['trs']
 
 
@@ -23,4 +24,13 @@ def checkPortState(host='127.0.0.1',port=9200):
        return True
     except:
         return False
+
+
+
+def mergeTwoDicts(DictA, DictB):
+    TmpDict = deepcopy(DictA)
+    TmpDict.update(DictB)
+
+    return TmpDict
+
 

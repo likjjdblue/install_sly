@@ -18,6 +18,7 @@ from pprint import pprint
 from codecs import open as open
 from storagenode import datastoragenode, logstoragenode
 from apps.storage import getClsObj
+from apps import mergeTwoDicts
 
 
 
@@ -63,8 +64,6 @@ class NginxTool(object):
         #### END ####
 
 
-
-
         self.AppInfo['HarborAddr'] = harbor
         self.k8sObj = k8s_tools.K8SClient()
 
@@ -85,7 +84,7 @@ class NginxTool(object):
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
-        TmpResponse = self.DataStorageObj.installStorage(basedir=self.AppInfo['LogStorageBasePath'])
+        TmpResponse = self.LogStorageObj.installStorage(basedir=self.AppInfo['LogStorageBasePath'])
         if TmpResponse['ret_code'] != 0:
             return TmpResponse
 
@@ -93,7 +92,7 @@ class NginxTool(object):
         print ('create SQLTool Storage successfully')
 
         self.DataStorageObj.createSubFolder(self.AppInfo['NginxDataPath'])
-        self.DataStorageObj.createSubFolder(self.AppInfo['NginxLogDataPath'])
+        self.LogStorageObj.createSubFolder(self.AppInfo['NginxLogDataPath'])
         self.DataStorageObj.createSubFolder(self.AppInfo['NginxConfigDataPath'])
 
         #### 20210202 ####
@@ -103,6 +102,13 @@ class NginxTool(object):
 
         #### END #####
 
+        self.TmpStoragePathDict = dict()
+        self.TmpStoragePathDict['NginxDataPath'] = self.DataStorageObj.generateRealPath(self.AppInfo['NginxDataPath'])
+        self.TmpStoragePathDict['NginxLogDataPath'] = self.LogStorageObj.generateRealPath(self.AppInfo['NginxLogDataPath'])
+        self.TmpStoragePathDict['NginxConfigDataPath'] = self.DataStorageObj.generateRealPath(self.AppInfo['NginxConfigDataPath'])
+        self.TmpStoragePathDict['NginxWCMDataPath'] = self.DataStorageObj.generateRealPath(self.AppInfo['NginxWCMDataPath'])
+        self.TmpStoragePathDict['NginxWCMPublishDataPath'] = self.DataStorageObj.generateRealPath(self.AppInfo['NginxWCMPublishDataPath'])
+        self.TmpStoragePathDict['NginxMCNDataPath'] = self.DataStorageObj.generateRealPath(self.AppInfo['NginxMCNDataPath'])
 
 
 
@@ -142,8 +148,11 @@ class NginxTool(object):
 
         if not os.path.isfile(os.path.join(TmpTargetNamespaceDIR, 'values.yaml')):
             self.generateValues()
+
+            TmpAppInfo = mergeTwoDicts(self.AppInfo, self.TmpStoragePathDict)
+
             with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='wb') as f:
-                yaml.safe_dump(self.AppInfo, f)
+                yaml.safe_dump(TmpAppInfo, f)
 
             TmpCWDPath = os.path.abspath(__file__)
             TmpCWDPath = os.path.dirname(TmpCWDPath)
@@ -157,7 +166,7 @@ class NginxTool(object):
                     TmpContent = ''
                     with open(os.path.join(basepath, file), mode='rb', encoding='utf-8') as f:
                         TmpContent = f.read()
-                    TmpContent = jinja2.Template(TmpContent).render(self.AppInfo)
+                    TmpContent = jinja2.Template(TmpContent).render(TmpAppInfo)
 
                     with open(os.path.join(basepath, file), mode='wb', encoding='utf-8') as f:
                         f.write(TmpContent)

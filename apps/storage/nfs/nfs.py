@@ -6,9 +6,13 @@ import tools
 import re
 
 class NFSTool(object):
-    def __init__(self, hostname, port, username, password, *args, **kwargs):
+    def __init__(self, hostname, port, username, password, baseurl, *args, **kwargs):
         self.SSHClient = tools.ssh_tools.SSHTool(hostname, port, username, password)
-        self.BaseDir= '/'
+
+        baseurl = baseurl.strip()
+        baseurl = os.path.join('/', baseurl)
+        baseurl = os.path.realpath(baseurl)
+        self.BaseDir= baseurl
 
     def setupNFSReady(self):
         TmpResult = self.SSHClient.checkConnection()
@@ -22,8 +26,7 @@ class NFSTool(object):
         TmpResult = self.SSHClient.ExecCmd('which nfsstat')
         return TmpResult
 
-    def installStorage(self, basedir='/TRS/DATA'):
-        self.BaseDir = basedir
+    def installStorage(self, basedir='/'):
         TmpResult = self.checkNFSExistence()
         if TmpResult['ret_code'] == 0 and TmpResult['result']['exitcode'] == 0:
             print ('NFS installed already')
@@ -64,7 +67,7 @@ class NFSTool(object):
         print ('Setup NFS .....')
         self.SSHClient.ExecCmd('mkdir -p %s'%(basedir,))
         #self.SSHClient.ExecCmd('chown nfsnobody:nfsnobody  %s'%(basedir,))
-        self.SSHClient.ExecCmd('chmod -R 777  %s'%(basedir,))
+        #self.SSHClient.ExecCmd('chmod -R 777  %s'%(basedir,))
         self.SSHClient.ExecCmd('touch /etc/exports')
 
         try:
@@ -75,13 +78,13 @@ class NFSTool(object):
                 if TmpReObj:
                     continue
 
-                TmpReObj = re.search(r'^\s*%s\s+.*?\n$'%(basedir, ), line)
+                TmpReObj = re.search(r'^\s*%s\s+.*?\n$'%(self.BaseDir, ), line)
                 if TmpReObj:
                     TmpMatched = True
                     break
 
             if not TmpMatched:
-                TmpFileContent += '\n' + '%s     %s\n'%(basedir, '*(rw,no_root_squash,sync)')
+                TmpFileContent += '\n' + '%s     %s\n'%(self.BaseDir, '*(rw,no_root_squash,sync)')
                 self.SSHClient.writeRemoteFile(filename='/etc/exports', data=TmpFileContent)
 
             print ('Restart NFS server...')
@@ -99,6 +102,10 @@ class NFSTool(object):
             }
 
     def createSubFolder(self, subpath):
+        subpath = subpath.strip()
+        if (subpath != '/')  and (subpath.startswith('/')):
+            subpath = subpath.strip('/')
+
         TmpPath = os.path.join(self.BaseDir, subpath)
         TmpResponse = self.SSHClient.ExecCmd('mkdir -p %s'%(TmpPath,))
         if TmpResponse['ret_code'] != 0:
@@ -119,5 +126,32 @@ class NFSTool(object):
 
     def uploadFile(self, localpath, remotepath, *args, **kwargs):
         self.SSHClient.uploadFile(localpath=localpath, remotepath=remotepath)
+
+
+    def generateRealPath(self, subpath):
+        subpath = subpath.strip()
+        if (subpath != '/')  and (subpath.startswith('/')):
+            subpath = subpath.strip('/')
+
+        TmpPath = os.path.join(self.BaseDir, subpath)
+        return os.path.realpath(TmpPath)
+
+
+    def cleanSubFolder(self, subpath):
+        subpath = subpath.strip()
+        if (subpath != '/')  and (subpath.startswith('/')):
+            subpath = subpath.strip('/')
+
+        TmpPath = os.path.join(self.BaseDir, subpath)
+        TmpResponse = self.SSHClient.ExecCmd('rm -f -r  %s/*'%(TmpPath,))
+        if TmpResponse['ret_code'] != 0:
+            return TmpResponse
+
+        return {
+            'ret_code': 0,
+            'result': 'NFS create subfolder %s successfully'%(subpath,)
+        }
+
+
 
 

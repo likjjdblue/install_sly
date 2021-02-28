@@ -7,7 +7,8 @@ datastoragenode = {
     'port': 1022,
     'username': 'root',
     'password': '!QAZ2wsx1234',
-    'basepath': '/TRS/DATA',
+    'basepath': '/',
+    'baseurl': '/TRS/DATA',
 }
 
 
@@ -17,7 +18,8 @@ logstoragenode = {
     'port': 1022,
     'username': 'root',
     'password': '!QAZ2wsx1234',
-    'basepath': '/TRS/LOG',
+    'basepath': '/',
+    'baseurl': '/TRS/LOG'
 }
 
 namespace = 'sly2'
