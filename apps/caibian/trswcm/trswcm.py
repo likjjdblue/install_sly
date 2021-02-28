@@ -391,7 +391,7 @@ class TRSWCMTool(object):
         self.DataStorageObj.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'nginx-web.tar.gz'),
                                   remotepath=os.path.join(TmpNginxDataPath, 'nginx-web.tar.gz')
                                   )
-        self.DataStorageObj.ExecCmd('cd  %s;tar -xvzf nginx-web.tar.gz' % (TmpNginxDataPath,))
+        self.DataStorageObj.ExecCmd('cd  %s;tar -xvzf nginx-web.tar.gz' % (self.DataStorageObj.generateRealPath(TmpNginxDataPath),))
 
 
 
