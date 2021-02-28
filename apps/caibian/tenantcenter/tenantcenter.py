@@ -19,6 +19,7 @@ from codecs import open as open
 import importlib
 from storagenode import datastoragenode, logstoragenode
 from apps.storage import getClsObj
+from apps import mergeTwoDicts
 
 
 class TenantCenterTool(object):
@@ -68,6 +69,9 @@ class TenantCenterTool(object):
 
         self.LogStorageObj.createSubFolder(self.AppInfo['TenantCenterLogPath'])
 
+        self.TmpStoragePathDict = dict()
+        self.TmpStoragePathDict['TenantCenterLogPath'] = self.LogStorageObj.generateRealPath(self.AppInfo['TenantCenterLogPath'])
+
         print ('setup TenantCenter Storage successfully')
 
         return {
@@ -105,6 +109,9 @@ class TenantCenterTool(object):
 
         if not os.path.isfile(os.path.join(TmpTargetNamespaceDIR, 'values.yaml')):
             self.generateValues()
+
+            TmpAppInfo = mergeTwoDicts(self.AppInfo, self.TmpStoragePathDict)
+
             with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='wb') as f:
                 yaml.safe_dump(self.AppInfo, f)
 
@@ -120,7 +127,7 @@ class TenantCenterTool(object):
                     TmpContent = ''
                     with open(os.path.join(basepath, file), mode='rb', encoding='utf-8') as f:
                         TmpContent = f.read()
-                    TmpContent = jinja2.Template(TmpContent).render(self.AppInfo)
+                    TmpContent = jinja2.Template(TmpContent).render(TmpAppInfo)
 
                     with open(os.path.join(basepath, file), mode='wb', encoding='utf-8') as f:
                         f.write(TmpContent)
@@ -394,7 +401,7 @@ class TenantCenterTool(object):
         TmpNginxConfigPath = os.path.realpath(os.path.join(self.AppInfo['DataStorageBasePath'], TmpNginxConfigPath))
 
         print (TmpNginxConfigPath)
-        self.DataStorageObj.ExecCmd('mkdir -p %s' % (TmpNginxConfigPath, ))
+        self.DataStorageObj.createSubFolder(TmpNginxConfigPath)
 
         self.DataStorageObj.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'tenantcenter.conf'),
                                   remotepath=os.path.join(TmpNginxConfigPath, 'tenantcenter.conf')
