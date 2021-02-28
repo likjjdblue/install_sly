@@ -18,6 +18,7 @@ from pprint import pprint
 from codecs import open as open
 from storagenode import datastoragenode, logstoragenode
 from apps.storage import getClsObj
+from apps import mergeTwoDicts
 
 
 
@@ -54,6 +55,9 @@ class NacosTool(object):
         print ('create NacosTool Storage successfully')
 
         self.DataStorageObj.createSubFolder(self.AppInfo['NacosDataPath'])
+
+        self.TmpStoragePathDict = dict()
+        self.TmpStoragePathDict['NacosDataPath'] = self.DataStorageObj.generateRealPath(self.AppInfo['NacosDataPath'])
 
 
 
@@ -94,8 +98,11 @@ class NacosTool(object):
 
         if not os.path.isfile(os.path.join(TmpTargetNamespaceDIR, 'values.yaml')):
             self.generateValues()
+
+            TmpAppInfo = mergeTwoDicts(self.AppInfo, self.TmpStoragePathDict)
+
             with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='wb') as f:
-                yaml.safe_dump(self.AppInfo, f)
+                yaml.safe_dump(TmpAppInfo, f)
 
             TmpCWDPath = os.path.abspath(__file__)
             TmpCWDPath = os.path.dirname(TmpCWDPath)
@@ -109,7 +116,7 @@ class NacosTool(object):
                     TmpContent = ''
                     with open(os.path.join(basepath, file), mode='rb', encoding='utf-8') as f:
                         TmpContent = f.read()
-                    TmpContent = jinja2.Template(TmpContent).render(self.AppInfo)
+                    TmpContent = jinja2.Template(TmpContent).render(TmpAppInfo)
 
                     with open(os.path.join(basepath, file), mode='wb', encoding='utf-8') as f:
                         f.write(TmpContent)
