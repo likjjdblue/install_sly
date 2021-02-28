@@ -362,7 +362,7 @@ class PaperReviewTool(object):
         self.DataStorageObj.createSubFolder(TmpNacosToolDataPath)
 
 
-        self.DataStorageObj.ExecCmd('rm -f -r %s/*'%(self.DataStorageObj.generateRealPath(TmpNacosToolDataPath), ))
+        self.DataStorageObj.cleanSubFolder(TmpNacosToolDataPath)
 
 
         print (os.path.join(self.BaseDIRPath, 'tmp', 'namespace.txt'))
@@ -377,7 +377,8 @@ class PaperReviewTool(object):
                                   )
 
 
-        self.DataStorageObj.ExecCmd('cd %s;tar -xvzf nacos.tar.gz'%(self.DataStorageObj.generateRealPath(TmpNacosToolDataPath), ))
+        #self.DataStorageObj.ExecCmd('cd %s;tar -xvzf nacos.tar.gz'%(self.DataStorageObj.generateRealPath(TmpNacosToolDataPath), ))
+        self.DataStorageObj.unTarFile(os.path.join(TmpNacosToolDataPath, 'nacos.tar.gz'))
 
         TmpNacosToolObj = nacostool.NacosTool(**self.kwargs)
         TmpResponse = TmpNacosToolObj.start()
@@ -401,7 +402,7 @@ class PaperReviewTool(object):
         TmpNginxConfigPath = os.path.realpath(os.path.join(self.AppInfo['DataStorageBasePath'], TmpNginxConfigPath))
 
         print (TmpNginxConfigPath)
-        self.DataStorageObj.ExecCmd('mkdir -p %s' % (TmpNginxConfigPath, ))
+        self.DataStorageObj.createSubFolder(TmpNginxConfigPath)
 
         '''self.DataStorageObj.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'trswcm.conf'),
                                   remotepath=os.path.join(TmpNginxConfigPath, 'trswcm.conf')

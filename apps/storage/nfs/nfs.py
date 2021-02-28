@@ -160,8 +160,43 @@ class NFSTool(object):
 
         return {
             'ret_code': 0,
-            'result': 'NFS create subfolder %s successfully'%(subpath,)
+            'result': 'NFS clean subfolder %s successfully'%(subpath,)
         }
+
+
+    def unTarFile(self, subpath):
+        subpath = subpath.strip()
+        if (subpath != '/')  and (subpath.startswith('/')):
+            subpath = subpath.strip('/')
+
+        TmpPath = os.path.join(self.BaseDir, subpath)
+        print ('unTAR file: '+str(TmpPath))
+        TmpResponse = self.SSHClient.ExecCmd('tar -C %s -xvzf  %s'%(os.path.dirname(TmpPath), TmpPath))
+        if TmpResponse['ret_code'] != 0:
+            return TmpResponse
+
+        return {
+            'ret_code': 0,
+            'result': 'NFS unTAR file %s successfully'%(subpath,)
+        }
+
+
+    def unZipFile(self, subpath):
+        subpath = subpath.strip()
+        if (subpath != '/')  and (subpath.startswith('/')):
+            subpath = subpath.strip('/')
+
+        TmpPath = os.path.join(self.BaseDir, subpath)
+        print ('unZIP file: ' + str(TmpPath))
+        TmpResponse = self.SSHClient.ExecCmd('cd %s;unzip  %s'%(os.path.dirname(TmpPath), TmpPath))
+        if TmpResponse['ret_code'] != 0:
+            return TmpResponse
+
+        return {
+            'ret_code': 0,
+            'result': 'NFS unZIP file %s successfully'%(subpath,)
+        }
+
 
 
 
