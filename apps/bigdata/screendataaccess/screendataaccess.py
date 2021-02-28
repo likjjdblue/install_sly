@@ -19,6 +19,7 @@ from codecs import open as open
 import importlib
 from storagenode import datastoragenode, logstoragenode
 from apps.storage import getClsObj
+from apps import mergeTwoDicts
 
 class ScreenDataAccessTool(object):
     def __init__(self, namespace='default', screendataaccessdata='screen-data-access-pv-data',
@@ -70,7 +71,10 @@ class ScreenDataAccessTool(object):
         print ('create ScreenDataAccess Storage successfully')
 
 
-        self.LogStorageObj.createSubFolder(self.AppInfo['ScreenDataAccessDataPath'])
+        self.DataStorageObj.createSubFolder(self.AppInfo['ScreenDataAccessDataPath'])
+
+        self.TmpStoragePathDict = dict()
+        self.TmpStoragePathDict['ScreenDataAccessDataPath'] = self.DataStorageObj.generateRealPath(self.AppInfo['ScreenDataAccessDataPath'])
 
         print ('setup ScreenDataAccess Storage successfully')
 
@@ -109,6 +113,9 @@ class ScreenDataAccessTool(object):
 
         if not os.path.isfile(os.path.join(TmpTargetNamespaceDIR, 'values.yaml')):
             self.generateValues()
+
+            TmpAppInfo = mergeTwoDicts(self.AppInfo, self.TmpStoragePathDict)
+
             with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='wb') as f:
                 yaml.safe_dump(self.AppInfo, f)
 
@@ -124,7 +131,7 @@ class ScreenDataAccessTool(object):
                     TmpContent = ''
                     with open(os.path.join(basepath, file), mode='rb', encoding='utf-8') as f:
                         TmpContent = f.read()
-                    TmpContent = jinja2.Template(TmpContent).render(self.AppInfo)
+                    TmpContent = jinja2.Template(TmpContent).render(TmpAppInfo)
 
                     with open(os.path.join(basepath, file), mode='wb', encoding='utf-8') as f:
                         f.write(TmpContent)
@@ -312,13 +319,13 @@ class ScreenDataAccessTool(object):
         print (TmpSQLToolAccountPath)
         print (TmpSQLToolSQLPath)
 
-        self.DataStorageObj.ExecCmd('mkdir -p %s'%(TmpSQLToolSQLPath, ))
-        self.DataStorageObj.ExecCmd('mkdir -p %s'%(TmpSQLToolAccountPath, ))
+        self.DataStorageObj.createSubFolder(TmpSQLToolSQLPath)
+        self.DataStorageObj.createSubFolder(TmpSQLToolAccountPath)
 
 
 
-        self.DataStorageObj.ExecCmd('rm -f -r %s/*'%(TmpSQLToolAccountPath, ))
-        self.DataStorageObj.ExecCmd('rm -f -r %s/*'%(TmpSQLToolSQLPath,))
+        self.DataStorageObj.cleanSubFolder(TmpSQLToolAccountPath)
+        self.DataStorageObj.cleanSubFolder(TmpSQLToolSQLPath)
 
         print (os.path.join(self.BaseDIRPath, 'tmp', 'account.txt'))
         print (os.path.join(self.BaseDIRPath, 'downloads', 'mcb_dicttool.sql'))
@@ -353,7 +360,7 @@ class ScreenDataAccessTool(object):
         TmpNginxConfigPath = os.path.realpath(os.path.join(self.AppInfo['DataStorageBasePath'], TmpNginxConfigPath))
 
         print (TmpNginxConfigPath)
-        self.DataStorageObj.ExecCmd('mkdir -p %s' % (TmpNginxConfigPath, ))
+        self.DataStorageObj.createSubFolder(TmpNginxConfigPath)
 
 
         '''
