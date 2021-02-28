@@ -362,8 +362,7 @@ class PaperReviewTool(object):
         self.DataStorageObj.createSubFolder(TmpNacosToolDataPath)
 
 
-
-        self.DataStorageObj.ExecCmd('rm -f -r %s/*'%(TmpNacosToolDataPath, ))
+        self.DataStorageObj.ExecCmd('rm -f -r %s/*'%(self.DataStorageObj.generateRealPath(TmpNacosToolDataPath), ))
 
 
         print (os.path.join(self.BaseDIRPath, 'tmp', 'namespace.txt'))
@@ -377,7 +376,8 @@ class PaperReviewTool(object):
                                   remotepath=os.path.join(TmpNacosToolDataPath, 'nacos.tar.gz')
                                   )
 
-        self.DataStorageObj.ExecCmd('cd %s;tar -xvzf nacos.tar.gz'%(TmpNacosToolDataPath, ))
+
+        self.DataStorageObj.ExecCmd('cd %s;tar -xvzf nacos.tar.gz'%(self.DataStorageObj.generateRealPath(TmpNacosToolDataPath), ))
 
         TmpNacosToolObj = nacostool.NacosTool(**self.kwargs)
         TmpResponse = TmpNacosToolObj.start()
