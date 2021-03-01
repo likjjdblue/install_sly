@@ -39,7 +39,10 @@ class NacosTool(object):
 
 
 
-        self.AppInfo['MysqlDataPath'] = os.path.join(self.AppInfo['DataStorageBasePath'], '-'.join([namespace, mysqldatapath]))
+        #self.AppInfo['MysqlDataPath'] = os.path.join(self.AppInfo['DataStorageBasePath'], '-'.join([namespace, mysqldatapath]))
+
+        ###  Mysql data path not changeable  ##
+        self.AppInfo['MysqlDataPath'] = os.path.join('/TRS/DATA', '-'.join([namespace, mysqldatapath]) )
         self.AppInfo['NacosDataPath'] = os.path.join(self.AppInfo['DataStorageBasePath'], '-'.join([namespace, nacosdatapath]))
         self.AppInfo['Namespace'] = namespace
         self.AppInfo['ProvisionerPath'] = nacosdatapath
@@ -69,7 +72,7 @@ class NacosTool(object):
         self.DataStorageObj.createSubFolder(self.AppInfo['NacosDataPath'])
 
         self.TmpStoragePathDict = dict()
-        self.TmpStoragePathDict['MysqlDataPath'] = self.DataStorageObj.generateRealPath(self.AppInfo['MysqlDataPath'])
+        #self.TmpStoragePathDict['MysqlDataPath'] = self.DataStorageObj.generateRealPath(self.AppInfo['MysqlDataPath'])
 
         print ('setup NACOS Storage successfully')
 

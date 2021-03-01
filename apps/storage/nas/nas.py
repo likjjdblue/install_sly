@@ -6,6 +6,7 @@ import tools
 import re
 import subprocess
 from storagenode import datastoragenode, logstoragenode
+from time import sleep
 
 class NASTool(object):
     def __init__(self, hostname, port, username, password, baseurl, *args, **kwargs):
@@ -33,27 +34,35 @@ class NASTool(object):
     def checkNASExistence(self):
         TmpMountState = os.path.ismount(self.MntPointPath)
 
-        if TmpMountState:
-            return {
-                'ret_code': 0,
-                'result': 'true',
-            }
-
         return {
-            'ret_code': 1,
-            'result': 'false'
+            'ret_code': 0,
+            'result': TmpMountState
         }
-
 
 
     def installStorage(self, basedir='/'):
         TmpResult = self.checkNASExistence()
 
-        if TmpResult['ret_code'] != 0:
-            print ('Going to mount NFS  %s:%s'%(self.HostName, self.BaseURL))
+        if TmpResult['result'] is not True:
+            print ('Going to mount NFS  %s:%s  @ %s'%(self.HostName, self.BaseURL, self.MntPointPath))
             subprocess.Popen('mkdir -p  %s' % (self.MntPointPath,), shell=True)
             subprocess.Popen('timeout --signal=9 3 mount -t nfs %s:%s  %s'%(self.HostName, self.BaseURL, self.MntPointPath), shell=True)
-            TmpResult = self.checkNASExistence()
+
+            print ('mount task finished')
+
+            for _ in range(1,61):
+                TmpResult = self.checkNASExistence()
+                if TmpResult['result'] is not True:
+                    print ('# %s Waitting for mount-point to be available .....'%(str(_), ))
+                    sleep (0.5)
+                    continue
+                break
+
+
+
+
+            if TmpResult['result'] is not True:
+                TmpResult['ret_code'] = 1
 
         return TmpResult
 
@@ -169,6 +178,10 @@ if __name__ == "__main__":
     #print (Tmp.generateRealPath('/TRS/DATA'))
     print (Tmp.unTarFile('/HAHs/nacos.tar.gz'))
     Tmp.cleanSubFolder('/HAHs')
+
+
+    Tmp2 = NASTool(**logstoragenode)
+    print (Tmp2.installStorage())
 
 
 

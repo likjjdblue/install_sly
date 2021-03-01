@@ -37,7 +37,11 @@ class MariaDBTool(object):
         self.AppInfo['LogStorageAddr'] = logstoragenode['hostname']
         self.AppInfo['LogStorageBasePath'] = logstoragenode['basepath']
 
-        self.AppInfo['MariaDBDataPath'] = os.path.join(self.AppInfo['DataStorageBasePath'], '-'.join([namespace, mariadbdatapath]))
+        #self.AppInfo['MariaDBDataPath'] = os.path.join(self.AppInfo['DataStorageBasePath'], '-'.join([namespace, mariadbdatapath]))
+
+
+        ### MariaDB data path not changeable   ###
+        self.AppInfo['MariaDBDataPath'] = os.path.join('/TRS/DATA', '-'.join([namespace, mariadbdatapath]))
         self.AppInfo['Namespace'] = namespace
 
         self.AppInfo['HarborAddr'] = harbor
@@ -62,7 +66,7 @@ class MariaDBTool(object):
         '''
 
         self.TmpStoragePathDict = dict()
-        self.TmpStoragePathDict['MariaDBDataPath'] = self.DataStorageObj.generateRealPath(self.AppInfo['MariaDBDataPath'])
+        #self.TmpStoragePathDict['MariaDBDataPath'] = self.DataStorageObj.generateRealPath(self.AppInfo['MariaDBDataPath'])
 
         print ('setup MariaDB Storage successfully')
 
