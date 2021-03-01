@@ -10,6 +10,7 @@ __all__ = [
 
 StortageNameMapping ={
     'nfs': 'apps.storage.nfs/NFSTool',
+    'nas': 'apps.storage.nas/NASTool',
 }
 
 def getClsObj(name):
