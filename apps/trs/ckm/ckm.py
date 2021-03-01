@@ -18,6 +18,7 @@ from pprint import pprint
 from codecs import open as open
 from storagenode import datastoragenode, logstoragenode
 from apps.storage import getClsObj
+from apps import mergeTwoDicts
 
 
 class CKMTool(object):
@@ -60,6 +61,9 @@ class CKMTool(object):
 
         self.DataStorageObj.createSubFolder(self.AppInfo['CKMDataPath'])
 
+        self.TmpStoragePathDict = dict()
+        self.TmpStoragePathDict['CKMDataPath'] = self.DataStorageObj.generateRealPath(self.AppInfo['CKMDataPath'])
+
 
 
         print ('setup CKM Storage successfully')
@@ -99,6 +103,9 @@ class CKMTool(object):
 
         if not os.path.isfile(os.path.join(TmpTargetNamespaceDIR, 'values.yaml')):
             self.generateValues()
+
+            TmpAppInfo = mergeTwoDicts(self.AppInfo, self.TmpStoragePathDict)
+
             with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='wb') as f:
                 yaml.safe_dump(self.AppInfo, f)
 
@@ -114,7 +121,7 @@ class CKMTool(object):
                     TmpContent = ''
                     with open(os.path.join(basepath, file), mode='rb', encoding='utf-8') as f:
                         TmpContent = f.read()
-                    TmpContent = jinja2.Template(TmpContent).render(self.AppInfo)
+                    TmpContent = jinja2.Template(TmpContent).render(TmpAppInfo)
 
                     with open(os.path.join(basepath, file), mode='wb', encoding='utf-8') as f:
                         f.write(TmpContent)
