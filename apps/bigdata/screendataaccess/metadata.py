@@ -13,7 +13,7 @@ AppInfo = {
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
-    'ScreenDataAccessImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/screen-data-access:v5',
+    'ScreenDataAccessImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/screen-data-access-deploy:zmy-devops-v2.2.0.2',
     "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
 
     'ScreenDataAccessPrimaryDBHost': 'mariadb-svc',

@@ -47,7 +47,7 @@ spec:
           - mountPath: /TRS/TRSWCM/logs/
             name: pvc-wcmlog
           - mountPath: /TRS/LOGS
-              name: pvc-wcmlog1
+            name: pvc-wcmlog1
           #- mountPath: /TRS/TRSWCM/webapps
           #  name: pvc-webapps
           ports:

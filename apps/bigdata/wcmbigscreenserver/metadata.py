@@ -13,7 +13,7 @@ AppInfo = {
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
-    'WCMBigScreenServerImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/wcm-bigscreen-server:v2',
+    'WCMBigScreenServerImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/wcm-bigscreen-server-deploy:zmy-devops-v2.2.0.2',
     "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
 
     'WCMBigScreenServerPrimaryDBHost': 'mariadb-svc',
