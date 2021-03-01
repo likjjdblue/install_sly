@@ -3,7 +3,7 @@
 
 import sys, os
 sys.path.append('../../..')
-from apps.common import nfs, nfsprovisioner, sqltool
+from apps.common import nfsprovisioner, sqltool
 from tools import k8s_tools, ssh_tools
 from metadata import AppInfo
 from copy import deepcopy
@@ -19,32 +19,22 @@ from codecs import open as open
 import importlib
 
 class TRSHyBaseTool(object):
-    def __init__(self, namespace='default', nfsinfo={},
+    def __init__(self, namespace='default',
                  harbor=None, retrytimes=10, *args, **kwargs):
 
         namespace = namespace.strip()
         kwargs['namespace'] = namespace
-        kwargs['nfsinfo'] = nfsinfo
         kwargs['harbor'] = harbor
         self.kwargs = kwargs
 
         self.RetryTimes = int(retrytimes)
-        self.NFSAddr = nfsinfo['hostname']
-        self.NFSPort = nfsinfo['port']
-        self.NFSUsername = nfsinfo['username']
-        self.NFSPassword = nfsinfo['password']
-        self.NFSBasePath = nfsinfo['basepath']
         self.AppInfo = deepcopy(AppInfo)
 
-        self.AppInfo['NFSAddr'] = self.NFSAddr
-        self.AppInfo['NFSBasePath'] = self.NFSBasePath
         self.AppInfo['Namespace'] = namespace
 
         self.AppInfo['HarborAddr'] = harbor
         self.k8sObj = k8s_tools.K8SClient()
 
-        self.NFSObj = nfs.NFSTool(**nfsinfo)
-        self.SSHClient = ssh_tools.SSHTool(**nfsinfo)
 
         self.DependencyDict ={}
         self.BaseDIRPath= os.path.realpath('../../..')
@@ -55,14 +45,6 @@ class TRSHyBaseTool(object):
 
 
     def setupNFS(self):
-        TmpResponse = self.NFSObj.installNFS(basedir=self.AppInfo['NFSBasePath'])
-        if TmpResponse['ret_code'] != 0:
-            return TmpResponse
-
-        print ('create TRS Hybase NFS successfully')
-
-        #self.NFSObj.createSubFolder(self.AppInfo['TRSIDSDataPath'])
-
 
         return {
             'ret_code': 0,
@@ -233,15 +215,6 @@ class TRSHyBaseTool(object):
         TmpNginxConfigPath = os.path.realpath(os.path.join(self.AppInfo['NFSBasePath'], TmpNginxConfigPath))
 
         print (TmpNginxConfigPath)
-        self.SSHClient.ExecCmd('mkdir -p %s' % (TmpNginxConfigPath, ))
-
-        '''
-        self.SSHClient.uploadFile(localpath=os.path.join(self.BaseDIRPath, 'downloads', 'trsids.conf'),
-                                  remotepath=os.path.join(TmpNginxConfigPath, 'trsids.conf')
-                                  )
-        '''
-
-
         TmpNginxPods = self.k8sObj.filterNamespacedPod(namespace=self.AppInfo['Namespace'], filters={
             "run": "nginx"
         })['result']
