@@ -210,26 +210,7 @@ class TRSCKM6Tool(object):
 
 
     def postInstall(self):
-        TmpNginxConfigPath = '-'.join([self.AppInfo['Namespace'], 'nginx-pv-config'])
-        TmpNginxConfigPath = os.path.realpath(os.path.join(self.AppInfo['NFSBasePath'], TmpNginxConfigPath))
-
-        print (TmpNginxConfigPath)
-
-        TmpNginxPods = self.k8sObj.filterNamespacedPod(namespace=self.AppInfo['Namespace'], filters={
-            "run": "nginx"
-        })['result']
-
-        TmpPod = None
-        for _ in range(1):
-            for pod in TmpNginxPods:
-                print ('Config target Nginx POD: '+str(pod.to_dict()['metadata']['name']))
-                TmpPod = pod.to_dict()
-                break
-
-
-        self.k8sObj.execNamespacedPod(namespace=self.AppInfo['Namespace'], name=TmpPod['metadata']['name'],
-                                      cmd='nginx -s reload'
-                                      )
+        pass
 
 
     def getValues(self):
