@@ -23,8 +23,8 @@ from apps import mergeTwoDicts
 
 
 class TRSWCMTool(object):
-    def __init__(self, namespace='default', wcmdatapath='trswcm-pv-data', wcmlogdata='trswcm-pv-log' ,
-                 harbor=None, retrytimes=60, *args, **kwargs):
+    def __init__(self, namespace='default', wcmdatapath='trswcm-pv-data', wcmlogdata='trswcm-pv-log',
+                 wcmlog1data='trswcm-pv-wcmlog1', harbor=None, retrytimes=60, *args, **kwargs):
 
         namespace = namespace.strip()
         kwargs['namespace'] = namespace
@@ -43,6 +43,7 @@ class TRSWCMTool(object):
 
         self.AppInfo['TRSWCMDataPath'] = os.path.join(self.AppInfo['DataStorageBasePath'], '-'.join([namespace, wcmdatapath]))
         self.AppInfo['TRSWCMLogPath'] = os.path.join(self.AppInfo['LogStorageBasePath'], '-'.join([namespace, wcmlogdata]))
+        self.AppInfo['TRSWCMLog1Path'] = os.path.join(self.AppInfo['LogStorageBasePath'], '-'.join([namespace, wcmlog1data]))
         self.AppInfo['Namespace'] = namespace
 
         self.AppInfo['HarborAddr'] = harbor
@@ -75,10 +76,13 @@ class TRSWCMTool(object):
 
         self.DataStorageObj.createSubFolder(self.AppInfo['TRSWCMDataPath'])
         self.LogStorageObj.createSubFolder(self.AppInfo['TRSWCMLogPath'])
+        self.LogStorageObj.createSubFolder(self.AppInfo['TRSWCMLog1Path'])
 
         self.TmpStoragePathDict = dict()
         self.TmpStoragePathDict['TRSWCMDataPath'] = self.DataStorageObj.generateRealPath(self.AppInfo['TRSWCMDataPath'])
         self.TmpStoragePathDict['TRSWCMLogPath'] = self.LogStorageObj.generateRealPath(self.AppInfo['TRSWCMLogPath'])
+        self.TmpStoragePathDict['TRSWCMLog1Path'] = self.LogStorageObj.generateRealPath(self.AppInfo['TRSWCMLog1Path'])
+
 
         print ('setup TRS WCM Storage successfully')
 

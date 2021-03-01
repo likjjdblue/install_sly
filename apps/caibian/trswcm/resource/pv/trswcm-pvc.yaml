@@ -24,3 +24,16 @@ spec:
   resources:
      requests:
        storage: 500Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc-wcmlog1-slytest
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  storageClassName: wcmlog1-class-slytest
+  resources:
+     requests:
+       storage: 500Gi

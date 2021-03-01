@@ -31,3 +31,19 @@ spec:
   nfs:
     path: {{ TRSWCMLogPath }}
     server: {{ LogStorageAddr }}
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-wcmlog1-slytest
+spec:
+  capacity:
+    storage: 500Gi
+  volumeMode: Filesystem
+  storageClassName: wcmlog1-class-slytest
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: {{ TRSWCMLog1Path }}
+    server: {{ LogStorageAddr }}

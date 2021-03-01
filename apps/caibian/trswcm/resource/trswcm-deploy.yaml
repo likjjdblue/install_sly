@@ -26,6 +26,9 @@ spec:
       - name: pvc-wcmlog
         persistentVolumeClaim:
           claimName: pvc-wcmlog-slytest
+      - name: pvc-wcmlog1
+        persistentVolumeClaim:
+          claimName: pvc-wcmlog1-slytest
       #- name: pvc-webapps
       #  persistentVolumeClaim:
       #    claimName: pvc-webapps
@@ -43,6 +46,8 @@ spec:
             name: pvc-wcmdata
           - mountPath: /TRS/TRSWCM/logs/
             name: pvc-wcmlog
+          - mountPath: /TRS/LOGS
+              name: pvc-wcmlog1
           #- mountPath: /TRS/TRSWCM/webapps
           #  name: pvc-webapps
           ports:
