@@ -1,12 +1,12 @@
-storagenode_example_template Ŀ¼�´�ŵ��ǹ�������ģ�壬ʹ�÷�ʽ��
-1����Ŀ�鰴ʵ���������������һ��ģ������һ���ļ�Ŀ¼(Ҳ����install_sly Ŀ¼��)�������ļ�������Ϊ"storagenode.py"
-2������ʵ�������storagenode.py�е�����������޸ġ�
+storagenode_example_template 目录下存放的是工具配置模板，使用方式：
+1、项目组按实际情况，拷贝其中一个模板至上一级文件目录(也就是install_sly 目录下)，并将文件重命名为"storagenode.py"
+2、按照实际情况对storagenode.py中的配置项进行修改。
 
 
-˵����
+说明：
 storagenode_nas.py  
-    ��ģ���Ӧ NAS �洢,ʹ�ø�ģ������ǰ��֤�ⲿNAS �ɷ��ʣ�������Ŀ�����Ȳ��ø÷�ʽ���� ����ʹ��mount  ������в���
+    该模板对应 NAS 存储,使用该模板需提前保证外部NAS 可访问（建议项目组优先采用该方式）； 可以使用mount  命令进行测试
 
 storagenode_nfs.py   
-    ��ģ���ӦNFS �洢,ʹ�ø�ģ�彫�ɹ��ߴNFS ����;�����Խ�NFS ���ܻ��кܴ����⣬һ�㲻�Ƽ�������ʽ������������С��ģʹ�ã��������ڲ��Ի���!
+    该模板对应NFS 存储,使用该模板将由工具搭建NFS 服务;程序自建NFS 性能会有很大问题，一般不推荐用于正式环境，除非是小规模使用，或者用于测试环境!
 
