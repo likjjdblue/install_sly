@@ -9,8 +9,7 @@ from storagenode import datastoragenode, logstoragenode
 from time import sleep
 
 class NASTool(object):
-    def __init__(self, hostname, port, username, password, baseurl, *args, **kwargs):
-        self.SSHClient = tools.ssh_tools.SSHTool(hostname, port, username, password)
+    def __init__(self, hostname, baseurl, *args, **kwargs):
 
         baseurl = baseurl.strip()
         baseurl = os.path.join('/', baseurl)
@@ -86,11 +85,11 @@ class NASTool(object):
         }
 
     def close(self):
-        self.SSHClient.close()
+        pass
 
 
     def ExecCmd(self,command, get_pty=True, *args, **kwargs):
-        self.SSHClient.ExecCmd(command)
+        pass
 
 
     def uploadFile(self, localpath, remotepath, *args, **kwargs):
@@ -105,7 +104,7 @@ class NASTool(object):
         print ('remote path: '+str(remotepath))
         print ('local path: '+str(localpath))
 
-        #self.SSHClient.uploadFile(localpath=localpath, remotepath=remotepath)
+
         subprocess.Popen('/usr/bin/cp %s %s'%(localpath, remotepath), shell=True)
 
 
@@ -124,7 +123,6 @@ class NASTool(object):
             subpath = subpath.strip('/')
 
         TmpPath = os.path.join(self.MntPointPath, subpath)
-        #TmpResponse = self.SSHClient.ExecCmd('rm -f -r  %s/*'%(TmpPath,))
 
         subprocess.call('rm -f -r %s/*'%(TmpPath, ), shell=True)
 
@@ -141,7 +139,7 @@ class NASTool(object):
 
         TmpPath = os.path.join(self.MntPointPath, subpath)
         print ('unTAR file: '+str(TmpPath))
-        #TmpResponse = self.SSHClient.ExecCmd('tar -C %s -xvzf  %s'%(os.path.dirname(TmpPath), TmpPath))
+
         subprocess.call('tar -C %s -xvzf  %s'%(os.path.dirname(TmpPath), TmpPath), shell=True)
 
 
@@ -158,7 +156,6 @@ class NASTool(object):
 
         TmpPath = os.path.join(self.MntPointPath, subpath)
         print ('unZIP file: ' + str(TmpPath))
-        #TmpResponse = self.SSHClient.ExecCmd('cd %s;unzip  %s'%(os.path.dirname(TmpPath), TmpPath))
 
         subprocess.call('cd %s;unzip  %s'%(os.path.dirname(TmpPath), TmpPath), shell=True)
 
