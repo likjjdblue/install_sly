@@ -1,7 +1,18 @@
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
+  labels:
+    app: nfs-client-provisioner
+    chart: nfs-client-provisioner-1.2.11
+    heritage: Helm
+    release: nfs-client-provisioner
   name: managed-nfs-storage
-provisioner: fuseim.pri/ifs
+provisioner: cluster.local/nfs-client-provisioner
+allowVolumeExpansion: true
+reclaimPolicy: Delete
 parameters:
-  archiveOnDelete: "false"
+  archiveOnDelete: "true"
+mountOptions:
+  - 'nfsvers=3'
+  - 'mountvers=3'
+  - 'nolock'

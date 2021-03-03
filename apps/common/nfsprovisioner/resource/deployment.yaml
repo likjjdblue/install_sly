@@ -1,12 +1,51 @@
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: nfs-client-provisioner
 ---
-kind: Deployment
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-nfs-client-provisioner
+  labels:
+    nfs-client-provisioner: nfs-client-provisioner
+spec:
+  capacity:
+    storage: 10Mi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: ""
+  mountOptions:
+    - 'nfsvers=3'
+    - 'mountvers=3'
+    - 'nolock'
+  nfs:
+    server: {{ DataStorageAddr }}
+    path: {{ NFSDataPath }}
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: pvc-nfs-client-provisioner
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  storageClassName: ""
+  selector:
+    matchLabels:
+      nfs-client-provisioner: nfs-client-provisioner
+  resources:
+    requests:
+      storage: 10Mi
+---
 apiVersion: apps/v1
+kind: Deployment
 metadata:
   name: nfs-client-provisioner
+  labels:
+    app: nfs-client-provisioner
+    chart: nfs-client-provisioner-1.2.11
+    heritage: Helm
+    release: nfs-client-provisioner
 spec:
   replicas: 1
   strategy:
@@ -14,27 +53,31 @@ spec:
   selector:
     matchLabels:
       app: nfs-client-provisioner
+      release: nfs-client-provisioner
   template:
     metadata:
+      annotations:
       labels:
         app: nfs-client-provisioner
+        release: nfs-client-provisioner
     spec:
-      serviceAccount: nfs-client-provisioner
+      serviceAccountName: nfs-client-provisioner
       containers:
         - name: nfs-client-provisioner
-          image: {{ NFSProvisionerImage }}
+          image: "quay.io/external_storage/nfs-client-provisioner:latest"
+          imagePullPolicy: IfNotPresent
           volumeMounts:
             - name: nfs-client-root
               mountPath: /persistentvolumes
           env:
             - name: PROVISIONER_NAME
-              value: fuseim.pri/ifs
+              value: cluster.local/nfs-client-provisioner
             - name: NFS_SERVER
               value: {{ DataStorageAddr }}
             - name: NFS_PATH
               value: {{ NFSDataPath }}
       volumes:
         - name: nfs-client-root
-          nfs:
-            server: {{ DataStorageAddr }}
-            path: {{ NFSDataPath }}
+          persistentVolumeClaim:
+            claimName: pvc-nfs-client-provisioner
+
