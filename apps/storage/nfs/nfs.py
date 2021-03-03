@@ -4,6 +4,7 @@ import sys, os
 sys.path.append('../../..')
 import tools
 import re
+from time import sleep
 
 class NFSTool(object):
     def __init__(self, hostname, port, username, password, baseurl, *args, **kwargs):
@@ -165,6 +166,7 @@ class NFSTool(object):
 
 
     def unTarFile(self, subpath):
+        sleep (5)
         subpath = subpath.strip()
         if (subpath != '/')  and (subpath.startswith('/')):
             subpath = subpath.strip('/')
@@ -182,6 +184,7 @@ class NFSTool(object):
 
 
     def unZipFile(self, subpath):
+        sleep (5)
         subpath = subpath.strip()
         if (subpath != '/')  and (subpath.startswith('/')):
             subpath = subpath.strip('/')

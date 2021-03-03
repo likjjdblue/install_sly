@@ -133,6 +133,7 @@ class NASTool(object):
 
 
     def unTarFile(self, subpath):
+        sleep (5)
         subpath = subpath.strip()
         if (subpath != '/')  and (subpath.startswith('/')):
             subpath = subpath.strip('/')
@@ -150,6 +151,7 @@ class NASTool(object):
 
 
     def unZipFile(self, subpath):
+        sleep (5)
         subpath = subpath.strip()
         if (subpath != '/')  and (subpath.startswith('/')):
             subpath = subpath.strip('/')
