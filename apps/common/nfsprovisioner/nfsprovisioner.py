@@ -27,6 +27,12 @@ class NFSProvisionerTool(object):
         self.RetryTimes = int(retrytimes)
         self.AppInfo = deepcopy(AppInfo)
 
+        try:
+            from storagenode import dynamicstoragenode as datastoragenode
+        except Exception as e:
+            pass
+
+
         self.AppInfo['DataStorageAddr'] = datastoragenode['hostname']
         self.AppInfo['DataStorageBasePath'] = datastoragenode['basepath']
         self.AppInfo['LogStorageAddr'] = logstoragenode['hostname']
