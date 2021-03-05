@@ -7,6 +7,7 @@ import re
 import subprocess
 from storagenode import datastoragenode, logstoragenode
 from time import sleep
+import storagenode
 
 class NASTool(object):
     def __init__(self, hostname, baseurl, *args, **kwargs):
@@ -42,10 +43,15 @@ class NASTool(object):
     def installStorage(self, basedir='/'):
         TmpResult = self.checkNASExistence()
 
+        try:
+            from storagenode import mountOption
+        except:
+            mountOption = 'mount -t nfs  -o nolock '
+
         if TmpResult['result'] is not True:
             print ('Going to mount NFS  %s:%s  @ %s'%(self.HostName, self.BaseURL, self.MntPointPath))
             subprocess.Popen('mkdir -p  %s' % (self.MntPointPath,), shell=True)
-            subprocess.Popen('timeout --signal=9 3 mount -t nfs  -o nolock %s:%s  %s'%(self.HostName, self.BaseURL, self.MntPointPath), shell=True)
+            subprocess.Popen('timeout --signal=9 3 %s  %s:%s  %s'%(mountOption, self.HostName, self.BaseURL, self.MntPointPath), shell=True)
 
             print ('mount task finished')
 
