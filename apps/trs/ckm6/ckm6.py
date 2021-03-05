@@ -120,10 +120,12 @@ class TRSCKM6Tool(object):
 
 
 
-        self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'ckm6-endpoint.yaml'),
+        self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'ckm6-svc.yaml'),
                                                namespace=self.AppInfo['Namespace']
                                                )
-        self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'ckm6-svc.yaml'),
+
+        self.k8sObj.deleteNamespacedEndpoint(name='ckm6-svc', namespace=self.AppInfo['Namespace'])
+        self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'ckm6-endpoint.yaml'),
                                                namespace=self.AppInfo['Namespace']
                                                )
 

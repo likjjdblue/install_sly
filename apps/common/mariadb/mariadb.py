@@ -283,7 +283,7 @@ class MariaDBTool(object):
                 )
 
 
-            self.k8sObj.deleteNamespacedEndpoint(name='mariadb-svc', namespace='sly2')
+            self.k8sObj.deleteNamespacedEndpoint(name='mariadb-svc', namespace=self.AppInfo['Namespace'])
 
             self.k8sObj.createResourceFromYaml(
                 filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mariadb-endpoint.yaml'),

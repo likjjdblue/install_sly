@@ -121,10 +121,12 @@ class TRSHyBaseTool(object):
 
 
 
-        self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'hybase-endpoint.yaml'),
+        self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'hybase-svc.yaml'),
                                                namespace=self.AppInfo['Namespace']
                                                )
-        self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'hybase-svc.yaml'),
+
+        self.k8sObj.deleteNamespacedEndpoint(name='hybase-svc', namespace=self.AppInfo['Namespace'])
+        self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'hybase-endpoint.yaml'),
                                                namespace=self.AppInfo['Namespace']
                                                )
 
