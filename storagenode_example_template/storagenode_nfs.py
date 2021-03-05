@@ -72,3 +72,24 @@ dynamicstoragenode = {
 
 
 namespace = 'sly2'
+
+
+######         externalMariadbnode   配置项说明      ###
+# 外部MYSQL 访问地址;如果项目组希望使用第三方提供的mysql (或mariadb),可以在这个地方进行配置。
+# 提供的ROOT 账号，必须具有创建DB，table ,user,为用户复权等权限；配置前最好手动验证账号权限
+
+# mysqlhost：外部数据库 IP 地址 (必填项，按实际情况修改)
+# mysqlport： 外部数据库端口 默认3306  (必填项，按实际情况修改)
+#  mysqluser：  外部数据库账号 (用户名只能是root )
+# mysqlpassword:  外部数据库root 账号密码  (必填项，按实际情况修改)
+
+#如果需要配置请将下面的"#"注释去掉
+
+#externalMariadbnode ={
+#    'mysqlhost': '192.168.200.168',
+#    'mysqlport': 3306,
+#    'mysqluser': 'root',
+#    'mysqlpassword': 'abc123',
+#}
+
+######      END      ###########

@@ -19,6 +19,45 @@ from codecs import open as open
 from storagenode import datastoragenode, logstoragenode
 from apps.storage import getClsObj
 from apps import mergeTwoDicts
+import storagenode
+
+
+def installMysqlDriver4Python():
+    TmpCWDPath = os.path.abspath(__file__)
+    TmpCWDPath = os.path.dirname(TmpCWDPath)
+    TmpCWDPath = os.path.join(TmpCWDPath, 'rpm')
+
+
+    try:
+        import mysql.connector
+    except:
+        subprocess.call('rpm -Uvh --force %s/mysql-connector-python-2.1.7-1.el7.x86_64.rpm'%(TmpCWDPath, ),
+                        shell=True)
+        import mysql.connector
+
+
+def checkMysqlConnection(mysqlhost, mysqlport, mysqluser, mysqlpassword):
+    try:
+        import mysql.connector
+        ConnObj=mysql.connector.connect(host=mysqlhost.strip(),
+                                        port=str(mysqlport).strip(),
+                                        user=str(mysqluser).strip(),
+                                        password=str(mysqlpassword).strip(),
+                                        connection_timeout=3)
+        CursorObj=ConnObj.cursor()
+        CursorObj.execute('use mysql;')
+        print ('External Mysql is available')
+        return {
+            'ret_code': 0,
+            'result': 'External Mysql check result good'
+        }
+    except Exception as e:
+        print ('External Mysql not available')
+        return {
+            'ret_code': 1,
+            'result': 'External Mysql check result bad'
+        }
+
 
 
 
@@ -31,6 +70,7 @@ class MariaDBTool(object):
         namespace = namespace.strip()
         self.RetryTimes = int(retrytimes)
         self.AppInfo = deepcopy(AppInfo)
+
 
         self.AppInfo['DataStorageAddr'] = datastoragenode['hostname']
         self.AppInfo['DataStorageBasePath'] = datastoragenode['basepath']
@@ -47,8 +87,8 @@ class MariaDBTool(object):
         self.AppInfo['HarborAddr'] = harbor
         self.k8sObj = k8s_tools.K8SClient()
 
-        self.DataStorageObj = getClsObj(datastoragenode['type'])(**datastoragenode)
-        self.LogStorageObj = getClsObj(logstoragenode['type'])(**logstoragenode)
+        #self.DataStorageObj = getClsObj(datastoragenode['type'])(**datastoragenode)
+        #self.LogStorageObj = getClsObj(logstoragenode['type'])(**logstoragenode)
 
         TmpCWDPath = os.path.abspath(__file__)
         TmpCWDPath = os.path.dirname(TmpCWDPath)
@@ -59,13 +99,21 @@ class MariaDBTool(object):
             self.AppInfo = deepcopy(self.getValues())
 
     def setupStorage(self):
+        self.TmpStoragePathDict = dict()
+
+        if hasattr(storagenode, 'externalMariadbnode'):
+            return {
+                'ret_code': 0,
+                'result': ''
+            }
+
         print ('create MariaDB Storage successfully')
 
         '''
         self.NFSObj.createSubFolder(self.AppInfo['MariaDBDataPath'])
         '''
 
-        self.TmpStoragePathDict = dict()
+
         #self.TmpStoragePathDict['MariaDBDataPath'] = self.DataStorageObj.generateRealPath(self.AppInfo['MariaDBDataPath'])
 
         print ('setup MariaDB Storage successfully')
@@ -79,7 +127,24 @@ class MariaDBTool(object):
         self.AppInfo['MariaDBImage'] = replaceDockerRepo(self.AppInfo['MariaDBImage'], self.AppInfo['HarborAddr'])
         self.AppInfo['NFSProvisionerImage'] =replaceDockerRepo(self.AppInfo['NFSProvisionerImage'],
                                                                self.AppInfo['HarborAddr'])
-        self.AppInfo['MariaDBPassword'] = crypto_tools.generateRandomAlphaNumericString(lenght=10)
+
+        if not hasattr(storagenode, 'externalMariadbnode'):
+            self.AppInfo['MariaDBPassword'] = crypto_tools.generateRandomAlphaNumericString(lenght=10)
+        else:
+            installMysqlDriver4Python()
+
+            from storagenode import externalMariadbnode
+            TmpMysqlCheckResult = checkMysqlConnection(**externalMariadbnode)
+            if TmpMysqlCheckResult['ret_code'] != 0:
+                print (TmpMysqlCheckResult['result'])
+                print ('Fatal Error, Quit....')
+                raise Exception('External Mysql  check result bad')
+
+            self.AppInfo['MariaDBHostIP'] = str(externalMariadbnode['mysqlhost']).strip()
+            self.AppInfo['MariaDBHostPort'] = str(externalMariadbnode['mysqlport']).strip()
+            self.AppInfo['MariaDBUser'] = str(externalMariadbnode['mysqluser']).strip()
+            self.AppInfo['MariaDBPassword'] = str(externalMariadbnode['mysqlpassword'])
+
 
         if not self.AppInfo['MariaDBHostIP']:
             TmpIP = raw_input('input k8s node IP  Address for MariaDB:')
@@ -110,6 +175,8 @@ class MariaDBTool(object):
         if not os.path.isdir(TmpTargetNamespaceDIR):
             os.mkdir(TmpTargetNamespaceDIR)
 
+        subprocess.call('mkdir -p %s'%(os.path.join(TmpTargetNamespaceDIR, 'resource')), shell=True)
+
         if not os.path.isfile(os.path.join(TmpTargetNamespaceDIR, 'values.yaml')):
             self.generateValues()
 
@@ -121,19 +188,40 @@ class MariaDBTool(object):
             TmpCWDPath = os.path.abspath(__file__)
             TmpCWDPath = os.path.dirname(TmpCWDPath)
 
-            subprocess.Popen('/usr/bin/cp -r %s %s'%(os.path.join(TmpCWDPath, 'resource'),
-                                                     TmpTargetNamespaceDIR), shell=True)
+            TmpNoneExternalTargetFiles = ['mariadb-cm.yaml', 'mariadb-deploy.yaml', 'mariadb-pv.yaml',
+                                          'mariadb-pvc.yaml', 'mariadb-svc.yaml',
+                                          ]
+
+            TmpExternalTargetFiles = ['mariadb-svc.yaml', 'mariadb-endpoint.yaml']
+
+
+
+            if hasattr(storagenode, 'externalMariadbnode'):
+                for file in TmpExternalTargetFiles:
+                    print ('copyint file: %s')%(file, )
+                    subprocess.Popen('/usr/bin/cp  %s %s' % (os.path.join(TmpCWDPath, 'resource', file),
+                                                               os.path.join(TmpTargetNamespaceDIR, 'resource', file)), shell=True)
+            elif not hasattr(storagenode, 'externalMariadbnode'):
+                for file in TmpNoneExternalTargetFiles:
+                    print ('copyint file: %s')%(file, )
+                    subprocess.Popen('/usr/bin/cp  %s %s' % (os.path.join(TmpCWDPath, 'resource', file),
+                                                               os.path.join(TmpTargetNamespaceDIR, 'resource', file)), shell=True)
+
+
             sleep (5)
+
 
             for basepath, _, files in os.walk(os.path.join(TmpTargetNamespaceDIR, 'resource')):
                 for file in files:
                     TmpContent = ''
+
                     with open(os.path.join(basepath, file), mode='rb', encoding='utf-8') as f:
                         TmpContent = f.read()
-                    TmpContent = jinja2.Template(TmpContent).render(TmpAppInfo)
 
+                    TmpContent = jinja2.Template(TmpContent).render(TmpAppInfo)
                     with open(os.path.join(basepath, file), mode='wb', encoding='utf-8') as f:
                         f.write(TmpContent)
+
 
         with open(os.path.join(TmpTargetNamespaceDIR, 'values.yaml'), mode='rb', encoding='utf-8') as f:
             self.AppInfo = yaml.safe_load(f)
@@ -147,8 +235,11 @@ class MariaDBTool(object):
 
 
         print ('Apply MariaDB ....')
-        if not self.k8sObj.checkNamespacedResourceHealth(name='mariadb-deploy', namespace=self.AppInfo['Namespace'],
-                                                         kind='Deployment'):
+        isRunning = False
+
+        if (not self.k8sObj.checkNamespacedResourceHealth(name='mariadb-deploy', namespace=self.AppInfo['Namespace'],
+                                                         kind='Deployment')) \
+                    and (not hasattr(storagenode, 'externalMariadbnode')):
             try:
                 self.k8sObj.deleteNamespacedDeployment(name='mariadb-deploy', namespace=self.AppInfo['Namespace'])
             except:
@@ -176,12 +267,38 @@ class MariaDBTool(object):
 
             TmpResponse = self.k8sObj.createResourceFromYaml(filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mariadb-deploy.yaml'),
                                                          namespace=self.AppInfo['Namespace'])
+
             if TmpResponse['ret_code'] != 0:
                 print (TmpResponse)
                 return TmpResponse
 
-        isRunning=False
+        elif hasattr(storagenode, 'externalMariadbnode'):
+            TmpTargetNamespaceDIR = os.path.join(self.AppInfo['TargetNamespaceDIR'], self.AppInfo['Namespace'],
+                                                 self.AppInfo['AppName'])
+            TmpTargetNamespaceDIR = os.path.normpath(os.path.realpath(TmpTargetNamespaceDIR))
+
+            self.k8sObj.createResourceFromYaml(
+                filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mariadb-svc.yaml'),
+                namespace=self.AppInfo['Namespace']
+                )
+
+
+            self.k8sObj.deleteNamespacedEndpoint(name='mariadb-svc', namespace='sly2')
+
+            self.k8sObj.createResourceFromYaml(
+                filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mariadb-endpoint.yaml'),
+                namespace=self.AppInfo['Namespace']
+                )
+            isRunning = True
+
+
+
+
+
         for itime in range(self.RetryTimes):
+            if isRunning:
+                break
+
             TmpResponse = self.k8sObj.getNamespacedDeployment(name='mariadb-deploy',
                                                                    namespace=self.AppInfo['Namespace'])['result'].to_dict()
 
@@ -210,6 +327,13 @@ class MariaDBTool(object):
         TmpServiceCheckObj = servicestatecheck.ServiceStateCheckTool(namespace=self.AppInfo['Namespace'], harbor=self.AppInfo['HarborAddr'])
         TmpCheckResult = TmpServiceCheckObj.checkServicePortState(targetaddress='mariadb-svc:3306')
         print ('mariadb-svc:3306 is listening....')
+
+        if hasattr(storagenode, 'externalMariadbnode'):
+            return {
+                'ret_code': 0,
+                'result': 'External Mysql is available now',
+            }
+
 
 
         return {
