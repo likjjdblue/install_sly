@@ -693,6 +693,41 @@ class K8SClient(object):
 
 
 
+    def getNamespacedEndpoint(self, name, namespace='default'):
+        try:
+            TmpResponse = self.K8SCoreV1Client.read_namespaced_endpoints(name=name, namespace=namespace)
+            return {
+                "ret_code": 0,
+                'result': TmpResponse
+            }
+        except Exception as e:
+            print (e)
+            return  {
+                "ret_code": 1,
+                'result': "Endpoint %s or Namespace %s not exists"%(name, namespace)
+            }
+
+
+
+
+
+
+    def deleteNamespacedEndpoint(self, name, namespace='default'):
+        TmpSecret = self.getNamespacedEndpoint(name=name, namespace=namespace)
+        if TmpSecret['ret_code'] != 0:
+            return {
+                "ret_code": 0,
+                'result': 'Secret object deleted'
+            }
+
+        self.K8SCoreV1Client.delete_namespaced_endpoints(name=name, namespace=namespace)
+        return {
+            "ret_code": 0,
+            'result': 'Secret object deleted'
+        }
+
+
+
 
 
 
@@ -742,6 +777,4 @@ class K8SClient(object):
 
 if __name__ == '__main__':
     TmpObj = K8SClient()
-    tmp = TmpObj.getNodes()['result'].to_dict()
-    for item in tmp['items']:
-        print (item['status']['addresses'])
+    print (TmpObj.getNamespacedEndpoint(name='mariadb-svc', namespace='sly2'))
