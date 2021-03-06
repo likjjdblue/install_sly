@@ -72,11 +72,17 @@ def showMenu():
 
 
 def installApps(TmpRawStr):
+
+    try:
+        from storagenode import harborAddr
+    except:
+        harborAddr = None
+
     TmpList = TmpRawStr.split('/')
     print (TmpList)
     TmpModuleName, TmpClsName = (TmpList[0], TmpList[1])
     TmpModule = importlib.import_module(TmpModuleName)
-    TmpInstance = getattr(TmpModule, TmpClsName)(namespace=TmpNamespace)
+    TmpInstance = getattr(TmpModule, TmpClsName)(namespace=TmpNamespace, harbor=harborAddr)
     TmpResponse = TmpInstance.start()
     print (TmpResponse)
     return TmpResponse

@@ -73,3 +73,14 @@ namespace = 'sly2'
 #}
 
 ######      END      ###########
+
+
+
+###    harborAddr  配置项说明      ###
+### 内部Docker  镜像仓库地址 ###
+
+#如果需要配置请将下面的"#"注释去掉
+
+#harborAddr='registry.cn-hangzhou.aliyuncs.com'
+
+####    END    ###

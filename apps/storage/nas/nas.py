@@ -51,6 +51,8 @@ class NASTool(object):
         if TmpResult['result'] is not True:
             print ('Going to mount NFS  %s:%s  @ %s'%(self.HostName, self.BaseURL, self.MntPointPath))
             subprocess.Popen('mkdir -p  %s' % (self.MntPointPath,), shell=True)
+            TmpMountCmd =  '%s  %s:%s  %s'%(mountOption, self.HostName, self.BaseURL, self.MntPointPath)
+            print ('Mount command: %s'%(TmpMountCmd, ))
             subprocess.Popen('timeout --signal=9 3 %s  %s:%s  %s'%(mountOption, self.HostName, self.BaseURL, self.MntPointPath), shell=True)
 
             print ('mount task finished')
