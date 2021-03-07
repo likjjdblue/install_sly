@@ -12,6 +12,7 @@ AppInfo = {
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
-    'KafkaImage': 'docker.io/bitnami/kafka:2.4.0-debian-10-r0',
-    "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
+    #'KafkaImage': 'docker.io/bitnami/kafka:2.4.0-debian-10-r0',
+    'KafkaImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/kafka:2.4.0-debian-10-r0',
+    "NFSProvisionerImage": 'registry.cn-hangzhou.aliyuncs.com/trssly/nfs-client-provisioner:latest',
 }

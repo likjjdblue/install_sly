@@ -12,5 +12,5 @@ AppInfo = {
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
-    "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
+    "NFSProvisionerImage": 'registry.cn-hangzhou.aliyuncs.com/trssly/nfs-client-provisioner:latest',
 }

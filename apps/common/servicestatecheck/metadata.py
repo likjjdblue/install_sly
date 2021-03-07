@@ -9,7 +9,7 @@ AppInfo = {
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
     'ServiceStateCheckImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/service_state_check:latest',
-    "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
+    "NFSProvisionerImage": 'registry.cn-hangzhou.aliyuncs.com/trssly/nfs-client-provisioner:latest',
     'RetryInterval': 2,
     'RetryTimes': 150,
     'ConnectionTimeOut': 5,

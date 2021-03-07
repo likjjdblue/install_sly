@@ -70,7 +70,7 @@ class RabbitmqHATool(object):
         }
 
     def generateValues(self):
-        self.AppInfo['BushboxImage'] = replaceDockerRepo(self.AppInfo['BusyboxImage'], self.AppInfo['HarborAddr'])
+        self.AppInfo['BusyboxImage'] = replaceDockerRepo(self.AppInfo['BusyboxImage'], self.AppInfo['HarborAddr'])
         self.AppInfo['RabbitmqImage'] = replaceDockerRepo(self.AppInfo['RabbitmqImage'], self.AppInfo['HarborAddr'])
         self.AppInfo['NFSProvisionerImage'] =replaceDockerRepo(self.AppInfo['NFSProvisionerImage'],
                                                                self.AppInfo['HarborAddr'])

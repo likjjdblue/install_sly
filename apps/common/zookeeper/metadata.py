@@ -12,6 +12,7 @@ AppInfo = {
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
-    'ZookeeperImage': 'docker.io/bitnami/zookeeper:3.6.2-debian-10-r37',
-    "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
+    #'ZookeeperImage': 'docker.io/bitnami/zookeeper:3.6.2-debian-10-r37',
+    'ZookeeperImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/zookeeper:3.6.2-debian-10-r37',
+    "NFSProvisionerImage": 'registry.cn-hangzhou.aliyuncs.com/trssly/nfs-client-provisioner:latest',
 }

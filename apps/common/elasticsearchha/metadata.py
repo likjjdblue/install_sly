@@ -13,5 +13,5 @@ AppInfo = {
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
     'ElasticsearchImage': 'registry.cn-hangzhou.aliyuncs.com/trsrd/elasticsearch:7.4.0-ik',
-    "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
+    "NFSProvisionerImage": 'registry.cn-hangzhou.aliyuncs.com/trssly/nfs-client-provisioner:latest',
 }

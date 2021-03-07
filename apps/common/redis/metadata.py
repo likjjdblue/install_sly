@@ -14,6 +14,7 @@ AppInfo = {
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
-    'RedisImage': 'redis:5.0',
-    "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
+    #'RedisImage': 'redis:5.0',
+    'RedisImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/redis:5.0',
+    "NFSProvisionerImage": 'registry.cn-hangzhou.aliyuncs.com/trssly/nfs-client-provisioner:latest',
 }
