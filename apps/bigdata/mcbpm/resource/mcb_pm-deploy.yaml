@@ -30,7 +30,7 @@ spec:
      #   - "nginx.nyrb-test.com"
       containers:
       - name: mcb-pm
-        image: registry.cn-hangzhou.aliyuncs.com/trssly/pm:v4
+        image: {{ MCBPMImage }}
         envFrom:
         - configMapRef:
             name: mcb-pm-configmap
