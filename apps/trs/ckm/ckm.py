@@ -75,7 +75,7 @@ class CKMTool(object):
 
     def generateValues(self):
         self.AppInfo['CKMImage'] = replaceDockerRepo(self.AppInfo['CKMImage'], self.AppInfo['HarborAddr'])
-        self.AppInfo['CKMImage'] = replaceDockerRepo(self.AppInfo['CKMImage'], self.AppInfo['HarborAddr'])
+        self.AppInfo['CKMPydlServerImage'] = replaceDockerRepo(self.AppInfo['CKMPydlServerImage'], self.AppInfo['HarborAddr'])
         self.AppInfo['NFSProvisionerImage'] =replaceDockerRepo(self.AppInfo['NFSProvisionerImage'],
                                                                self.AppInfo['HarborAddr'])
 
