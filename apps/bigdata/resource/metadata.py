@@ -15,7 +15,7 @@ AppInfo = {
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
-    'ResourceImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/resource:v6',
+    'ResourceImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/resource-deploy:zmy-devops-v2.13.1',
     "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
 
     'ResourcePrimaryDBHost': 'mariadb-svc',

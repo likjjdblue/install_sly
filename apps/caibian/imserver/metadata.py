@@ -13,7 +13,7 @@ AppInfo = {
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
-    'IMServerImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/im-server:v18',
+    'IMServerImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/im-server-deploy:xjzmy-devops-v0.2.1.6',
     "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
     'IMServerDBHost': 'mariadb-svc',
     'IMServerDBName': 'im_server',

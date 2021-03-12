@@ -14,7 +14,7 @@ AppInfo = {
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
-    'MCNAdminImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/mcnadmin-deploy:xjzmy-devops-2.8.14',
+    'MCNAdminImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/mcnadmin-deploy:xjzmy-devops-2.8.15',
     "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
     'UPCAdminDBHost': 'mariadb-svc',
     'UPCAdminDBName': 'mcn_upc',

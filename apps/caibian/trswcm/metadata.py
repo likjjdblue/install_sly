@@ -14,7 +14,7 @@ AppInfo = {
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
-    'TRSWCMImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/wcm-deploy:xjzmy-devops-2.22.32',
+    'TRSWCMImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/wcm-deploy:xjzmy-devops-2.22.53',
     "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
     'TRSWCMDBHost': 'mariadb-svc',
     'TRSWCMDBName': 'mty_wcm',

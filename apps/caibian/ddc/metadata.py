@@ -13,7 +13,7 @@ AppInfo = {
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
-    'DDCImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/ddc-deploy:xjzmy-devops-2.2.3',
+    'DDCImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/ddc-deploy:zmy-prod-1.0.1',
     "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
     'DDCDBHost': 'mariadb-svc',
     'DDCDBName': 'mty_ddc',

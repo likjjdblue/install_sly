@@ -14,7 +14,7 @@ AppInfo = {
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
-    'MCBMessageImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/mcb-message-deploy:zmy-devops-v1.0.4',
+    'MCBMessageImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/mcb-message-deploy:zmy-prod-v2.3',
     "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
 
     'MCBMessagePrimaryDBHost': 'mariadb-svc',

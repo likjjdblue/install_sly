@@ -13,7 +13,7 @@ AppInfo = {
     'Namespace': None,
     'TargetNamespaceDIR': '../../.././namespaces',
     'HarborAddr': None,
-    'WebCollectionImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/webcollection:v4',
+    'WebCollectionImage': 'registry.cn-hangzhou.aliyuncs.com/trssly/webcollection-deploy:zmy-devops-v2.1.1',
     "NFSProvisionerImage": 'quay.io/external_storage/nfs-client-provisioner:latest',
 
     'WebCollectionPrimaryDBHost': 'mariadb-svc',
