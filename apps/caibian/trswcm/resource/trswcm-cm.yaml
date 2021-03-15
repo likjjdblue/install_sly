@@ -15,3 +15,5 @@ data:
   wcm_ids_http_host: "http://{{ PublishURLHost }}"
   wcm_rabbitmq_username: "{{ TRSMQUser }}"
   wcm_rabbitmq_pwd: "{{ TRSMQPassword }}"
+  wcm_dataexchange_ip: "172.50.2.119"
+  wcm_dataexchange_user: "admin"

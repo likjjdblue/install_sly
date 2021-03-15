@@ -28,6 +28,8 @@ spec:
           volumeMounts:
           - mountPath: /TRS/LOGS/im-server
             name: pvc-im-serverlog-slytest
+          - mountPath: /TRS/LOGS/imserver
+            name: pvc-im-serverlog-slytest
           resources:
             limits:
               cpu: 1000m
