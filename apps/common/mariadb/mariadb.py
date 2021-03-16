@@ -192,7 +192,7 @@ class MariaDBTool(object):
                                           'mariadb-pvc.yaml', 'mariadb-svc.yaml',
                                           ]
 
-            TmpExternalTargetFiles = ['mariadb-svc.yaml', 'mariadb-endpoint.yaml']
+            TmpExternalTargetFiles = ['mariadb-svc-external.yaml', 'mariadb-endpoint.yaml']
 
 
 
@@ -278,7 +278,7 @@ class MariaDBTool(object):
             TmpTargetNamespaceDIR = os.path.normpath(os.path.realpath(TmpTargetNamespaceDIR))
 
             self.k8sObj.createResourceFromYaml(
-                filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mariadb-svc.yaml'),
+                filepath=os.path.join(TmpTargetNamespaceDIR, 'resource', 'mariadb-svc-external.yaml'),
                 namespace=self.AppInfo['Namespace']
                 )
 
